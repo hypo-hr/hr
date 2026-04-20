@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.3.0.4 - 통합 관리</title>
+<title>히포케이메논 ERP V.3.0.5 - 통합 관리</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{--icube-blue:#3162C7;--icube-bg:#EDF2F5;--icube-border:#C4C9CC;--icube-header:#F1F4F7;--icube-selected:#FFFFE1;--sidebar-width:240px;--sidebar-dark:#2C3E50;--sidebar-hover:#34495E}
 *{box-sizing:border-box} body{margin:0;font-family:'Malgun Gothic',sans-serif;font-size:12px;background:var(--icube-bg);height:100vh;overflow:hidden;display:flex;flex-direction:column}
-#login-screen{display:none !important} /* 테스트용 임시 숨김 */
+#login-screen{display:none !important} /* 테스트 시 임시 숨김 */
 body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당자"] .auth-payroll-up{display:none !important} body[data-role="임금담당자"] .auth-admin-only{display:none !important} body[data-role="기타"] .auth-admin-only, body[data-role="기타"] .auth-payroll-up, body[data-role="기타"] .auth-basic-up{display:none !important}
 #app-container{display:flex;height:100%;flex-direction:column;width:100%}
 .header{height:50px;background:white;border-bottom:1px solid var(--icube-border);display:flex;align-items:center;padding:0 20px;flex-shrink:0} .header-title{font-weight:bold;color:var(--icube-blue);font-size:15px;cursor:pointer} .version-tag{background:#eee;padding:2px 6px;border-radius:3px;font-size:10px;color:#666;margin-left:10px}
@@ -32,7 +33,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 .relation-container{display:flex;flex-direction:column;gap:2px} .other-input{display:none;margin-top:2px;border-color:var(--icube-blue) !important} .other-input.show{display:block} .career-summary-bar{background:#f8f9fa;border:1px solid var(--icube-border);border-top:none;padding:10px 15px;display:flex;justify-content:flex-end;align-items:center;gap:10px;font-weight:bold}
 .dual-panel-container{display:flex;gap:15px;flex:1;overflow:hidden;min-height:500px} .panel-left{width:320px;display:flex;flex-direction:column;background:white;border:1px solid var(--icube-border);flex-shrink:0} .panel-right{flex:1;display:flex;flex-direction:column;background:white;border:1px solid var(--icube-border);padding:20px;overflow-y:auto} .status-header{font-size:14px;font-weight:bold;margin-bottom:15px;border-bottom:2px solid var(--icube-blue);padding-bottom:5px;display:flex;justify-content:space-between;align-items:center}
 .salary-input-table{width:100%;border-collapse:collapse;margin-top:10px} .salary-input-table th{background:#f8f8f8;border:1px solid var(--icube-border);padding:6px 10px;text-align:left;width:120px;font-weight:normal} .salary-input-table td{border:1px solid var(--icube-border);padding:4px} .salary-input-table input,.salary-input-table select{width:100%;height:24px;border:1px solid #ddd;padding:0 8px;text-align:right;font-size:11px}
-.msg-box-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);display:none;justify-content:center;align-items:center;z-index:3000} .msg-box{background:white;padding:25px 30px;border-radius:4px;box-shadow:0 4px 15px rgba(0,0,0,0.2);text-align:center;display:flex;flex-direction:column} .empty-page{justify-content:center;align-items:center;background:#f9f9f9;text-align:center;color:#999;height:100%;display:flex;flex-direction:column;min-height:400px;border:1px solid var(--icube-border);border-radius:4px}
+.msg-box-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);display:none;justify-content:center;align-items:center;z-index:3000} .msg-box{background:white;padding:25px 30px;border-radius:4px;box-shadow:0 4px 15px rgba(0,0,0,0.2);text-align:center;display:flex;flex-direction:column;max-height:90vh;} .empty-page{justify-content:center;align-items:center;background:#f9f9f9;text-align:center;color:#999;height:100%;display:flex;flex-direction:column;min-height:400px;border:1px solid var(--icube-border);border-radius:4px}
 .record-card{background:white;border:1px solid #000;padding:20px;color:#000;font-family:'Malgun Gothic',serif;position:relative;max-width:800px;margin:0 auto} .record-title{text-align:center;font-size:24px;font-weight:bold;margin-bottom:20px;letter-spacing:5px} .record-top-grid{display:flex;gap:15px;margin-bottom:15px} .photo-box{width:130px;height:170px;border:1px solid #000;display:flex;justify-content:center;align-items:center;background:#f9f9f9;color:#999;flex-shrink:0} .record-table{width:100%;border-collapse:collapse;margin-bottom:15px;table-layout:fixed} .record-table th,.record-table td{border:1px solid #000;padding:6px;font-size:11px;text-align:center;vertical-align:middle;word-wrap:break-word} .record-table th{background:#f0f0f0;font-weight:bold} .record-section-title{font-size:13px;font-weight:bold;margin-bottom:5px;border-left:3px solid #000;padding-left:8px;margin-top:10px}
 .quick-links{display:flex;gap:15px;justify-content:center;padding:15px;background:white;border:1px solid var(--icube-border);margin-bottom:20px;border-radius:4px} .quick-link-btn{padding:10px 20px;background:#fff;border:1px solid var(--icube-blue);color:var(--icube-blue);font-weight:bold;border-radius:20px;text-decoration:none;transition:all 0.2s;display:flex;align-items:center;gap:8px} .quick-link-btn:hover{background:var(--icube-blue);color:white;box-shadow:0 4px 10px rgba(49,98,199,0.3)}
 .org-tree{display:flex;flex-direction:column;gap:10px;padding:15px;background:#fbfbfb;border:1px solid #eee;border-radius:4px;overflow-x:auto;margin-bottom:20px} .org-node{background:white;border:2px solid var(--icube-blue);border-radius:4px;padding:8px 15px;font-weight:bold;text-align:center;cursor:pointer;min-width:120px;display:inline-block;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.1)} .org-node:hover,.org-node.active{background:var(--icube-blue);color:white} .org-level{display:flex;justify-content:center;gap:20px;position:relative;padding-top:20px} .org-level::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid #ccc;width:0;height:20px} .org-level-wrapper{text-align:center;position:relative}
@@ -64,19 +65,13 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 </head>
 <body data-role="관리자">
 
-<!-- App Container -->
 <div id="app-container">
-    <!-- Block UI -->
-    <div id="ipBlockOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:9999;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-        <i class="fa-solid fa-shield-halved" style="font-size:60px;color:#d32f2f;margin-bottom:20px"></i><h1 style="color:#333;margin-bottom:10px">접속 불가 지역</h1><p style="color:#666">사내 네트워크에서만 접속할 수 있습니다.</p><p id="displayBlockedIp" style="color:#999;margin-top:20px;font-size:11px"></p>
-    </div>
-    
-    <!-- MsgBoxes -->
+    <div id="ipBlockOverlay"><i class="fa-solid fa-shield-halved" style="font-size:60px;color:#d32f2f;margin-bottom:20px"></i><h1 style="color:#333;margin-bottom:10px">접속 불가 지역</h1><p style="color:#666">사내 네트워크에서만 접속할 수 있습니다.</p><p id="displayBlockedIp" style="color:#999;margin-top:20px;font-size:11px"></p></div>
     <div id="msgBoxOverlay" class="msg-box-overlay"><div class="msg-box"><p id="msgBoxText" style="margin-bottom:15px;font-weight:bold"></p><button class="tool-btn primary" style="margin:0 auto;width:80px" onclick="window.closeMsgBox()">확인</button></div></div>
     <div id="confirmBoxOverlay" class="msg-box-overlay" style="z-index:3100"><div class="msg-box" style="padding:25px 40px"><p id="confirmBoxText" style="margin-bottom:20px;font-weight:bold;line-height:1.5"></p><div style="display:flex;justify-content:center;gap:10px"><button class="tool-btn" onclick="window.closeConfirmBox(false)">취소</button><button class="tool-btn primary" onclick="window.closeConfirmBox(true)">확인</button></div></div></div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.0.4</span></div>
+        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.0.5</span></div>
         <div style="margin-left:auto;font-size:12px;color:#555;display:flex;align-items:center;gap:15px">
             <span><span id="displayLoggedInUser" style="font-weight:bold;color:var(--icube-blue)"></span> 님 로그인 중</span><button class="tool-btn logout" onclick="window.handleLogout()"><i class="fa-solid fa-power-off"></i> 로그아웃</button>
         </div>
@@ -117,7 +112,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
         </div>
 
         <div class="content-area" id="mainContentArea">
-            <!-- HOME (V.3.0.4 Design) -->
+            <!-- HOME -->
             <div id="page-home" class="page-content active">
                 <div class="quick-links" id="homeQuickLinks"></div>
                 <div class="home-layout">
@@ -193,7 +188,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                     <div class="panel-left"><div class="search-box"><input type="text" id="recordSearch" placeholder="정규직/계약직 사번,이름 검색" style="width:100%" onkeyup="if(event.key==='Enter') window.renderSearchList()"></div><div style="overflow-y:auto;flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="80">부서</th></tr></thead><tbody id="recordEmpList"></tbody></table></div></div>
                     <div class="panel-right" style="background:#e9ecef; padding: 20px;">
                         <div id="recordCardArea" style="display:none; margin: 0 auto; width:100%; max-width:800px;">
-                            <div class="status-header print-hide">인사기록카드 <button class="tool-btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button></div>
+                            <div class="status-header print-hide">인사기록카드 <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button></div>
                             <div class="record-card">
                                 <div class="record-title">인사기록카드</div>
                                 <div class="record-top-grid">
@@ -306,11 +301,16 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
             <!-- BULK UPLOAD -->
             <div id="page-mgmt-bulk" class="page-content">
-                <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-upload"></i> 일괄업로드</div></div>
+                <div class="toolbar">
+                    <div style="font-weight:bold;"><i class="fa-solid fa-upload"></i> 일괄업로드</div>
+                    <div style="margin-left:auto;">
+                        <button class="tool-btn danger" onclick="window.deleteAllEmployees()"><i class="fa-solid fa-trash-can"></i> 전체 사원 초기화 (DB 비우기)</button>
+                    </div>
+                </div>
                 <div class="dual-panel-container">
                     <div class="list-panel" style="padding:20px; flex:1;">
                         <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-users"></i> 사원 일괄 업로드</h3>
-                        <p style="color:#666; margin-bottom:15px;">신규 사원 대량 등록 및 기존 사원의 기본 정보를 일괄 업데이트할 수 있습니다. (임금정보 제외)</p>
+                        <p style="color:#666; margin-bottom:15px;">전체 사원의 137개 항목(기본, 학력, 경력, 자격 등)을 엑셀로 일괄 업로드합니다. 양식을 다운받아 작성하세요.</p>
                         <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="tool-btn" onclick="window.downloadEmpTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 내려받기</button><button class="tool-btn primary" onclick="document.getElementById('empBulkInput').click()"><i class="fa-solid fa-upload"></i> 파일 업로드</button><input type="file" id="empBulkInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleEmpBulkUpload(event)"></div>
                     </div>
                     <div class="list-panel" style="padding:20px; flex:1;">
@@ -348,11 +348,11 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
             <!-- SYSTEM SETTINGS -->
             <div id="page-sys-site" class="page-content">
                 <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-link"></i> 사이트 관리</div></div>
-                <div class="list-panel" style="padding:20px;"><p style="color:#666; margin-bottom:15px;">HOME 화면 최상단에 노출되는 업무 관련 퀵 링크 사이트를 관리합니다.</p><div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="newSiteName" placeholder="링크명" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><input type="text" id="newSiteUrl" placeholder="URL 주소" style="flex:2; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><input type="number" id="newSiteOrder" placeholder="순서" style="width:80px; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><button class="tool-btn primary" onclick="window.addSiteLink()">추가</button></div><table class="icube-grid"><thead><tr><th width="80">순서</th><th width="200">링크명</th><th>URL 주소</th><th width="80">삭제</th></tr></thead><tbody id="siteListBody"></tbody></table></div>
+                <div class="list-panel" style="padding:20px;"><p style="color:#666; margin-bottom:15px;">HOME 화면 최상단에 노출되는 업무 관련 퀵 링크 사이트를 관리합니다.</p><div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="newSiteName" placeholder="링크명 (예: 하이웍스)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><input type="text" id="newSiteUrl" placeholder="URL 주소 (예: https://...)" style="flex:2; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><input type="number" id="newSiteOrder" placeholder="순서" style="width:80px; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><button class="tool-btn primary" onclick="window.addSiteLink()">추가</button></div><table class="icube-grid"><thead><tr><th width="80">순서</th><th width="200">링크명</th><th>URL 주소</th><th width="80">삭제</th></tr></thead><tbody id="siteListBody"></tbody></table></div>
             </div>
             <div id="page-sys-ip" class="page-content">
                 <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-network-wired"></i> 접속 IP 허용 설정</div></div>
-                <div class="list-panel" style="padding:20px;"><div style="background:#f4f6f8; padding:15px; border-radius:4px; margin-bottom:20px; border:1px solid var(--icube-border);"><p style="font-weight:bold; color:var(--icube-blue); margin-bottom:5px;">현재 접속 중인 IP: <span id="currentIpDisplay">조회 중...</span></p><p style="color:#666; font-size:11px;">사외 접속을 차단하기 위해 등록된 IP에서만 ERP 접속을 허용합니다.</p></div><div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="newIpInput" placeholder="허용할 IP 주소 입력" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><input type="text" id="newIpMemo" placeholder="설명" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><button class="tool-btn primary" onclick="window.addAllowedIp()">추가</button></div><table class="icube-grid"><thead><tr><th width="200">허용된 IP</th><th>설명</th><th width="80">삭제</th></tr></thead><tbody id="ipListBody"></tbody></table></div>
+                <div class="list-panel" style="padding:20px;"><div style="background:#f4f6f8; padding:15px; border-radius:4px; margin-bottom:20px; border:1px solid var(--icube-border);"><p style="font-weight:bold; color:var(--icube-blue); margin-bottom:5px;">현재 접속 중인 IP: <span id="currentIpDisplay">조회 중...</span></p><p style="color:#666; font-size:11px;">사외 접속을 차단하기 위해 등록된 IP에서만 ERP 접속을 허용합니다.</p></div><div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="newIpInput" placeholder="허용할 IP 주소 입력 (예: 123.45.67.89)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><input type="text" id="newIpMemo" placeholder="설명 (예: 본사 1층)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><button class="tool-btn primary" onclick="window.addAllowedIp()">IP 추가</button></div><table class="icube-grid"><thead><tr><th width="200">허용된 IP</th><th>설명</th><th width="80">삭제</th></tr></thead><tbody id="ipListBody"></tbody></table></div>
             </div>
             <div id="page-sys-log" class="page-content">
                 <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-list-check"></i> 시스템 활동 Log</div><button class="tool-btn" onclick="window.renderLogs()" style="margin-left:auto;"><i class="fa-solid fa-rotate"></i> 새로고침</button></div>
@@ -374,108 +374,6 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 <!-- ==============================================
      MODALS
      ============================================== -->
-
-<!-- 1. 사원 상세 모달 (Registration/Edit) -->
-<div id="empModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header"><h2 id="modalTitle">사원 정보</h2><button class="close-btn" onclick="window.closeModal()">&times;</button></div>
-        <div class="modal-body">
-            <div class="tab-bar">
-                <div class="tab-item active" data-tab="basic" onclick="window.switchTab('basic')">기본사항</div>
-                <div class="tab-item" data-tab="education" onclick="window.switchTab('education')">학력사항</div>
-                <div class="tab-item" data-tab="career" onclick="window.switchTab('career')">경력사항</div>
-                <div class="tab-item" data-tab="language" onclick="window.switchTab('language')">어학사항</div>
-                <div class="tab-item" data-tab="license" onclick="window.switchTab('license')">자격사항</div>
-                <div class="tab-item" data-tab="family" onclick="window.switchTab('family')">가족사항</div>
-                <div class="tab-item" data-tab="military" onclick="window.switchTab('military')">병역사항</div>
-                <div class="tab-item auth-payroll-up" data-tab="salary" onclick="window.switchTab('salary')">임금정보</div>
-            </div>
-            
-            <div class="tab-content-container">
-                <div id="content-basic" class="tab-content active">
-                    <div class="section-divider"><hr><span>인적 정보</span><hr></div>
-                    <table class="detail-table">
-                        <tr><th class="required">이름</th><td><input id="formName"></td><th class="required">주민등록번호</th><td><div style="display:flex; gap:4px;"><input id="formSSN" class="auto-hyphen" data-type="ssn" placeholder="000000-0000000" onblur="window.checkSSNValid(this)"><button id="btnSsnEdit" class="tool-btn" style="display:none;" onclick="window.requestSsnEdit()">수정</button><button id="btnSsnHistory" class="tool-btn" style="display:none;" onclick="window.viewSsnHistory()">이력</button></div></td></tr>
-                        <tr><th>연락처</th><td><input id="formPhone" class="auto-hyphen" data-type="phone" placeholder="010-0000-0000"></td><th>이메일</th><td><input id="formEmail" type="email" placeholder="example@email.com"></td></tr>
-                        <tr><th>주소</th><td colspan="3"><div style="display:flex; gap:4px; margin-bottom:4px"><input id="formZip" class="read-only" readonly style="width:80px" placeholder="우편번호"><button class="tool-btn" onclick="window.searchAddr()" style="height:26px">검색</button></div><input id="formAddr" class="read-only" readonly style="margin-bottom:4px" placeholder="기본주소"><input id="formAddrDetail" placeholder="상세주소"></td></tr>
-                        <tr><th>급여계좌</th><td colspan="3">
-                            <div style="display:flex; gap:8px">
-                                <select id="formBank" style="width:180px" onchange="window.formatAccount()">
-                                    <option value="">은행/증권사 선택</option>
-                                    <optgroup label="은행">
-                                        <option>KB국민은행</option><option>신한은행</option><option>우리은행</option><option>하나은행</option>
-                                        <option>NH농협은행</option><option>IBK기업은행</option><option>카카오뱅크</option><option>토스뱅크</option>
-                                        <option>케이뱅크</option><option>SC제일은행</option><option>한국씨티은행</option><option>새마을금고</option>
-                                        <option>신협</option><option>우체국</option><option>수협</option><option>대구은행</option>
-                                        <option>부산은행</option><option>광주은행</option><option>제주은행</option><option>전북은행</option><option>경남은행</option>
-                                    </optgroup>
-                                    <optgroup label="증권사">
-                                        <option>NH투자증권</option><option>미래에셋증권</option><option>삼성증권</option><option>한국투자증권</option>
-                                        <option>키움증권</option><option>대신증권</option><option>KB증권</option><option>신한투자증권</option><option>하나증권</option>
-                                    </optgroup>
-                                </select>
-                                <input id="formAccount" class="auto-hyphen" data-type="account" placeholder="계좌번호 (숫자만 입력)" style="flex:1">
-                            </div>
-                        </td></tr>
-                    </table>
-                    <div class="section-divider"><hr><span>인사 정보</span><hr></div>
-                    <table class="detail-table">
-                        <tr><th>고용형태</th><td><select id="formContractType" onchange="window.handleContractTypeChange()"><option value="정규직">정규직</option><option value="계약직">계약직</option><option value="일용직">일용직</option><option value="위탁직">위탁직</option><option value="프리랜서">프리랜서</option></select></td><th>사원번호</th><td><input id="formEmpID" class="read-only" readonly></td></tr>
-                        <tr><th class="required">입사일</th><td><input id="formJoinDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" onchange="window.generateEmpID(this.value)"></td><th>수습종료(예정)일</th><td><input id="formProbationEnd" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td></tr>
-                        <tr><th>부서명</th><td><select id="formDept"></select></td><th>직위</th><td><select id="formRank"><option value="">선택</option><option value="직위없음">직위없음</option></select></td></tr>
-                        <tr><th>직책</th><td><select id="formDuty"><option value="직책없음">직책없음</option></select></td><th>퇴사일</th><td><input id="formQuitDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td></tr>
-                    </table>
-                </div>
-
-                <!-- 동적 탭들 -->
-                <div id="content-education" class="tab-content"><div class="section-title"><span>학력 정보</span><button class="tool-btn" onclick="window.addRow('eduBody')"><i class="fa-solid fa-plus"></i> 추가</button></div><table class="data-list-table"><thead><tr><th width="150">학력구분</th><th width="180">재학기간</th><th>학교명</th><th width="150">전공</th><th width="120">졸업상태</th><th width="40">삭제</th></tr></thead><tbody id="eduBody"></tbody></table></div>
-                <div id="content-career" class="tab-content"><div class="section-title"><span>경력 정보</span><button class="tool-btn" onclick="window.addRow('careerBody')"><i class="fa-solid fa-plus"></i> 추가</button></div><table class="data-list-table"><thead><tr><th width="200">근무기간</th><th width="120">회사명</th><th width="100">부서</th><th width="100">직급/직책</th><th width="160">주요직무</th><th>퇴사사유</th><th width="60">개월</th><th width="40">삭제</th></tr></thead><tbody id="careerBody"></tbody></table><div class="career-summary-bar"><span id="totalCareerMonths">0개월</span></div></div>
-                <div id="content-language" class="tab-content"><div class="section-title"><span>어학 성적</span><button class="tool-btn" onclick="window.addRow('langBody')"><i class="fa-solid fa-plus"></i> 추가</button></div><table class="data-list-table"><thead><tr><th width="250">외국어명 / 시험명</th><th width="100">점수(등급)</th><th width="120">취득일</th><th>발행기관</th><th width="40">삭제</th></tr></thead><tbody id="langBody"></tbody></table></div>
-                <div id="content-license" class="tab-content"><div class="section-title"><span>자격 및 면허</span><button class="tool-btn" onclick="window.addRow('licenseBody')"><i class="fa-solid fa-plus"></i> 추가</button></div><table class="data-list-table"><thead><tr><th width="180">자격증명</th><th width="180">발행처</th><th width="120">취득일</th><th>취득사유</th><th width="40">삭제</th></tr></thead><tbody id="licenseBody"></tbody></table></div>
-                <div id="content-family" class="tab-content"><div class="section-title"><span>가족 관계</span><button class="tool-btn" onclick="window.addRow('familyBody')"><i class="fa-solid fa-plus"></i> 추가</button></div><table class="data-list-table"><thead><tr><th width="130">관계</th><th width="120">성명</th><th width="140">생년월일</th><th width="80">동거</th><th width="120">직업</th><th>비고</th><th width="40">삭제</th></tr></thead><tbody id="familyBody"></tbody></table></div>
-                
-                <div id="content-military" class="tab-content">
-                    <div class="section-title">병역 이행 정보</div>
-                    <table class="detail-table">
-                        <tr><th>병역구분</th><td><select id="formMilType" onchange="window.toggleMil()"><option value="해당없음">해당없음</option><option value="필">필</option><option value="미필">미필</option><option value="면제">면제</option></select></td><th>군별</th><td><select id="formMilGroup" class="mil-field" onchange="window.updateMilExitOptions()"><option value="">선택</option><optgroup label="정규군"><option>육군</option><option>해군</option><option>공군</option><option>해병대</option></optgroup><optgroup label="대체복무"><option>사회복무요원</option><option>산업기능요원</option><option>전문연구요원</option></optgroup></select></td></tr>
-                        <tr id="milReasonRow" class="mil-reason-row"><th id="milReasonLabel">사유</th><td colspan="3"><input id="formMilReason"></td></tr>
-                        <tr><th>전역사유</th><td><select id="formMilExit" class="mil-field"></select></td><th>계급</th><td><input id="formMilRank" class="mil-field"></td></tr>
-                        <tr><th>복무기간</th><td colspan="3"><input id="formMilS" class="auto-hyphen mil-field" data-type="date" placeholder="YYYY-MM-DD"> ~ <input id="formMilE" class="auto-hyphen mil-field" data-type="date" placeholder="YYYY-MM-DD"></td></tr>
-                    </table>
-                </div>
-
-                <div id="content-salary" class="tab-content">
-                    <div class="salary-grid">
-                        <div class="salary-left">
-                            <div id="salaryInputMask" class="salary-security-overlay"><i class="fa-solid fa-lock" style="font-size:24px; color:#999"></i><span>보안 마스킹 중</span><button class="tool-btn primary" onclick="window.unlockSalaryInfo()">*** 표시 (암호 입력)</button></div>
-                            <table class="detail-table">
-                                <tr style="background:#f0f7ff"><th>수습 급여 적용률 (%)</th><td><input id="salProbationRate" class="num-input secure-field" value="100"></td></tr>
-                                <tr><th class="required">일 근로시간</th><td><input id="salWorkDay" class="num-input" type="number" step="0.5" value="8" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>기본급</th><td><input id="salBase" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>식대</th><td><input id="salMeal" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>자가운전보조금</th><td><input id="salDrive" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>차량유지비</th><td><input id="salCar" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>근속수당</th><td><input id="salService" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>직책수당</th><td><input id="salRank" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                                <tr><th>고정연장수당</th><td><input id="salFixedOver" class="salary-input secure-field" oninput="window.updateSalaryCalc()"></td></tr>
-                            </table>
-                        </div>
-                        <div class="salary-right">
-                            <div id="salaryCalcMask" class="salary-security-overlay"></div>
-                            <div class="calc-result-box">
-                                <div class="calc-row"><span>월 소정근로시간</span><span id="resWorkMonth" class="calc-val">209시간</span></div>
-                                <div class="calc-row"><span>월 급여합계</span><span id="resMonthPay" class="calc-val secure-text">***</span></div>
-                                <div class="calc-row"><span>연봉 (월 합계 * 12)</span><span id="resYearPay" class="calc-val secure-text">***</span></div>
-                                <div class="calc-row"><span>통상시급</span><span id="resHourPay" class="calc-val secure-text">***</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer"><button class="tool-btn" onclick="window.closeModal()">취소</button><button class="tool-btn primary" onclick="window.doSave()">저장</button></div>
-    </div>
-</div>
 
 <!-- Etc Dialogs -->
 <div id="pwdModal" class="modal-overlay" style="z-index:1100">
@@ -643,24 +541,29 @@ window.addDuty = async () => { const n=$('newDutyName').value; if(!n) return; aw
 window.addSiteLink = async () => { const n=$('newSiteName').value, u=$('newSiteUrl').value, o=$('newSiteOrder').value; if(n&&u) await setDoc(doc(settingsRef,'site_'+Date.now()),{type:'SITE',name:n,url:u,order:parseInt(o)||99}); $('newSiteName').value=''; $('newSiteUrl').value=''; $('newSiteOrder').value=''; };
 window.removeDoc = async (coll, id) => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id)); window.showMessageBox("삭제 완료"); window.logSystemAction('삭제', coll, id); };
 
+window.deleteAllEmployees = async () => {
+    window.showConfirmBox("정말 등록된 모든 사원 데이터를 영구적으로 삭제하시겠습니까?", () => {
+        window.showConfirmBox("삭제된 데이터는 절대로 복구할 수 없습니다. 계속 진행하시겠습니까?", async () => {
+            for(let e of emps) { await deleteDoc(doc(empRef, e.empID)); }
+            window.logSystemAction('초기화', '시스템 DB', '모든 사원 데이터 일괄 삭제 실행');
+            window.showMessageBox("모든 사원 데이터가 성공적으로 삭제되었습니다.");
+            window.renderGrid(); window.renderSearchList(); window.renderHomeData();
+        }, null);
+    }, null);
+};
+
 // Edit/Delete for ORG
 window.requestOrgEdit = (id, type, oldName) => {
-    const newName = prompt("새로운 이름을 입력하세요.", oldName);
+    const newName = prompt("수정할 이름을 입력하세요:", oldName);
     if(!newName || newName === oldName) return;
     auditActionContext = { type: 'ORG_EDIT', id: id };
     $('auditOrgId').value = id; $('auditOrgType').value = type; $('auditOrgNewName').value = newName;
-    $('auditTitle').innerText = "이름 수정 권한 요청";
-    $('auditModifier').value = currentLoggedInUserName;
-    $('auditReason').value = ""; $('auditNewSsn').style.display = "none";
-    $('auditModal').style.display = 'flex'; $('auditReason').focus();
+    $('auditTitle').innerText = "조직도 설정 수정"; $('auditModifier').value = currentLoggedInUserName; $('auditReason').value = ""; $('auditNewSsn').style.display = "none"; $('auditModal').style.display = 'flex'; $('auditReason').focus();
 };
 window.requestOrgDelete = (id, type, name) => {
     auditActionContext = { type: 'ORG_DEL', id: id };
     $('auditOrgId').value = id; $('auditOrgType').value = type; $('auditOrgNewName').value = name;
-    $('auditTitle').innerText = "삭제 권한 요청";
-    $('auditModifier').value = currentLoggedInUserName;
-    $('auditReason').value = ""; $('auditNewSsn').style.display = "none";
-    $('auditModal').style.display = 'flex'; $('auditReason').focus();
+    $('auditTitle').innerText = "조직도 설정 삭제"; $('auditModifier').value = currentLoggedInUserName; $('auditReason').value = ""; $('auditNewSsn').style.display = "none"; $('auditModal').style.display = 'flex'; $('auditReason').focus();
 };
 
 // 5. MGMT (REG & SEARCH)
@@ -668,7 +571,7 @@ window.renderGrid = () => {
     const b = $('empGridBody'), t = $('topSearch').value; if(!b) return;
     b.innerHTML = emps.filter(e => (e.name||'').includes(t) || (e.empID||'').includes(t)).map(e => {
         const out = e.quitDate && e.quitDate.trim().length >= 10, stat = ['위탁직','프리랜서'].includes(e.contractType)?(out?'해촉':'위촉'):(out?'퇴직':'재직');
-        const sCls = ['재직','위촉'].includes(statusStr) ? 'status-active' : 'status-retired';
+        const sCls = ['재직','위촉'].includes(stat) ? 'status-active' : 'status-retired';
         const dispRank = (e.duty && e.duty !== '직책없음' && stdDutyOrder.includes(e.duty)) ? e.duty : (e.rank || '사원');
         const genC = e.ssn?e.ssn.split('-')[1]?.charAt(0):''; return `<tr onclick="window.viewDetail('${e.empID}')"><td><span class="status-badge ${sCls}">${stat}</span></td><td>${e.contractType||'-'}</td><td>${e.empID}</td><td>${e.dept||'-'}</td><td style="font-weight:bold;color:var(--icube-blue)">${e.name}</td><td>${dispRank}</td><td>${e.ssn||'-'}</td><td>${['1','3','9'].includes(genC)?'남':(['2','4','0'].includes(genC)?'여':'-')}</td><td>${e.joinDate||'-'}</td><td>${e.quitDate||'-'}</td></tr>`;
     }).join('');
@@ -688,7 +591,7 @@ window.doSave = async () => {
     let d = { empID:id, name:nm, joinDate:jd, ssn:$('formSSN').value||"", dept:$('formDept').value||"", rank:$('formRank').value||"", duty:$('formDuty').value||"직책없음", contractType:$('formContractType').value||"정규직", phone:$('formPhone').value||"", email:$('formEmail').value||"", zip:$('formZip').value||"", addr:$('formAddr').value||"", addrDetail:$('formAddrDetail').value||"", bank:$('formBank').value||"", account:$('formAccount').value||"", quitDate:$('formQuitDate').value||"", probationEndDate:$('formProbationEnd').value||"", milType:$('formMilType').value||"해당없음", milGroup:$('formMilGroup').value||"", milExit:$('formMilExit').value||"", milRank:$('formMilRank').value||"", milS:$('formMilS').value||"", milE:$('formMilE').value||"", milReason:$('formMilReason').value||"", educations:window.getTableData('eduBody'), careers:window.getTableData('careerBody'), languages:window.getTableData('langBody'), licenses:window.getTableData('licenseBody'), families:window.getTableData('familyBody') };
     salaryKeys.forEach(k=>{ const el=$(k.id); if(el) d[k.id]=el.value.replace(/,/g,''); });
     const ex=isEditMode?emps.find(e=>e.empID===id)||{}:{}; let h=ex.salaryHistory||[], t=0; salaryKeys.filter(k=>!k.type).forEach(k=>t+=parseInt(d[k.id])||0);
-    if(!h.length){ if(t>0||!isEditMode) h=[{date:jd, reason:"입사", monthly:t.toLocaleString()+"원", annual:(t*12).toLocaleString()+"원"}]; }
+    if(!h.length){ if(t>0||!isEditMode) h=[{date:jd, reason:"입사", monthly:t.toLocaleString()+"원", annual:(t*12).toLocaleString()+"원", period: jd}]; }
     else if(h.length===1 && h[0].reason==='입사') { h[0].annual=(t*12).toLocaleString()+"원"; h[0].monthly=t.toLocaleString()+"원"; h[0].date=jd; } d.salaryHistory=h;
     await setDoc(doc(empRef, id), {...ex, ...d}); window.logSystemAction(isEditMode?'수정':'신규등록', '사원정보', `${nm}(${id}) 정보 저장`); window.showMessageBox("저장 완료"); window.closeModal();
 };
@@ -746,7 +649,7 @@ window.selectEmpForSalary = (id, tr) => {
 window.saveSalaryUpdate = async () => {
     if(!selectedEmpForSalary) return; const d=$('salDate').value, r=$('salReason').value; if(!d) return window.showMessageBox("날짜 누락");
     const u={}; let t=0; salaryKeys.filter(k=>!k.type).forEach(k=>{ const v=$('st_'+k.id).value.replace(/,/g,''); u[k.id]=v; t+=parseInt(v)||0; });
-    const nh={date:d, reason:r, monthly:t.toLocaleString()+"원", annual:(t*12).toLocaleString()+"원"}; u.salaryHistory=arrayUnion(nh);
+    const nh={date:d, reason:r, monthly:t.toLocaleString()+"원", annual:(t*12).toLocaleString()+"원", period:d}; u.salaryHistory=arrayUnion(nh);
     await updateDoc(doc(empRef, selectedEmpForSalary.empID), u); window.logSystemAction('정보 갱신', '연봉 관리', `${selectedEmpForSalary.name}(${selectedEmpForSalary.empID}) 연봉 갱신`);
     if(!selectedEmpForSalary.salaryHistory) selectedEmpForSalary.salaryHistory=[]; selectedEmpForSalary.salaryHistory.push(nh); window.selectEmpForSalary(selectedEmpForSalary.empID, document.querySelector('#salStatusEmpList tr.selected'));
     if(r==='인사발령') window.showConfirmBox("인사발령 팝업 연결?", ()=>window.openQuickAppointModal(selectedEmpForSalary, d), null); else window.showMessageBox("완료");
@@ -786,7 +689,7 @@ window.syncQaOptions = () => {
 };
 window.saveQuickAppointment = async () => {
     const d=$('qaDate').value, t=$('qaType').value, a=$('qaAfter').value; if(!d||!t||!a) return window.showMessageBox("누락");
-    const nA={date:d, type:t, before:$('qaBefore').value, after:a, wage:$('qaWage').value};
+    const nA={date:d, type:t, before:$('qaBefore').value, after:a, wage:$('appWage').value};
     const uO={appointments:arrayUnion(nA)}; if(t==='직책부여') uO.duty=a; else if(t==='직위승진') uO.rank=a; else uO.dept=a;
     await updateDoc(doc(empRef, qsTargetEmp.empID), uO); $('quickAppointModal').style.display='none'; window.showMessageBox("완료");
     if(selectedEmpForAppoint && selectedEmpForAppoint.empID===qsTargetEmp.empID) { if(!selectedEmpForAppoint.appointments) selectedEmpForAppoint.appointments=[]; selectedEmpForAppoint.appointments.push(nA); window.selectEmpForAppoint(selectedEmpForAppoint.empID, document.querySelector('#appointEmpList tr.selected')); }
@@ -798,36 +701,82 @@ window.openQuickSalaryModal = (emp, dateStr) => {
 window.saveQuickSalary = async () => {
     const d=$('qsDate').value, r=$('qsReason').value; if(!d) return;
     const u={}; let tot=0; salaryKeys.filter(k=>!k.type).forEach(k=>{ const v=$('qs_'+k.id).value.replace(/,/g,''); u[k.id]=v; tot+=parseInt(v)||0; });
-    const nh={date:d, reason:r, monthly:tot.toLocaleString()+"원", annual:(tot*12).toLocaleString()+"원"}; u.salaryHistory=arrayUnion(nh);
+    const nh={date:d, reason:r, monthly:tot.toLocaleString()+"원", annual:(tot*12).toLocaleString()+"원", period:d}; u.salaryHistory=arrayUnion(nh);
     await updateDoc(doc(empRef, qsTargetEmp.empID), u); $('quickSalModal').style.display='none'; window.showMessageBox("완료");
     if(selectedEmpForSalary && selectedEmpForSalary.empID===qsTargetEmp.empID) { if(!selectedEmpForSalary.salaryHistory) selectedEmpForSalary.salaryHistory=[]; selectedEmpForSalary.salaryHistory.push(nh); window.selectEmpForSalary(selectedEmpForSalary.empID, document.querySelector('#salStatusEmpList tr.selected')); }
 };
 
 // 7. EXCEL BULK & AUDIT
-window.downloadEmpTemplate = () => { const ws=XLSX.utils.aoa_to_sheet([["사번(수정시기입)","성명(필수)","주민번호(필수)","이메일","연락처","우편번호","기본주소","상세주소","은행","계좌번호","고용형태","입사일(필수)","수습종료일","부서명","직위","직책","퇴사일"],["비워두면 자동생성","문자열","000000-0000000","이메일","010-0000-0000","숫자","문자열","문자열","은행명","계좌번호","정규직/계약직 등","YYYY-MM-DD","YYYY-MM-DD","부서명","직위명","직책명","YYYY-MM-DD"]]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"사원양식"); XLSX.writeFile(wb,"사원_일괄업로드_양식.xlsx"); };
+window.downloadEmpTemplate = () => { 
+    // 3줄의 완벽한 엑셀 양식 헤더 생성
+    const r1 = ["기본사항","","","","","","","","","","","","",""];
+    const r2 = ["사번","이름","주민번호","연락처","이메일","주소(상세포함)","은행명","계좌번호","고용형태","입사일","수습종료일","부서명","직위","직책"];
+    const r3 = ["비워두면 자동생성","문자열","000000-0000000","숫자또는-","이메일형식","문자열","은행명","계좌번호","정규직 등","YYYYMMDD","YYYYMMDD","조직도명칭","조직도명칭","조직도명칭"];
+    for(let i=1; i<=2; i++){ r1.push("학력사항","","","","",""); r2.push(`학력구분${i}`, `시작월${i}`, `종료월${i}`, `학교${i}`, `전공${i}`, `상태${i}`); r3.push("선택", "YYYYMM", "YYYYMM", "문자열", "문자열", "선택"); }
+    for(let i=1; i<=5; i++){ r1.push("경력사항","","","","","",""); r2.push(`시작월${i}`, `종료월${i}`, `회사명${i}`, `부서${i}`, `직급/직책${i}`, `담당업무${i}`, `퇴사사유${i}`); r3.push("YYYYMMDD", "YYYYMMDD", "문자열", "문자열", "문자열", "문자열", "문자열"); }
+    for(let i=1; i<=5; i++){ r1.push("어학사항","","",""); r2.push(`시험명${i}`, `점수${i}`, `취득일${i}`, `기관${i}`); r3.push("문자열", "문자열", "YYYYMM", "문자열"); }
+    for(let i=1; i<=5; i++){ r1.push("자격사항","","",""); r2.push(`자격명${i}`, `발행처${i}`, `취득일${i}`, `사유${i}`); r3.push("문자열", "문자열", "YYYYMM", "문자열"); }
+    for(let i=1; i<=5; i++){ r1.push("가족사항","","","","",""); r2.push(`관계${i}`, `성명${i}`, `생년월일${i}`, `동거${i}`, `직업${i}`, `비고${i}`); r3.push("부/모 등", "문자열", "YYYYMMDD", "동거/비동거", "문자열", "문자열"); }
+    r1.push("병역사항","","","","",""); r2.push("병역구분","군별","사유(미필/면제)","계급","복무시작일","복무종료일"); r3.push("필/미필/면제/해당없음","육군 등","문자열","문자열","YYYYMMDD","YYYYMMDD");
+    const ws = XLSX.utils.aoa_to_sheet([r1, r2, r3]); 
+    ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:13}}, {s:{r:0,c:14},e:{r:0,c:25}}, {s:{r:0,c:26},e:{r:0,c:60}}, {s:{r:0,c:61},e:{r:0,c:80}}, {s:{r:0,c:81},e:{r:0,c:100}}, {s:{r:0,c:101},e:{r:0,c:130}}, {s:{r:0,c:131},e:{r:0,c:136}}];
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "사원일괄업로드"); XLSX.writeFile(wb, "사원_일괄업로드_양식.xlsx");
+};
 window.downloadAppointTemplate = () => { const ws=XLSX.utils.aoa_to_sheet([["사번(필수)","발령일(필수)","발령내용(필수)","발령 전","발령 후(필수)","임금변동"],["260101","YYYY-MM-DD","부서명변경/직위승진/직책부여","참고용","변경될값","변동/유지"]]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"발령양식"); XLSX.writeFile(wb,"인사발령_일괄업로드_양식.xlsx"); };
 
 window.handleEmpBulkUpload = (e) => {
     const f=e.target.files[0]; if(!f) return; const r=new FileReader();
     r.onload=async(ev)=>{
-        const rows=XLSX.utils.sheet_to_json(XLSX.read(ev.target.result,{type:'binary'}).Sheets[XLSX.read(ev.target.result,{type:'binary'}).SheetNames[0]]);
+        const data = new Uint8Array(ev.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
         let errs=[], vd=[];
-        rows.forEach((r, idx)=>{
-            if(idx===0) return; // Skip tip row
-            if(!r["성명(필수)"] && !r["입사일(필수)"]) return;
-            let re=[]; if(!r["성명(필수)"]) re.push("성명 누락"); if(!r["입사일(필수)"] || !/^\d{4}-\d{2}-\d{2}$/.test(r["입사일(필수)"])) re.push("입사일 오류"); if(!r["주민번호(필수)"] || !/^\d{6}-[0-49]\d{6}$/.test(r["주민번호(필수)"])) re.push("주민번호 오류");
-            let id=r["사번(수정시기입)"]?String(r["사번(수정시기입)"]):""; if(id && !emps.find(x=>x.empID===id)) re.push("사번 없음"); if(!id && emps.find(x=>x.ssn===r["주민번호(필수)"])) re.push("중복 주민번호");
-            if(re.length) errs.push(`[${idx+2}행] ${r["성명(필수)"]||''}: ${re.join(', ')}`); else vd.push({...r, _id:id});
-        });
+        
+        const fmtD = (v) => { if(!v) return ""; let s = String(v).replace(/[^0-9]/g, ''); return s.length === 8 ? `${s.substring(0,4)}-${s.substring(4,6)}-${s.substring(6,8)}` : v; };
+        const fmtM = (v) => { if(!v) return ""; let s = String(v).replace(/[^0-9]/g, ''); return s.length === 6 ? `${s.substring(0,4)}-${s.substring(4,6)}` : v; };
+
+        for(let i=3; i<rows.length; i++) {
+            const rd = rows[i]; if(!rd || rd.length === 0) continue;
+            const name = rd[1] ? String(rd[1]).trim() : "", ssnRaw = rd[2] ? String(rd[2]).trim() : "", joinRaw = rd[9] ? String(rd[9]).trim() : "";
+            if(!name && !joinRaw) continue; 
+            
+            let re=[]; if(!name) re.push("성명 누락");
+            let joinDate = fmtD(joinRaw); if(!joinDate || !/^\d{4}-\d{2}-\d{2}$/.test(joinDate)) re.push("입사일 오류");
+            let ssn = ssnRaw.replace(/[^0-9]/g, ''); if(ssn.length === 13) ssn = ssn.substring(0,6) + '-' + ssn.substring(6,13);
+            if(!ssn || !/^\d{6}-[0-49]\d{6}$/.test(ssn)) re.push("주민번호 오류");
+
+            let id = rd[0] ? String(rd[0]).trim() : "";
+            if(id && !emps.find(x=>x.empID===id)) re.push("사번 없음(수정 불가)");
+            if(!id && emps.find(x=>x.ssn===ssn)) re.push("중복 주민번호");
+
+            if(re.length) { errs.push(`[${i+1}행] ${name||'이름없음'}: ${re.join(', ')}`); continue; }
+            
+            let eds=[], cars=[], langs=[], lics=[], fams=[];
+            for(let j=0; j<2; j++) { const bs=14+j*6; if(rd[bs]) eds.push({type:rd[bs], period:(fmtM(rd[bs+1])+(rd[bs+2]?' ~ '+fmtM(rd[bs+2]):'')).trim(), school:rd[bs+3], major:rd[bs+4], status:rd[bs+5]}); }
+            for(let j=0; j<5; j++) { const bs=26+j*7; if(rd[bs+2]) cars.push({period:(fmtD(rd[bs])+(rd[bs+1]?' ~ '+fmtD(rd[bs+1]):'')).trim(), company:rd[bs+2], dept:rd[bs+3], rank:rd[bs+4], duty:rd[bs+5], reason:rd[bs+6], months:"0"}); }
+            for(let j=0; j<5; j++) { const bs=61+j*4; if(rd[bs]) langs.push({name:rd[bs], score:rd[bs+1], date:fmtM(rd[bs+2]), issuer:rd[bs+3]}); }
+            for(let j=0; j<5; j++) { const bs=81+j*4; if(rd[bs]) lics.push({name:rd[bs], issuer:rd[bs+1], date:fmtM(rd[bs+2]), reason:rd[bs+3]}); }
+            for(let j=0; j<5; j++) { const bs=101+j*6; if(rd[bs]) fams.push({relation:rd[bs], name:rd[bs+1], birth:fmtD(rd[bs+2]), living:rd[bs+3], job:rd[bs+4], memo:rd[bs+5]}); }
+
+            vd.push({
+                _id:id, name, ssn, phone:rd[3]?String(rd[3]):"", email:rd[4]||"", addr:rd[5]||"", bank:rd[6]||"", account:rd[7]?String(rd[7]):"", contractType:rd[8]||"정규직", joinDate, probationEndDate:fmtD(rd[10])||"", dept:rd[11]||"", rank:rd[12]||"사원", duty:rd[13]||"직책없음",
+                educations:eds, careers:cars, languages:langs, licenses:lics, families:fams,
+                milType:rd[131]||"해당없음", milGroup:rd[132]||"", milReason:rd[133]||"", milRank:rd[134]||"", milS:fmtD(rd[135])||"", milE:fmtD(rd[136])||""
+            });
+        }
+        
         if(errs.length) { $('bulkValidationErrors').innerHTML = errs.join('<br>'); $('bulkValidationErrors').style.display='block'; $('bulkValidationSuccess').style.display='none'; $('bulkConfirmBtn').style.display='none'; } 
         else { $('bulkValidationErrors').style.display='none'; $('bulkValidationSuccess').style.display='block'; $('bulkConfirmBtn').style.display='block';
             $('bulkConfirmBtn').onclick = async () => {
-                for(let v of vd) { let nid=v._id; if(!nid){ const pre=v["입사일(필수)"].substring(2,4)+v["입사일(필수)"].substring(5,7); nid=pre+String(emps.filter(x=>x.empID.startsWith(pre)).length+1).padStart(2,'0'); }
-                const ex=emps.find(e=>e.empID===nid)||{}; await setDoc(doc(empRef, nid), {...ex, empID:nid, name:v["성명(필수)"], ssn:v["주민번호(필수)"], joinDate:v["입사일(필수)"], dept:v["부서명"]||"", rank:v["직위"]||"사원", duty:v["직책"]||"직책없음", contractType:v["고용형태"]||"정규직", phone:v["연락처"]||"", email:v["이메일"]||"", zip:v["우편번호"]||"", addr:v["기본주소"]||"", addrDetail:v["상세주소"]||"", bank:v["은행"]||"", account:v["계좌번호"]||"", quitDate:v["퇴사일"]||"", probationEndDate:v["수습종료일"]||""}); }
-                window.showMessageBox("업로드 완료"); $('bulkValidationModal').style.display='none';
+                for(let v of vd) { 
+                    let nid=v._id; if(!nid){ const pre=v.joinDate.substring(2,4)+v.joinDate.substring(5,7); nid=pre+String(emps.filter(x=>x.empID.startsWith(pre)).length+1).padStart(2,'0'); emps.push({empID: nid}); }
+                    const ex=emps.find(e=>e.empID===nid)||{}; 
+                    await setDoc(doc(empRef, nid), {...ex, empID:nid, name:v.name, ssn:v.ssn, joinDate:v.joinDate, dept:v.dept, rank:v.rank, duty:v.duty, contractType:v.contractType, phone:v.phone, email:v.email, addr:v.addr, bank:v.bank, account:v.account, probationEndDate:v.probationEndDate, educations:v.educations, careers:v.careers, languages:v.languages, licenses:v.licenses, families:v.families, milType:v.milType, milGroup:v.milGroup, milReason:v.milReason, milRank:v.milRank, milS:v.milS, milE:v.milE}, {merge:true}); 
+                }
+                window.showMessageBox("업로드 완료"); $('bulkValidationModal').style.display='none'; window.renderGrid();
             };
         } $('bulkValidationModal').style.display='flex'; $('empBulkInput').value='';
-    }; r.readAsBinaryString(f);
+    }; r.readAsArrayBuffer(f);
 };
 
 window.handleAppointBulkUpload = (e) => {
