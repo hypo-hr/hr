@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>히포케이메논 ERP V.2.8.8 - 통합 관리</title>
+    <title>히포케이메논 ERP V.2.8.9 - 통합 관리</title>
     <!-- Daum Postcode Service -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <!-- SheetJS for Excel Processing -->
@@ -27,12 +27,12 @@
 
         /* Layout */
         .header { height: 50px; background: white; border-bottom: 1px solid var(--icube-border); display: flex; align-items: center; padding: 0 20px; z-index: 20; flex-shrink: 0; }
-        .header-title { font-weight: bold; color: var(--icube-blue); font-size: 15px; }
+        .header-title { font-weight: bold; color: var(--icube-blue); font-size: 15px; cursor: pointer; }
         .version-tag { background: #eee; padding: 2px 6px; border-radius: 3px; font-size: 10px; color: #666; margin-left: 10px; }
         .main-wrapper { display: flex; flex: 1; overflow: hidden; }
 
         /* Sidebar */
-        .sidebar { width: var(--sidebar-width); background: var(--sidebar-dark); color: #ecf0f1; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar { width: var(--sidebar-width); background: var(--sidebar-dark); color: #ecf0f1; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
         .menu-group { margin-top: 10px; }
         .menu-category { padding: 12px 20px; font-size: 11px; color: #95a5a6; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; border-bottom: 1px solid #3e4f5f; }
         .menu-list { list-style: none; padding: 0; margin: 0; }
@@ -133,25 +133,42 @@
         .empty-page { justify-content: center; align-items: center; background: #f9f9f9; text-align: center; color: #999; height: 100%; display: flex; flex-direction: column; }
         
         /* Personnel Record Card Styles (For '사원 조회') */
-        .record-card { background: white; border: 1px solid #000; padding: 20px; color: #000; font-family: 'Malgun Gothic', serif; position: relative; }
+        .record-card { background: white; border: 1px solid #000; padding: 20px; color: #000; font-family: 'Malgun Gothic', serif; position: relative; max-width: 800px; margin: 0 auto; }
         .record-title { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; letter-spacing: 5px; }
         .record-top-grid { display: flex; gap: 15px; margin-bottom: 15px; }
         .photo-box { width: 130px; height: 170px; border: 1px solid #000; display: flex; justify-content: center; align-items: center; background: #f9f9f9; color: #999; flex-shrink: 0; }
-        .record-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; page-break-inside: avoid; table-layout: fixed; }
+        .record-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
         .record-table th, .record-table td { border: 1px solid #000; padding: 6px; font-size: 11px; text-align: center; vertical-align: middle; word-wrap: break-word; }
         .record-table th { background: #f0f0f0; font-weight: bold; }
         .record-section-title { font-size: 13px; font-weight: bold; margin-bottom: 5px; border-left: 3px solid #000; padding-left: 8px; margin-top: 10px; }
-        .print-footer { display: none; text-align: center; font-size: 16px; font-weight: bold; letter-spacing: 3px; color: #000; margin-top: 30px; }
+        .print-footer { display: none; text-align: center; font-size: 16px; font-weight: bold; letter-spacing: 3px; color: #000; margin-top: 30px; page-break-inside: avoid; padding-bottom: 10px; }
 
         /* Print Media Query */
         @media print {
-            @page { size: A4 portrait; margin: 0.5mm; }
-            body, html { background: white; padding: 0; margin: 0; height: 100vh; overflow: hidden; }
+            @page { 
+                size: A4 portrait; 
+                margin: 0.5mm; 
+                /* Experimental CSS Paged Media for page numbers (works in some PDF generators/browsers) */
+                @bottom-center {
+                    content: "HYPOKEIMENON\A " counter(page) " / " counter(pages);
+                    white-space: pre;
+                    font-size: 12px;
+                    font-weight: bold;
+                }
+            }
+            body, html { background: white; padding: 0; margin: 0; height: auto; overflow: visible !important; }
             .header, .sidebar, .panel-left, .toolbar, .msg-box-overlay, .modal-overlay, .print-hide, .status-header { display: none !important; }
-            .main-wrapper, .content-area, .dual-panel-container { display: block; overflow: visible; height: 100%; padding: 0; margin: 0; }
-            .panel-right { width: 100%; border: none !important; padding: 0 !important; overflow: visible; height: 100%; background: white !important; }
-            .record-card { padding: 10px; border: none; margin: 0; }
+            .main-wrapper, .content-area, .dual-panel-container { display: block; overflow: visible; height: auto; padding: 0; margin: 0; }
+            .panel-right { width: 100%; border: none !important; padding: 0 !important; overflow: visible; height: auto; background: white !important; }
+            .record-card { padding: 10px; border: none; margin: 0; max-width: 100%; }
+            
+            /* Allow natural page breaks for multiple pages */
+            .record-table { page-break-inside: auto; }
+            .record-table tr { page-break-inside: avoid; page-break-after: auto; }
+            .record-section-title { page-break-after: avoid; }
+            
             .print-footer { display: block; }
+            
             /* Force exact colors for printing */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .record-table th { background: #e0e0e0 !important; }
@@ -179,7 +196,8 @@
     </div>
 
     <div class="header">
-        <div class="header-title"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.8</span></div>
+        <!-- Logo click navigates to Home -->
+        <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.9</span></div>
     </div>
 
     <div class="main-wrapper">
@@ -199,9 +217,31 @@
                     <li class="menu-item" onclick="window.switchMenu('pay-history', this)"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</li>
                 </ul>
             </div>
+            <div class="menu-group">
+                <div class="menu-category">시스템 설정</div>
+                <ul class="menu-list">
+                    <li class="menu-item" onclick="window.switchMenu('account', this)"><i class="fa-solid fa-users-gear"></i> 계정 관리</li>
+                </ul>
+            </div>
         </div>
 
         <div class="content-area">
+            <!-- HOME Page -->
+            <div id="page-home" class="page-content">
+                <div class="empty-page">
+                    <i class="fa-solid fa-house" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                    <p>HOME 메인 대시보드 준비 중입니다.</p>
+                </div>
+            </div>
+
+            <!-- 계정 관리 Page -->
+            <div id="page-account" class="page-content">
+                <div class="empty-page">
+                    <i class="fa-solid fa-users-gear" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                    <p>계정 권한 관리 메뉴 준비 중입니다.</p>
+                </div>
+            </div>
+
             <!-- 사원 등록/수정 -->
             <div id="page-mgmt-reg" class="page-content active">
                 <div class="toolbar">
@@ -246,7 +286,7 @@
                         <div id="recordCardArea" style="display:none; margin: 0 auto; max-width: 800px;">
                             <div class="status-header print-hide">
                                 인사기록카드 
-                                <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
+                                <button class="tool-btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
                             </div>
                             
                             <div class="record-card">
@@ -326,14 +366,14 @@
                                     </tr>
                                 </table>
 
-                                <!-- 임금 정보 (Full width with Grouping) -->
+                                <!-- 임금 정보 (Full width with Corrected Grouping & Layout) -->
                                 <div class="record-section-title">현재 임금정보</div>
                                 <table class="record-table">
                                     <tr>
                                         <th rowspan="2" width="10%">통상임금</th>
-                                        <th width="12%">기본급</th><td width="18%" id="rc_salBase"></td>
-                                        <th width="12%">식대</th><td width="18%" id="rc_salMeal"></td>
-                                        <th width="12%">자가운전보조</th><td width="18%" id="rc_salDrive"></td>
+                                        <th width="15%">기본급</th><td width="20%" id="rc_salBase"></td>
+                                        <th width="15%">식대</th><td width="20%" id="rc_salMeal"></td>
+                                        <th width="10%">자가운전</th><td width="10%" id="rc_salDrive"></td>
                                     </tr>
                                     <tr>
                                         <th>차량유지비</th><td id="rc_salCar"></td>
@@ -347,8 +387,8 @@
                                     </tr>
                                     <tr>
                                         <th style="background:#eef4ff;">월급여 총액</th><td colspan="2" style="font-weight:bold; color:var(--icube-blue);" id="rc_salMonth"></td>
-                                        <th style="background:#eef4ff;">연봉</th><td colspan="2" style="font-weight:bold; color:var(--icube-blue);" id="rc_salYear"></td>
-                                        <th style="background:#fffbe6;">통상시급</th><td colspan="2" style="font-weight:bold; color:#000;" id="rc_resHourPay"></td>
+                                        <th style="background:#eef4ff;">연봉</th><td colspan="1" style="font-weight:bold; color:var(--icube-blue);" id="rc_salYear"></td>
+                                        <th style="background:#fffbe6;">통상시급</th><td colspan="1" style="font-weight:bold; color:#000;" id="rc_resHourPay"></td>
                                     </tr>
                                 </table>
 
@@ -890,32 +930,6 @@
             auditActionContext = null;
         };
 
-        // Print Card Logic
-        window.printRecordCard = () => {
-            const card = document.querySelector('.record-card');
-            card.style.zoom = '1';
-            card.style.transform = 'none';
-            
-            const safeHeight = 1080; 
-            const currentHeight = card.scrollHeight;
-            
-            if (currentHeight > safeHeight) {
-                const scaleRatio = safeHeight / currentHeight;
-                card.style.zoom = scaleRatio;
-                if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-                    card.style.transform = `scale(${scaleRatio})`;
-                    card.style.transformOrigin = 'top center';
-                }
-            }
-            
-            window.print();
-            
-            setTimeout(() => {
-                card.style.zoom = '1';
-                card.style.transform = 'none';
-            }, 1000);
-        };
-
         // Modal Logic
         window.openModal = (edit = false) => {
             isEditMode = edit; isSalaryLocked = edit;
@@ -1018,7 +1032,6 @@
 
         window.viewDetail = (id) => {
             const e = emps.find(x => x.empID === id); if(!e) return;
-            currentEditEmp = e;
             window.openModal(true);
             const setV = (id, v) => { const el = document.getElementById(id); if(el) el.value = v || ''; };
             setV('formName', e.name); setV('formSSN', e.ssn); setV('formPhone', e.phone); setV('formEmail', e.email);
@@ -1140,7 +1153,7 @@
             (e.salaryHistory || []).forEach(sal => events.push({ type: 'salary', date: sal.date, reason: sal.reason, monthly: sal.monthly, annual: sal.annual }));
             (e.appointments || []).forEach(app => events.push({ type: 'appoint', date: app.date, reason: app.type, before: app.before, after: app.after, wage: app.wage }));
             
-            events.sort((a,b) => a.date.localeCompare(b.date));
+            events.sort((a,b) => new Date(a.date) - new Date(b.date)); // Sort ascending
             
             let groupedEvents = {};
             events.forEach(ev => {
@@ -1149,7 +1162,7 @@
             });
             
             let mergedRows = [];
-            let currentTitle = '-';
+            let currentState = '-';
             let currentSal = '-';
             
             Object.keys(groupedEvents).sort().forEach(date => {
@@ -1159,30 +1172,38 @@
                 let hasApp = dayEvents.find(ev => ev.type === 'appoint');
                 
                 let rowReason = [];
-                let rowBefore = currentTitle;
-                let rowAfter = currentTitle;
+                let rowBefore = currentState;
+                let rowAfter = currentState;
                 let rowBeforeSal = currentSal;
                 let rowAfterSal = currentSal;
                 
-                if (hasApp) {
-                    rowReason.push(hasApp.reason);
-                    rowBefore = hasApp.before;
-                    rowAfter = hasApp.after;
-                    currentTitle = hasApp.after;
-                }
-                
-                if (hasSal) {
-                    if (hasSal.reason === '입사') {
-                        rowReason = ['입사'];
-                        rowBefore = '-';
-                        rowAfter = e.dept + ' ' + (e.duty !== '직책없음' ? e.duty : e.rank);
-                        rowBeforeSal = '-';
-                        currentTitle = rowAfter;
-                    } else if (!hasApp) {
-                        rowReason.push(hasSal.reason);
-                    }
+                if (hasSal && hasSal.reason === '입사') {
+                    rowReason = ['입사'];
+                    rowBefore = '-';
+                    rowAfter = e.dept + ' ' + (e.duty !== '직책없음' ? e.duty : e.rank);
+                    rowBeforeSal = '-';
                     rowAfterSal = hasSal.annual;
-                    currentSal = hasSal.annual;
+                    
+                    currentState = rowAfter;
+                    currentSal = rowAfterSal;
+                } else {
+                    if (hasApp) {
+                        rowReason.push(hasApp.reason);
+                        rowBefore = currentState !== '-' ? currentState : hasApp.before;
+                        rowAfter = hasApp.after;
+                        currentState = rowAfter;
+                    }
+                    if (hasSal) {
+                        if (!hasApp) rowReason.push(hasSal.reason);
+                        else if (hasSal.reason !== '인사발령') rowReason.push(hasSal.reason);
+                        
+                        rowBeforeSal = currentSal;
+                        rowAfterSal = hasSal.annual;
+                        currentSal = rowAfterSal;
+                    } else {
+                        rowBeforeSal = currentSal;
+                        rowAfterSal = currentSal;
+                    }
                 }
                 
                 mergedRows.push({
@@ -1321,6 +1342,7 @@
             
             const newAppoint = { date: d, type: t, before: document.getElementById('appBefore').value, after: a, wage: document.getElementById('appWage').value };
             
+            // Update local first for instant render
             if(!selectedEmpForAppoint.appointments) selectedEmpForAppoint.appointments = [];
             selectedEmpForAppoint.appointments.push(newAppoint);
             
@@ -1405,18 +1427,8 @@
                     if(document.getElementById('page-mgmt-search').classList.contains('active')) window.renderSearchList();
                 }, err => console.error(err));
             });
-            
-            // Build Dynamic UI
             const sBody = document.getElementById('salaryFormBody');
-            const qsBody = document.getElementById('qsFormBody');
-            
-            salaryKeys.forEach(k => { 
-                const sRow = `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="${k.id}" class="${k.type?'num-input':'salary-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateSalaryCalc()"></td></tr>`;
-                const qsRow = `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="qs_${k.id}" class="${k.type?'num-input':'qs-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateQsCalc()"></td></tr>`;
-                
-                if(sBody) sBody.innerHTML += sRow; 
-                if(qsBody) qsBody.innerHTML += qsRow;
-            });
+            salaryKeys.forEach(k => { sBody.innerHTML += `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="${k.id}" class="${k.type?'num-input':'salary-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateSalaryCalc()"></td></tr>`; });
         }
 
         document.addEventListener('input', e => {
