@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>히포케이메논 ERP V.2.8.6 - 통합 관리</title>
+    <title>히포케이메논 ERP V.2.8.8 - 통합 관리</title>
     <!-- Daum Postcode Service -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <!-- SheetJS for Excel Processing -->
@@ -146,11 +146,11 @@
         /* Print Media Query */
         @media print {
             @page { size: A4 portrait; margin: 0.5mm; }
-            body { background: white; padding: 0; margin: 0; }
+            body, html { background: white; padding: 0; margin: 0; height: 100vh; overflow: hidden; }
             .header, .sidebar, .panel-left, .toolbar, .msg-box-overlay, .modal-overlay, .print-hide, .status-header { display: none !important; }
-            .main-wrapper, .content-area, .dual-panel-container { display: block; overflow: visible; height: auto; padding: 0; margin: 0; }
-            .panel-right { width: 100%; border: none !important; padding: 0 !important; overflow: visible; height: auto; background: white !important; }
-            .record-card { padding: 10px; border: none; }
+            .main-wrapper, .content-area, .dual-panel-container { display: block; overflow: visible; height: 100%; padding: 0; margin: 0; }
+            .panel-right { width: 100%; border: none !important; padding: 0 !important; overflow: visible; height: 100%; background: white !important; }
+            .record-card { padding: 10px; border: none; margin: 0; }
             .print-footer { display: block; }
             /* Force exact colors for printing */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -166,9 +166,20 @@
             <button class="tool-btn primary" style="margin: 0 auto; width: 80px;" onclick="window.closeMsgBox()">확인</button>
         </div>
     </div>
+    
+    <!-- 공용 확인 창 (Yes/No) -->
+    <div id="confirmBoxOverlay" class="msg-box-overlay" style="z-index: 3100;">
+        <div class="msg-box">
+            <p id="confirmBoxText" style="margin-bottom: 15px; font-size: 13px; font-weight: bold;"></p>
+            <div style="display:flex; justify-content:center; gap:10px;">
+                <button class="tool-btn" onclick="window.closeConfirmBox(false)">취소</button>
+                <button class="tool-btn primary" onclick="window.closeConfirmBox(true)">확인</button>
+            </div>
+        </div>
+    </div>
 
     <div class="header">
-        <div class="header-title"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.6</span></div>
+        <div class="header-title"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.8</span></div>
     </div>
 
     <div class="main-wrapper">
@@ -235,7 +246,7 @@
                         <div id="recordCardArea" style="display:none; margin: 0 auto; max-width: 800px;">
                             <div class="status-header print-hide">
                                 인사기록카드 
-                                <button class="tool-btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
+                                <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
                             </div>
                             
                             <div class="record-card">
@@ -315,46 +326,38 @@
                                     </tr>
                                 </table>
 
-                                <!-- 임금 정보 (Full width) -->
+                                <!-- 임금 정보 (Full width with Grouping) -->
                                 <div class="record-section-title">현재 임금정보</div>
                                 <table class="record-table">
                                     <tr>
-                                        <th width="12.5%">기본급</th><td width="12.5%" id="rc_salBase"></td>
-                                        <th width="12.5%">식대</th><td width="12.5%" id="rc_salMeal"></td>
-                                        <th width="12.5%">자가운전보조</th><td width="12.5%" id="rc_salDrive"></td>
-                                        <th width="12.5%">차량유지비</th><td width="12.5%" id="rc_salCar"></td>
+                                        <th rowspan="2" width="10%">통상임금</th>
+                                        <th width="12%">기본급</th><td width="18%" id="rc_salBase"></td>
+                                        <th width="12%">식대</th><td width="18%" id="rc_salMeal"></td>
+                                        <th width="12%">자가운전보조</th><td width="18%" id="rc_salDrive"></td>
                                     </tr>
                                     <tr>
+                                        <th>차량유지비</th><td id="rc_salCar"></td>
                                         <th>근속수당</th><td id="rc_salService"></td>
                                         <th>직책수당</th><td id="rc_salRank"></td>
-                                        <th>고정연장수당</th><td id="rc_salFixedOver"></td>
-                                        <th></th><td></td>
                                     </tr>
                                     <tr>
-                                        <th style="background:#eef4ff;">월급여 총액</th><td style="font-weight:bold; color:var(--icube-blue);" id="rc_salMonth"></td>
-                                        <th style="background:#eef4ff;">연봉</th><td style="font-weight:bold; color:var(--icube-blue);" id="rc_salYear"></td>
-                                        <th style="background:#fffbe6;">통상시급</th><td style="font-weight:bold; color:#000;" id="rc_resHourPay"></td>
-                                        <th></th><td></td>
+                                        <th>기타수당</th>
+                                        <th>고정연장수당</th><td id="rc_salFixedOver"></td>
+                                        <td colspan="4"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="background:#eef4ff;">월급여 총액</th><td colspan="2" style="font-weight:bold; color:var(--icube-blue);" id="rc_salMonth"></td>
+                                        <th style="background:#eef4ff;">연봉</th><td colspan="2" style="font-weight:bold; color:var(--icube-blue);" id="rc_salYear"></td>
+                                        <th style="background:#fffbe6;">통상시급</th><td colspan="2" style="font-weight:bold; color:#000;" id="rc_resHourPay"></td>
                                     </tr>
                                 </table>
 
-                                <!-- Bottom: History (Last 5 Years) -->
-                                <div style="display:flex; gap:15px; margin-bottom: 10px;">
-                                    <div style="flex:1; min-width: 0;">
-                                        <div class="record-section-title">연봉갱신 내역 (최근 5년)</div>
-                                        <table class="record-table" id="rc_salHistoryTable">
-                                            <thead><tr><th>시작일자</th><th>구분</th><th>월급여</th><th>연봉</th></tr></thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-                                    <div style="flex:1; min-width: 0;">
-                                        <div class="record-section-title">인사발령 내역 (최근 5년)</div>
-                                        <table class="record-table" id="rc_appointTable">
-                                            <thead><tr><th>발령일자</th><th>발령구분</th><th>발령 전</th><th>발령 후</th></tr></thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                <!-- Bottom: Merged History (Last 5 Years) -->
+                                <div class="record-section-title">연봉갱신 및 인사발령 내역 (최근 5년)</div>
+                                <table class="record-table" id="rc_mergedHistoryTable">
+                                    <thead><tr><th>발령일자</th><th>발령구분</th><th>발령 전</th><th>발령 후</th><th>발령 전 임금</th><th>발령 후 임금</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
 
                                 <!-- Evaluation (Placeholders) -->
                                 <div class="record-section-title">평가 내역</div>
@@ -584,6 +587,32 @@
         </div>
     </div>
 
+    <!-- 퀵 연봉 갱신 모달 (인사발령 연동 전용) -->
+    <div id="quickSalModal" class="modal-overlay" style="z-index:1150">
+        <div class="modal-content" style="width:600px;">
+            <div class="modal-header"><h2 id="qsTitle">연봉 갱신 업데이트</h2><button class="close-btn" onclick="document.getElementById('quickSalModal').style.display='none'">&times;</button></div>
+            <div class="modal-body" style="padding:20px;">
+                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
+                    <div style="flex:1;"><label style="font-weight:bold;">갱신일</label><input id="qsDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div>
+                    <div style="flex:1;"><label style="font-weight:bold;">사유</label><input id="qsReason" value="인사발령" readonly class="read-only" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div>
+                </div>
+                <table class="salary-input-table">
+                    <tbody id="qsFormBody"></tbody>
+                </table>
+                <div class="calc-result-box" style="margin-top:15px;">
+                    <div class="calc-row"><span>월 소정근로시간</span><span id="qs_resWorkMonth" class="calc-val">209시간</span></div>
+                    <div class="calc-row"><span>월 급여합계</span><span id="qs_resMonthPay" class="calc-val">0원</span></div>
+                    <div class="calc-row"><span>연봉 (월 * 12)</span><span id="qs_resYearPay" class="calc-val">0원</span></div>
+                    <div class="calc-row"><span>통상시급</span><span id="qs_resHourPay" class="calc-val">0원</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="tool-btn" onclick="document.getElementById('quickSalModal').style.display='none'">취소</button>
+                <button class="tool-btn success" onclick="window.saveQuickSalary()">저장</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -601,8 +630,11 @@
         let isSalaryLocked = true;
         let selectedEmpForSalary = null;
         let selectedEmpForAppoint = null;
+        let qsTargetEmp = null;
         
         let auditActionContext = null; 
+        let confirmCallback = null;
+        let cancelCallback = null;
 
         const salaryKeys = [
             {id: 'salProbationRate', label: '수습 급여 적용률 (%)', type: 'num'},
@@ -620,13 +652,24 @@
         window.showMessageBox = (t) => { const e = document.getElementById('msgBoxText'), o = document.getElementById('msgBoxOverlay'); if(e && o) { e.innerText = t; o.style.display = 'flex'; } };
         window.closeMsgBox = () => { document.getElementById('msgBoxOverlay').style.display = 'none'; };
         
+        window.showConfirmBox = (msg, onConfirm, onCancel) => {
+            document.getElementById('confirmBoxText').innerText = msg;
+            confirmCallback = onConfirm;
+            cancelCallback = onCancel;
+            document.getElementById('confirmBoxOverlay').style.display = 'flex';
+        };
+        window.closeConfirmBox = (result) => {
+            document.getElementById('confirmBoxOverlay').style.display = 'none';
+            if(result && confirmCallback) confirmCallback();
+            if(!result && cancelCallback) cancelCallback();
+        };
+        
         window.switchMenu = (id, el) => { 
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active')); 
             if(el) el.classList.add('active'); 
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active')); 
             const target = document.getElementById('page-' + id); 
             if(target) target.classList.add('active'); 
-            // Call specific render functions for menus if needed
             if(id === 'mgmt-search') window.renderSearchList();
         };
 
@@ -847,6 +890,32 @@
             auditActionContext = null;
         };
 
+        // Print Card Logic
+        window.printRecordCard = () => {
+            const card = document.querySelector('.record-card');
+            card.style.zoom = '1';
+            card.style.transform = 'none';
+            
+            const safeHeight = 1080; 
+            const currentHeight = card.scrollHeight;
+            
+            if (currentHeight > safeHeight) {
+                const scaleRatio = safeHeight / currentHeight;
+                card.style.zoom = scaleRatio;
+                if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                    card.style.transform = `scale(${scaleRatio})`;
+                    card.style.transformOrigin = 'top center';
+                }
+            }
+            
+            window.print();
+            
+            setTimeout(() => {
+                card.style.zoom = '1';
+                card.style.transform = 'none';
+            }, 1000);
+        };
+
         // Modal Logic
         window.openModal = (edit = false) => {
             isEditMode = edit; isSalaryLocked = edit;
@@ -895,6 +964,7 @@
                 empID: id, name, joinDate: jd, 
                 ssn: document.getElementById('formSSN').value,
                 phone: document.getElementById('formPhone').value, email: document.getElementById('formEmail').value,
+                zip: document.getElementById('formZip').value, addr: document.getElementById('formAddr').value, addrDetail: document.getElementById('formAddrDetail').value,
                 bank: document.getElementById('formBank').value, account: document.getElementById('formAccount').value,
                 dept: document.getElementById('formDept').value, rank: document.getElementById('formRank').value,
                 duty: document.getElementById('formDuty').value, contractType: document.getElementById('formContractType').value,
@@ -948,9 +1018,11 @@
 
         window.viewDetail = (id) => {
             const e = emps.find(x => x.empID === id); if(!e) return;
+            currentEditEmp = e;
             window.openModal(true);
             const setV = (id, v) => { const el = document.getElementById(id); if(el) el.value = v || ''; };
             setV('formName', e.name); setV('formSSN', e.ssn); setV('formPhone', e.phone); setV('formEmail', e.email);
+            setV('formZip', e.zip); setV('formAddr', e.addr); setV('formAddrDetail', e.addrDetail);
             setV('formBank', e.bank); setV('formAccount', e.account); setV('formEmpID', e.empID); setV('formJoinDate', e.joinDate);
             setV('formDept', e.dept); setV('formRank', e.rank); setV('formDuty', e.duty); setV('formContractType', e.contractType);
             setV('formQuitDate', e.quitDate);
@@ -1009,7 +1081,9 @@
             setHtml('rc_duty', e.duty === '직책없음' ? '-' : e.duty);
             setHtml('rc_phone', e.phone);
             setHtml('rc_email', e.email);
-            setHtml('rc_addr', `(${e.zip || ''}) ${e.addr || ''} ${e.addrDetail || ''}`);
+            
+            const addrText = (e.zip || e.addr || e.addrDetail) ? `(${e.zip || ''}) ${e.addr || ''} ${e.addrDetail || ''}`.trim() : '-';
+            setHtml('rc_addr', addrText);
             
             // Military Parse
             setHtml('rc_milType', e.milType);
@@ -1058,23 +1132,81 @@
             
             fillTable('rc_careerTable', e.careers, i => `<tr><td>${i.company}</td><td>${i.dept} / ${i.rank}</td><td>${i.duty}</td><td>${i.period} (${i.months}개월)</td></tr>`);
 
-            // History Filters (Last 5 Years)
+            // Merged History Logic
             const currentYear = new Date().getFullYear();
             const fiveYearsAgo = currentYear - 5;
-            
-            const recentSalaries = (e.salaryHistory || [])
-                .filter(a => parseInt(a.date.substring(0,4)) >= fiveYearsAgo)
-                .sort((a,b)=>b.date.localeCompare(a.date));
-            fillTable('rc_salHistoryTable', recentSalaries, i => `<tr><td>${i.date}</td><td>${i.reason}</td><td>${i.monthly}</td><td>${i.annual}</td></tr>`);
 
-            const recentAppoints = (e.appointments || [])
-                .filter(a => parseInt(a.date.substring(0,4)) >= fiveYearsAgo)
-                .sort((a,b)=>b.date.localeCompare(a.date));
-            fillTable('rc_appointTable', recentAppoints, i => `<tr><td>${i.date}</td><td>${i.type}</td><td>${i.before}</td><td>${i.after}</td></tr>`);
+            let events = [];
+            (e.salaryHistory || []).forEach(sal => events.push({ type: 'salary', date: sal.date, reason: sal.reason, monthly: sal.monthly, annual: sal.annual }));
+            (e.appointments || []).forEach(app => events.push({ type: 'appoint', date: app.date, reason: app.type, before: app.before, after: app.after, wage: app.wage }));
+            
+            events.sort((a,b) => a.date.localeCompare(b.date));
+            
+            let groupedEvents = {};
+            events.forEach(ev => {
+                if(!groupedEvents[ev.date]) groupedEvents[ev.date] = [];
+                groupedEvents[ev.date].push(ev);
+            });
+            
+            let mergedRows = [];
+            let currentTitle = '-';
+            let currentSal = '-';
+            
+            Object.keys(groupedEvents).sort().forEach(date => {
+                let dayEvents = groupedEvents[date];
+                
+                let hasSal = dayEvents.find(ev => ev.type === 'salary');
+                let hasApp = dayEvents.find(ev => ev.type === 'appoint');
+                
+                let rowReason = [];
+                let rowBefore = currentTitle;
+                let rowAfter = currentTitle;
+                let rowBeforeSal = currentSal;
+                let rowAfterSal = currentSal;
+                
+                if (hasApp) {
+                    rowReason.push(hasApp.reason);
+                    rowBefore = hasApp.before;
+                    rowAfter = hasApp.after;
+                    currentTitle = hasApp.after;
+                }
+                
+                if (hasSal) {
+                    if (hasSal.reason === '입사') {
+                        rowReason = ['입사'];
+                        rowBefore = '-';
+                        rowAfter = e.dept + ' ' + (e.duty !== '직책없음' ? e.duty : e.rank);
+                        rowBeforeSal = '-';
+                        currentTitle = rowAfter;
+                    } else if (!hasApp) {
+                        rowReason.push(hasSal.reason);
+                    }
+                    rowAfterSal = hasSal.annual;
+                    currentSal = hasSal.annual;
+                }
+                
+                mergedRows.push({
+                    date: date,
+                    reason: rowReason.join(' / '),
+                    before: rowBefore,
+                    after: rowAfter,
+                    beforeSal: rowBeforeSal,
+                    afterSal: rowAfterSal
+                });
+            });
+            
+            let displayRows = mergedRows
+                .filter(r => parseInt(r.date.substring(0,4)) >= fiveYearsAgo)
+                .sort((a,b) => b.date.localeCompare(a.date));
+                
+            fillTable('rc_mergedHistoryTable', displayRows, i => `<tr><td>${i.date}</td><td>${i.reason}</td><td>${i.before}</td><td>${i.after}</td><td>${i.beforeSal}</td><td>${i.afterSal}</td></tr>`);
         };
 
         // Salary & Security
-        window.unlockSalaryInfo = () => { document.getElementById('pwdModal').style.display = 'flex'; };
+        window.unlockSalaryInfo = () => { 
+            document.getElementById('pwdModal').style.display = 'flex'; 
+            setTimeout(() => document.getElementById('salaryPwd').focus(), 50);
+        };
         window.closePwdModal = () => document.getElementById('pwdModal').style.display = 'none';
         window.verifySalaryPwd = () => {
             if(document.getElementById('salaryPwd').value === 'hypopay01') {
@@ -1099,6 +1231,65 @@
             document.getElementById('resMonthPay').innerText = total.toLocaleString() + '원';
             document.getElementById('resYearPay').innerText = (total * 12).toLocaleString() + '원';
             document.getElementById('resHourPay').innerText = (mh > 0 ? Math.floor(usual/mh) : 0).toLocaleString() + '원';
+        };
+
+        // Quick Salary Update Modal (For Appoint integration)
+        window.openQuickSalaryModal = (emp, dateStr) => {
+            qsTargetEmp = emp;
+            document.getElementById('qsDate').value = dateStr || new Date().toISOString().slice(0,10);
+            
+            salaryKeys.forEach(k => {
+                const el = document.getElementById('qs_' + k.id);
+                if(el) el.value = k.type ? (emp[k.id]||'0') : parseInt(emp[k.id]||0).toLocaleString();
+            });
+            window.updateQsCalc();
+            document.getElementById('quickSalModal').style.display = 'flex';
+        };
+
+        window.updateQsCalc = () => {
+            const sDay = document.getElementById('qs_salWorkDay'); if(!sDay) return;
+            const dh = parseFloat(sDay.value) || 0; const mh = Math.ceil(dh * (209 / 8));
+            document.getElementById('qs_resWorkMonth').innerText = mh + '시간';
+            
+            let total = 0, usual = 0;
+            salaryKeys.filter(k=>!k.type).forEach(k => {
+                const val = parseInt(document.getElementById('qs_'+k.id).value.replace(/,/g,'')) || 0;
+                total += val; if(k.id !== 'salFixedOver') usual += val;
+            });
+            document.getElementById('qs_resMonthPay').innerText = total.toLocaleString() + '원';
+            document.getElementById('qs_resYearPay').innerText = (total * 12).toLocaleString() + '원';
+            document.getElementById('qs_resHourPay').innerText = (mh > 0 ? Math.floor(usual/mh) : 0).toLocaleString() + '원';
+        };
+
+        window.saveQuickSalary = async () => {
+            const d = document.getElementById('qsDate').value;
+            const r = document.getElementById('qsReason').value;
+            if(!d) return window.showMessageBox("갱신일을 입력하세요.");
+            
+            const updateObj = {};
+            let total = 0;
+            salaryKeys.filter(k=>!k.type).forEach(k => {
+                const v = document.getElementById('qs_'+k.id).value.replace(/,/g,'');
+                updateObj[k.id] = v;
+                total += parseInt(v) || 0;
+            });
+            
+            const newHistory = { date: d, reason: r, monthly: total.toLocaleString() + "원", annual: (total * 12).toLocaleString() + "원" };
+            updateObj.salaryHistory = arrayUnion(newHistory);
+            
+            await updateDoc(doc(empRef, qsTargetEmp.empID), updateObj);
+            
+            if(!qsTargetEmp.salaryHistory) qsTargetEmp.salaryHistory = [];
+            qsTargetEmp.salaryHistory.push(newHistory);
+            
+            document.getElementById('quickSalModal').style.display = 'none';
+            window.showMessageBox("연봉 갱신이 완료되었습니다.");
+            
+            // Refresh pay status UI if currently active
+            if(selectedEmpForSalary && selectedEmpForSalary.empID === qsTargetEmp.empID) {
+                const activeTr = document.querySelector('#salStatusEmpList tr.selected');
+                if(activeTr) window.selectForSalaryStatus(qsTargetEmp.empID, activeTr);
+            }
         };
 
         // Personnel Appoint
@@ -1130,7 +1321,6 @@
             
             const newAppoint = { date: d, type: t, before: document.getElementById('appBefore').value, after: a, wage: document.getElementById('appWage').value };
             
-            // Update local first for instant render
             if(!selectedEmpForAppoint.appointments) selectedEmpForAppoint.appointments = [];
             selectedEmpForAppoint.appointments.push(newAppoint);
             
@@ -1138,8 +1328,19 @@
             if(t === '직책부여') updateObj.duty = a; else if(t === '직위승진') updateObj.rank = a; else updateObj.dept = a;
             
             await updateDoc(doc(empRef, selectedEmpForAppoint.empID), updateObj); 
-            window.showMessageBox("발령 저장 완료"); 
+            
             window.renderAppointHistory();
+
+            // Link to Quick Salary update if Wage Changed
+            if(newAppoint.wage === '변동') {
+                window.showConfirmBox(`${selectedEmpForAppoint.name}님의 연봉 갱신 업데이트를 하시겠습니까?`, () => {
+                    window.openQuickSalaryModal(selectedEmpForAppoint, d);
+                }, () => {
+                    window.showMessageBox("발령이 저장되었습니다.");
+                });
+            } else {
+                window.showMessageBox("발령이 저장되었습니다.");
+            }
         };
         window.renderAppointHistory = () => {
             const b = document.getElementById('appointHistoryBody'), h = selectedEmpForAppoint.appointments || [];
@@ -1204,8 +1405,18 @@
                     if(document.getElementById('page-mgmt-search').classList.contains('active')) window.renderSearchList();
                 }, err => console.error(err));
             });
+            
+            // Build Dynamic UI
             const sBody = document.getElementById('salaryFormBody');
-            salaryKeys.forEach(k => { sBody.innerHTML += `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="${k.id}" class="${k.type?'num-input':'salary-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateSalaryCalc()"></td></tr>`; });
+            const qsBody = document.getElementById('qsFormBody');
+            
+            salaryKeys.forEach(k => { 
+                const sRow = `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="${k.id}" class="${k.type?'num-input':'salary-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateSalaryCalc()"></td></tr>`;
+                const qsRow = `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="qs_${k.id}" class="${k.type?'num-input':'qs-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateQsCalc()"></td></tr>`;
+                
+                if(sBody) sBody.innerHTML += sRow; 
+                if(qsBody) qsBody.innerHTML += qsRow;
+            });
         }
 
         document.addEventListener('input', e => {
@@ -1215,7 +1426,7 @@
                 if (v.startsWith('02')) { if(v.length <= 2) t.value = v; else if(v.length <= 5) t.value = v.slice(0,2) + '-' + v.slice(2,5) + '-' + v.slice(5,9); else t.value = v.slice(0,2) + '-' + v.slice(2,6) + '-' + v.slice(6,10); }
                 else { if(v.length <= 3) t.value = v; else if(v.length <= 7) t.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11); else t.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7,11); }
             } else if (t.dataset.type === 'account') { window.formatAccount(); }
-            else if (t.classList.contains('salary-input') || (t.id && t.id.startsWith('st_sal'))) { let v = t.value.replace(/[^0-9]/g, ''); t.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+            else if (t.classList.contains('salary-input') || t.classList.contains('qs-input') || (t.id && t.id.startsWith('st_sal'))) { let v = t.value.replace(/[^0-9]/g, ''); t.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
             else if (t.classList.contains('auto-hyphen')) {
                 let v = t.value.replace(/[^0-9]/g, ''), dt = t.dataset.type;
                 if(dt === 'ssn') t.value = v.length <= 6 ? v : v.slice(0,6)+'-'+v.slice(6,13);
