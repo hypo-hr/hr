@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>히포케이메논 ERP V.2.8.9 - 통합 관리</title>
+    <title>히포케이메논 ERP V.2.8.10 - 통합 관리</title>
     <!-- Daum Postcode Service -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <!-- SheetJS for Excel Processing -->
@@ -148,7 +148,6 @@
             @page { 
                 size: A4 portrait; 
                 margin: 0.5mm; 
-                /* Experimental CSS Paged Media for page numbers (works in some PDF generators/browsers) */
                 @bottom-center {
                     content: "HYPOKEIMENON\A " counter(page) " / " counter(pages);
                     white-space: pre;
@@ -162,17 +161,19 @@
             .panel-right { width: 100%; border: none !important; padding: 0 !important; overflow: visible; height: auto; background: white !important; }
             .record-card { padding: 10px; border: none; margin: 0; max-width: 100%; }
             
-            /* Allow natural page breaks for multiple pages */
             .record-table { page-break-inside: auto; }
             .record-table tr { page-break-inside: avoid; page-break-after: auto; }
             .record-section-title { page-break-after: avoid; }
             
             .print-footer { display: block; }
-            
-            /* Force exact colors for printing */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .record-table th { background: #e0e0e0 !important; }
         }
+
+        /* Account Modals specific styles */
+        .account-form-grid { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .account-form-grid label { font-weight: bold; font-size: 12px; color: #444; }
+        .account-form-grid input { height: 28px; border: 1px solid var(--icube-border); padding: 0 8px; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -186,8 +187,8 @@
     
     <!-- 공용 확인 창 (Yes/No) -->
     <div id="confirmBoxOverlay" class="msg-box-overlay" style="z-index: 3100;">
-        <div class="msg-box">
-            <p id="confirmBoxText" style="margin-bottom: 15px; font-size: 13px; font-weight: bold;"></p>
+        <div class="msg-box" style="padding: 25px 40px;">
+            <p id="confirmBoxText" style="margin-bottom: 20px; font-size: 14px; font-weight: bold; line-height: 1.5;"></p>
             <div style="display:flex; justify-content:center; gap:10px;">
                 <button class="tool-btn" onclick="window.closeConfirmBox(false)">취소</button>
                 <button class="tool-btn primary" onclick="window.closeConfirmBox(true)">확인</button>
@@ -196,8 +197,7 @@
     </div>
 
     <div class="header">
-        <!-- Logo click navigates to Home -->
-        <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.9</span></div>
+        <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.10</span></div>
     </div>
 
     <div class="main-wrapper">
@@ -218,6 +218,13 @@
                 </ul>
             </div>
             <div class="menu-group">
+                <div class="menu-category">평가</div>
+                <ul class="menu-list">
+                    <li class="menu-item" onclick="window.switchMenu('eval-probation', this)"><i class="fa-solid fa-clipboard-user"></i> 수습평가</li>
+                    <li class="menu-item" onclick="window.switchMenu('eval-kpi', this)"><i class="fa-solid fa-bullseye"></i> KPI평가</li>
+                </ul>
+            </div>
+            <div class="menu-group">
                 <div class="menu-category">시스템 설정</div>
                 <ul class="menu-list">
                     <li class="menu-item" onclick="window.switchMenu('account', this)"><i class="fa-solid fa-users-gear"></i> 계정 관리</li>
@@ -234,11 +241,37 @@
                 </div>
             </div>
 
+            <!-- 평가 Pages -->
+            <div id="page-eval-probation" class="page-content">
+                <div class="empty-page">
+                    <i class="fa-solid fa-clipboard-user" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                    <p>수습평가 메뉴 준비 중입니다.</p>
+                </div>
+            </div>
+            <div id="page-eval-kpi" class="page-content">
+                <div class="empty-page">
+                    <i class="fa-solid fa-bullseye" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                    <p>KPI평가 메뉴 준비 중입니다.</p>
+                </div>
+            </div>
+
             <!-- 계정 관리 Page -->
             <div id="page-account" class="page-content">
-                <div class="empty-page">
-                    <i class="fa-solid fa-users-gear" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                    <p>계정 권한 관리 메뉴 준비 중입니다.</p>
+                <div class="toolbar">
+                    <button class="tool-btn primary" onclick="window.openAccountModal()"><i class="fa-solid fa-plus"></i> 계정 생성</button>
+                    <button class="tool-btn" onclick="window.renderAccountGrid()"><i class="fa-solid fa-rotate"></i> 조회</button>
+                </div>
+                <div class="list-panel">
+                    <div style="overflow-y:auto; flex:1">
+                        <table class="icube-grid">
+                            <thead>
+                                <tr>
+                                    <th width="100">이름</th><th width="100">사번</th><th width="120">부서명</th><th width="100">직위/직책</th><th width="120">입사일</th><th width="150">계정(ID)</th><th width="80">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accountGridBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -286,7 +319,7 @@
                         <div id="recordCardArea" style="display:none; margin: 0 auto; max-width: 800px;">
                             <div class="status-header print-hide">
                                 인사기록카드 
-                                <button class="tool-btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
+                                <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
                             </div>
                             
                             <div class="record-card">
@@ -323,24 +356,18 @@
                                     </div>
                                 </div>
 
-                                <!-- Middle: Re-ordered Details -->
-                                <!-- 가족 & 학력 (Side by Side) -->
-                                <div style="display:flex; gap:15px; margin-bottom:0;">
-                                    <div style="flex:1; min-width: 0;">
-                                        <div class="record-section-title">가족 사항</div>
-                                        <table class="record-table" id="rc_familyTable">
-                                            <thead><tr><th>관계</th><th>성명</th><th>생년월일</th><th>동거여부</th></tr></thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-                                    <div style="flex:1; min-width: 0;">
-                                        <div class="record-section-title">학력 사항</div>
-                                        <table class="record-table" id="rc_eduTable">
-                                            <thead><tr><th>학교명</th><th>전공</th><th>기간</th><th>상태</th></tr></thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                <!-- Middle: Re-ordered Details (Full Width for all) -->
+                                <div class="record-section-title">가족 사항</div>
+                                <table class="record-table" id="rc_familyTable">
+                                    <thead><tr><th width="20%">관계</th><th width="30%">성명</th><th width="30%">생년월일</th><th width="20%">동거여부</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+
+                                <div class="record-section-title">학력 사항</div>
+                                <table class="record-table" id="rc_eduTable">
+                                    <thead><tr><th width="30%">학교명</th><th width="25%">전공</th><th width="25%">기간</th><th width="20%">상태</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
 
                                 <!-- 자격 및 어학 (Full width) -->
                                 <div class="record-section-title">자격 및 어학</div>
@@ -627,6 +654,26 @@
         </div>
     </div>
 
+    <!-- 퀵 인사발령 등록 모달 (연봉 갱신 연동 전용) -->
+    <div id="quickAppointModal" class="modal-overlay" style="z-index:1150">
+        <div class="modal-content" style="width:600px;">
+            <div class="modal-header"><h2 id="qaTitle">인사발령 등록</h2><button class="close-btn" onclick="document.getElementById('quickAppointModal').style.display='none'">&times;</button></div>
+            <div class="modal-body" style="padding:20px;">
+                <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; align-items:end;">
+                    <div><label style="font-size:11px;">발령일</label><input id="qaDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div>
+                    <div><label style="font-size:11px;">발령내용</label><select id="qaType" onchange="window.syncQaOptions()" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"><option value="">선택</option><option value="부서명변경">부서명변경</option><option value="직책부여">직책부여</option><option value="직위승진">직위승진</option></select></div>
+                    <div><label style="font-size:11px;">발령 전</label><div id="qaBeforeContainer"><input id="qaBefore" readonly class="read-only" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div></div>
+                    <div><label style="font-size:11px;">발령 후</label><div id="qaAfterContainer"><input id="qaAfter" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div></div>
+                    <div><label style="font-size:11px;">임금변동</label><select id="qaWage" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"><option value="변동" selected>변동</option><option value="유지">유지</option></select></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="tool-btn" onclick="document.getElementById('quickAppointModal').style.display='none'">취소</button>
+                <button class="tool-btn success" onclick="window.saveQuickAppointment()">저장</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 퀵 연봉 갱신 모달 (인사발령 연동 전용) -->
     <div id="quickSalModal" class="modal-overlay" style="z-index:1150">
         <div class="modal-content" style="width:600px;">
@@ -653,9 +700,59 @@
         </div>
     </div>
 
+    <!-- 계정 생성/관리 전용 모달 -->
+    <div id="accountModal" class="modal-overlay" style="z-index: 1100;">
+        <div class="modal-content" style="width: 400px;">
+            <div class="modal-header"><h2 id="accountModalTitle">계정 생성</h2><button class="close-btn" onclick="document.getElementById('accountModal').style.display='none'">&times;</button></div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="account-form-grid">
+                    <label>사원 선택</label>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="accName" readonly class="read-only" placeholder="사원 검색을 통해 입력" style="flex:1;">
+                        <button class="tool-btn" onclick="window.openEmpSearchModal()">검색</button>
+                    </div>
+                    
+                    <label>사번</label><input type="text" id="accEmpID" readonly class="read-only">
+                    <label>부서명</label><input type="text" id="accDept" readonly class="read-only">
+                    <label>직위/직책</label><input type="text" id="accRankDuty" readonly class="read-only">
+                    <label>입사일</label><input type="text" id="accJoinDate" readonly class="read-only">
+                    
+                    <div style="grid-column: 1 / -1; height: 1px; background: #ddd; margin: 10px 0;"></div>
+                    
+                    <label class="required">계정 (ID)</label><input type="text" id="accId" placeholder="아이디 입력">
+                    <label class="required">비밀번호</label><input type="password" id="accPw" placeholder="비밀번호 입력">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="tool-btn" onclick="document.getElementById('accountModal').style.display='none'">취소</button>
+                <button class="tool-btn primary" onclick="window.saveAccount()">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 계정 생성을 위한 사원 검색 모달 -->
+    <div id="empSearchModal" class="modal-overlay" style="z-index: 1200;">
+        <div class="modal-content" style="width: 700px; max-height: 80vh;">
+            <div class="modal-header"><h2>사원 검색</h2><button class="close-btn" onclick="document.getElementById('empSearchModal').style.display='none'">&times;</button></div>
+            <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <div class="search-box" style="padding: 0; background: transparent; border: none;">
+                    <input type="text" id="empSearchInput" placeholder="이름/사번 검색" style="height:28px; width:200px; padding:0 8px; border:1px solid #ccc;" onkeyup="window.renderEmpSearchList()">
+                </div>
+                <div style="overflow-y:auto; flex:1; border:1px solid #ddd;">
+                    <table class="icube-grid" style="margin:0;">
+                        <thead>
+                            <tr><th>이름</th><th>사번</th><th>부서명</th><th>직위/직책</th><th>입사일</th><th>퇴사일</th></tr>
+                        </thead>
+                        <tbody id="empSearchBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : JSON.parse('{"apiKey": "AIzaSyBohhdlBOkvjEPpdxc2NS_qEDOTvR0hl18", "authDomain": "hypo-erp-5b661.firebaseapp.com", "projectId": "hypo-erp-5b661", "storageBucket": "hypo-erp-5b661.firebasestorage.app"}');
@@ -663,9 +760,12 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'hypo-erp-v1';
+        
         const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees');
+        const accountRef = collection(db, 'artifacts', appId, 'public', 'data', 'accounts');
 
         let emps = [];
+        let accounts = []; // Stores accounts data
         let isEditMode = false;
         let isSalaryLocked = true;
         let selectedEmpForSalary = null;
@@ -675,6 +775,9 @@
         let auditActionContext = null; 
         let confirmCallback = null;
         let cancelCallback = null;
+        
+        // Mock logged-in user name (Since no actual login page exists yet)
+        const currentLoggedInUserName = "최고관리자 (Admin)";
 
         const salaryKeys = [
             {id: 'salProbationRate', label: '수습 급여 적용률 (%)', type: 'num'},
@@ -707,10 +810,27 @@
         window.switchMenu = (id, el) => { 
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active')); 
             if(el) el.classList.add('active'); 
+            
             document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active')); 
             const target = document.getElementById('page-' + id); 
             if(target) target.classList.add('active'); 
-            if(id === 'mgmt-search') window.renderSearchList();
+            
+            // Record Card reset logic when leaving 'mgmt-search'
+            if(id !== 'mgmt-search') {
+                const recEmpty = document.getElementById('recordEmptyArea');
+                const recCard = document.getElementById('recordCardArea');
+                if(recEmpty && recCard) {
+                    recEmpty.style.display = 'flex';
+                    recCard.style.display = 'none';
+                }
+                document.querySelectorAll('#recordEmpList tr').forEach(r => r.classList.remove('selected'));
+            } else {
+                window.renderSearchList();
+            }
+
+            if(id === 'account') {
+                window.renderAccountGrid();
+            }
         };
 
         window.switchTab = (id) => { document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === id)); document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'content-' + id)); if(id === 'salary') window.updateSalaryCalc(); };
@@ -821,12 +941,18 @@
             if(!empId) return; 
             auditActionContext = { type: 'SSN_EDIT' };
             document.getElementById('auditTitle').innerText = "주민등록번호 수정 권한 요청";
-            document.getElementById('auditModifier').value = "";
+            
+            // Auto-fill and lock modifier name
+            const modEl = document.getElementById('auditModifier');
+            modEl.value = currentLoggedInUserName;
+            modEl.classList.add('read-only');
+            modEl.readOnly = true;
+
             document.getElementById('auditReason').value = "";
             document.getElementById('auditNewSsn').value = "";
             document.getElementById('auditNewSsn').style.display = "block";
             document.getElementById('auditModal').style.display = 'flex';
-            document.getElementById('auditModifier').focus();
+            document.getElementById('auditReason').focus();
         };
 
         window.viewSsnHistory = () => {
@@ -845,11 +971,16 @@
         window.requestAppointDelete = (idx) => {
             auditActionContext = { type: 'APPOINT_DEL', index: idx };
             document.getElementById('auditTitle').innerText = "발령 삭제 권한 요청";
-            document.getElementById('auditModifier').value = "";
+            
+            const modEl = document.getElementById('auditModifier');
+            modEl.value = currentLoggedInUserName;
+            modEl.classList.add('read-only');
+            modEl.readOnly = true;
+
             document.getElementById('auditReason').value = "";
             document.getElementById('auditNewSsn').style.display = "none";
             document.getElementById('auditModal').style.display = 'flex';
-            document.getElementById('auditModifier').focus();
+            document.getElementById('auditReason').focus();
         };
 
         window.viewAppointHistory = () => {
@@ -926,6 +1057,23 @@
                 
                 window.showMessageBox("발령 내역이 삭제되었습니다.");
                 window.renderAppointHistory();
+
+            } else if (auditActionContext.type === 'ACCOUNT_DEL') {
+                document.getElementById('auditModal').style.display = 'none';
+                const accId = auditActionContext.accountId;
+                
+                const logEntry = {
+                    date: new Date().toISOString().slice(0,10),
+                    modifier: mod,
+                    reason: rsn,
+                    deletedId: accId
+                };
+
+                // Remove from DB collection
+                await deleteDoc(doc(accountRef, accId));
+                
+                window.showMessageBox(`계정(${accId})이 삭제되었습니다.`);
+                window.renderAccountGrid();
             }
             auditActionContext = null;
         };
@@ -1138,7 +1286,10 @@
             };
 
             fillTable('rc_familyTable', e.families, i => `<tr><td>${i.relation}</td><td>${i.name}</td><td>${i.birth}</td><td>${i.living}</td></tr>`);
-            fillTable('rc_eduTable', e.educations, i => `<tr><td>${i.school}</td><td>${i.major}</td><td>${i.period}</td><td>${i.status}</td></tr>`);
+            
+            // 학력사항 (최신순 정렬)
+            const sortedEdu = [...(e.educations || [])].sort((a,b) => (b.period||'').localeCompare(a.period||''));
+            fillTable('rc_eduTable', sortedEdu, i => `<tr><td>${i.school}</td><td>${i.major}</td><td>${i.period}</td><td>${i.status}</td></tr>`);
             
             const licensesAndLangs = [...(e.licenses||[]).map(l=>({type:'자격', name:l.name, detail:`${l.issuer}`, date:l.date})), ...(e.languages||[]).map(l=>({type:'어학', name:l.name, detail:`${l.score} (${l.issuer})`, date:l.date}))];
             fillTable('rc_licenseTable', licensesAndLangs, i => `<tr><td>${i.type}</td><td>${i.name}</td><td>${i.detail}</td><td>${i.date}</td></tr>`);
@@ -1252,6 +1403,54 @@
             document.getElementById('resMonthPay').innerText = total.toLocaleString() + '원';
             document.getElementById('resYearPay').innerText = (total * 12).toLocaleString() + '원';
             document.getElementById('resHourPay').innerText = (mh > 0 ? Math.floor(usual/mh) : 0).toLocaleString() + '원';
+        };
+
+        // Quick Appoint Modal (For Salary integration)
+        window.openQuickAppointModal = (emp, dateStr) => {
+            qsTargetEmp = emp;
+            document.getElementById('qaDate').value = dateStr || new Date().toISOString().slice(0,10);
+            document.getElementById('qaType').value = '';
+            document.getElementById('qaBefore').value = '';
+            document.getElementById('qaAfter').value = '';
+            document.getElementById('qaWage').value = '변동';
+            window.syncQaOptions();
+            document.getElementById('quickAppointModal').style.display = 'flex';
+        };
+
+        window.syncQaOptions = () => {
+            const t = document.getElementById('qaType').value, bc = document.getElementById('qaBeforeContainer'), ac = document.getElementById('qaAfterContainer');
+            if(!qsTargetEmp) return;
+            if(t === '직책부여') {
+                bc.innerHTML = `<input id="qaBefore" value="${qsTargetEmp.duty && qsTargetEmp.duty !== '직책없음' ? qsTargetEmp.duty : '직책없음'}" readonly class="read-only" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;">`;
+                ac.innerHTML = `<select id="qaAfter" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"><option>대표이사</option><option>본부장</option><option>팀장</option><option>파트장</option><option>직책없음</option></select>`;
+            } else if(t === '직위승진') {
+                bc.innerHTML = `<input id="qaBefore" value="${qsTargetEmp.rank || '사원'}" readonly class="read-only" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;">`;
+                ac.innerHTML = `<select id="qaAfter" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"><option>대표이사</option><option>이사</option><option>부장</option><option>책임</option><option>전임</option><option>선임</option><option>주임</option><option>사원</option></select>`;
+            } else { 
+                bc.innerHTML = `<input id="qaBefore" value="${qsTargetEmp.dept || ''}" readonly class="read-only" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;">`; 
+                ac.innerHTML = `<input id="qaAfter" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;">`; 
+            }
+        };
+
+        window.saveQuickAppointment = async () => {
+            const d = document.getElementById('qaDate').value, t = document.getElementById('qaType').value, a = document.getElementById('qaAfter').value;
+            if(!d || !t || !a) return window.showMessageBox("정보 누락");
+            
+            const newAppoint = { date: d, type: t, before: document.getElementById('qaBefore').value, after: a, wage: document.getElementById('qaWage').value };
+            
+            const updateObj = { appointments: arrayUnion(newAppoint) };
+            if(t === '직책부여') updateObj.duty = a; else if(t === '직위승진') updateObj.rank = a; else updateObj.dept = a;
+            
+            await updateDoc(doc(empRef, qsTargetEmp.empID), updateObj); 
+            
+            document.getElementById('quickAppointModal').style.display = 'none';
+            window.showMessageBox("인사발령 등록이 완료되었습니다.");
+
+            if(selectedEmpForAppoint && selectedEmpForAppoint.empID === qsTargetEmp.empID) {
+                if(!selectedEmpForAppoint.appointments) selectedEmpForAppoint.appointments = [];
+                selectedEmpForAppoint.appointments.push(newAppoint);
+                window.renderAppointHistory();
+            }
         };
 
         // Quick Salary Update Modal (For Appoint integration)
@@ -1406,26 +1605,147 @@
             if (!selectedEmpForSalary.salaryHistory) selectedEmpForSalary.salaryHistory = [];
             selectedEmpForSalary.salaryHistory.push(newHistory); // 빠른 화면 갱신
             
-            window.showMessageBox("연봉 업데이트 완료"); 
             window.renderSalaryHistory(); 
+
+            // Link to Quick Appointment update if Reason is '인사발령'
+            if(r === '인사발령') {
+                window.showConfirmBox("연봉 업데이트가 완료되었습니다.\n인사발령 등록을 연이어 하시겠습니까?", () => {
+                    window.openQuickAppointModal(selectedEmpForSalary, d);
+                }, () => {
+                    window.showMessageBox("연봉 업데이트 완료");
+                });
+            } else {
+                window.showMessageBox("연봉 업데이트 완료");
+            }
         };
         window.renderSalaryHistory = () => {
             const b = document.getElementById('salHistoryBody'), h = selectedEmpForSalary.salaryHistory || [];
             b.innerHTML = h.sort((a,b)=>b.date.localeCompare(a.date)).map(i => `<tr><td>${i.reason}</td><td>${i.date}</td><td>${i.monthly}</td><td>${i.annual}</td></tr>`).join('');
         };
 
+        // Account Management Features
+        window.renderAccountGrid = () => {
+            const b = document.getElementById('accountGridBody');
+            if(!b) return;
+            b.innerHTML = accounts.map(a => `
+                <tr>
+                    <td style="font-weight:bold; color:var(--icube-blue);">${a.name}</td>
+                    <td>${a.empID}</td>
+                    <td>${a.dept}</td>
+                    <td>${a.rankDuty}</td>
+                    <td>${a.joinDate}</td>
+                    <td>${a.accountId}</td>
+                    <td><button class="tool-btn" style="padding:2px 6px; color:#d32f2f; margin:0 auto;" onclick="window.requestAccountDelete('${a.accountId}')" title="계정 삭제"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+            if(accounts.length === 0) b.innerHTML = `<tr><td colspan="7">등록된 계정이 없습니다.</td></tr>`;
+        };
+
+        window.openAccountModal = () => {
+            document.getElementById('accName').value = '';
+            document.getElementById('accEmpID').value = '';
+            document.getElementById('accDept').value = '';
+            document.getElementById('accRankDuty').value = '';
+            document.getElementById('accJoinDate').value = '';
+            document.getElementById('accId').value = '';
+            document.getElementById('accPw').value = '';
+            document.getElementById('accountModal').style.display = 'flex';
+        };
+
+        window.openEmpSearchModal = () => {
+            document.getElementById('empSearchInput').value = '';
+            window.renderEmpSearchList();
+            document.getElementById('empSearchModal').style.display = 'flex';
+        };
+
+        window.renderEmpSearchList = () => {
+            const b = document.getElementById('empSearchBody');
+            const term = document.getElementById('empSearchInput').value;
+            const f = emps.filter(e => (e.name && e.name.includes(term)) || (e.empID && e.empID.includes(term)));
+            b.innerHTML = f.map(e => `
+                <tr onclick="window.selectEmpForAccount('${e.empID}')">
+                    <td style="font-weight:bold; color:var(--icube-blue);">${e.name}</td>
+                    <td>${e.empID}</td>
+                    <td>${e.dept||''}</td>
+                    <td>${e.duty && e.duty !== '직책없음' ? e.duty : (e.rank||'사원')}</td>
+                    <td>${e.joinDate}</td>
+                    <td>${e.quitDate||'-'}</td>
+                </tr>
+            `).join('');
+        };
+
+        window.selectEmpForAccount = (empID) => {
+            const e = emps.find(x => x.empID === empID);
+            if(!e) return;
+            document.getElementById('accName').value = e.name;
+            document.getElementById('accEmpID').value = e.empID;
+            document.getElementById('accDept').value = e.dept || '';
+            document.getElementById('accRankDuty').value = e.duty && e.duty !== '직책없음' ? e.duty : (e.rank || '사원');
+            document.getElementById('accJoinDate').value = e.joinDate;
+            document.getElementById('empSearchModal').style.display = 'none';
+        };
+
+        window.saveAccount = async () => {
+            const empID = document.getElementById('accEmpID').value;
+            const accountId = document.getElementById('accId').value.trim();
+            const accountPw = document.getElementById('accPw').value.trim();
+            
+            if(!empID) return window.showMessageBox("사원을 검색하여 선택해주세요.");
+            if(!accountId || !accountPw) return window.showMessageBox("계정 ID와 비밀번호를 모두 입력해주세요.");
+            
+            // Check for duplicate account ID
+            if(accounts.some(a => a.accountId === accountId)) {
+                return window.showMessageBox("이미 존재하는 계정 ID입니다.");
+            }
+
+            const accData = {
+                empID: empID,
+                name: document.getElementById('accName').value,
+                dept: document.getElementById('accDept').value,
+                rankDuty: document.getElementById('accRankDuty').value,
+                joinDate: document.getElementById('accJoinDate').value,
+                accountId: accountId,
+                password: accountPw // In a real app, never store plain text PW
+            };
+
+            await setDoc(doc(accountRef, accountId), accData);
+            window.showMessageBox("계정이 성공적으로 등록되었습니다.");
+            document.getElementById('accountModal').style.display = 'none';
+        };
+
+        window.requestAccountDelete = (accId) => {
+            auditActionContext = { type: 'ACCOUNT_DEL', accountId: accId };
+            document.getElementById('auditTitle').innerText = "계정 삭제 권한 요청";
+            
+            const modEl = document.getElementById('auditModifier');
+            modEl.value = currentLoggedInUserName;
+            modEl.classList.add('read-only');
+            modEl.readOnly = true;
+
+            document.getElementById('auditReason').value = "";
+            document.getElementById('auditNewSsn').style.display = "none";
+            document.getElementById('auditModal').style.display = 'flex';
+            document.getElementById('auditReason').focus();
+        };
+
         // App Initialization
         async function start() {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); }
             onAuthStateChanged(auth, user => {
-                if(user) onSnapshot(empRef, snap => {
-                    emps = snap.docs.map(d => ({...d.data(), id: d.id}));
-                    window.renderGrid();
-                    window.renderSalaryStatusList();
-                    window.renderAppointList();
-                    // If Search tab is active, re-render search list
-                    if(document.getElementById('page-mgmt-search').classList.contains('active')) window.renderSearchList();
-                }, err => console.error(err));
+                if(user) {
+                    onSnapshot(empRef, snap => {
+                        emps = snap.docs.map(d => ({...d.data(), id: d.id}));
+                        window.renderGrid();
+                        window.renderSalaryStatusList();
+                        window.renderAppointList();
+                        if(document.getElementById('page-mgmt-search').classList.contains('active')) window.renderSearchList();
+                    }, err => console.error(err));
+
+                    onSnapshot(accountRef, snap => {
+                        accounts = snap.docs.map(d => ({...d.data(), id: d.id}));
+                        if(document.getElementById('page-account').classList.contains('active')) window.renderAccountGrid();
+                    }, err => console.error(err));
+                }
             });
             const sBody = document.getElementById('salaryFormBody');
             salaryKeys.forEach(k => { sBody.innerHTML += `<tr><th class="${k.id==='salWorkDay'?'required':''}">${k.label}</th><td><input id="${k.id}" class="${k.type?'num-input':'salary-input'} secure-field" value="${k.id==='salWorkDay'?'8':k.id==='salProbationRate'?'100':''}" oninput="window.updateSalaryCalc()"></td></tr>`; });
