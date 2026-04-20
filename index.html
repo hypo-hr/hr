@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>히포케이메논 ERP V.2.8.11 - 통합 관리</title>
+    <title>히포케이메논 ERP V.2.8.12 - 통합 관리</title>
     <!-- Daum Postcode Service -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <!-- SheetJS for Excel Processing -->
@@ -25,6 +25,34 @@
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Malgun Gothic', 'Dotum', sans-serif; font-size: 12px; background: var(--icube-bg); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
+        /* Login Screen */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #EDF2F5; z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .login-box {
+            background: white; padding: 50px 40px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 380px; text-align: center;
+        }
+        .login-title {
+            font-size: 26px; font-weight: 900; letter-spacing: 5px;
+            margin-bottom: 40px; color: var(--sidebar-dark); font-family: 'Arial', sans-serif;
+        }
+        .login-input {
+            width: 100%; height: 42px; border: 1px solid #ccc;
+            border-radius: 4px; padding: 0 15px; margin-bottom: 15px;
+            font-size: 13px; box-sizing: border-box; outline: none; transition: border 0.3s;
+        }
+        .login-input:focus { border-color: var(--icube-blue); }
+        .login-btn {
+            width: 100%; height: 44px; background: var(--icube-blue); color: white;
+            border: none; border-radius: 4px; font-size: 14px; font-weight: bold;
+            cursor: pointer; margin-top: 15px; transition: background 0.2s;
+        }
+        .login-btn:hover { background: #234B9E; }
+
         /* 권한 제어 (CSS 기반 숨김 처리) */
         body[data-role="기본담당자"] .auth-admin-only,
         body[data-role="기본담당자"] .auth-payroll-up { display: none !important; }
@@ -36,6 +64,7 @@
         body[data-role="기타"] .auth-basic-up { display: none !important; }
 
         /* Layout */
+        #app-container { display: none; height: 100%; flex-direction: column; width: 100%; }
         .header { height: 50px; background: white; border-bottom: 1px solid var(--icube-border); display: flex; align-items: center; padding: 0 20px; z-index: 20; flex-shrink: 0; }
         .header-title { font-weight: bold; color: var(--icube-blue); font-size: 15px; cursor: pointer; }
         .version-tag { background: #eee; padding: 2px 6px; border-radius: 3px; font-size: 10px; color: #666; margin-left: 10px; }
@@ -188,412 +217,444 @@
         #ipBlockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
     </style>
 </head>
-<body data-role="관리자">
+<body data-role="기타">
 
-    <!-- IP Block Overlay -->
-    <div id="ipBlockOverlay">
-        <i class="fa-solid fa-shield-halved" style="font-size:60px; color:#d32f2f; margin-bottom:20px;"></i>
-        <h1 style="color:#333; margin-bottom:10px;">접속 불가 지역입니다</h1>
-        <p style="color:#666;">인가된 사내 IP 네트워크에서만 접속할 수 있습니다.</p>
-        <p style="color:#999; margin-top:20px; font-size:11px;">현재 IP: <span id="displayBlockedIp"></span></p>
-    </div>
-
-    <div id="msgBoxOverlay" class="msg-box-overlay">
-        <div class="msg-box">
-            <p id="msgBoxText" style="margin-bottom: 15px; font-size: 13px; font-weight: bold;"></p>
-            <button class="tool-btn primary" style="margin: 0 auto; width: 80px;" onclick="window.closeMsgBox()">확인</button>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="login-title">HYPOKEIMENON</div>
+            <input type="text" id="loginId" class="login-input" placeholder="아이디 (ID)" autocomplete="off">
+            <input type="password" id="loginPw" class="login-input" placeholder="비밀번호 (Password)" onkeyup="if(event.keyCode===13) window.handleLogin()">
+            <button class="login-btn" onclick="window.handleLogin()">로그인</button>
         </div>
     </div>
-    
-    <!-- 공용 확인 창 (Yes/No) -->
-    <div id="confirmBoxOverlay" class="msg-box-overlay" style="z-index: 3100;">
-        <div class="msg-box" style="padding: 25px 40px;">
-            <p id="confirmBoxText" style="margin-bottom: 20px; font-size: 14px; font-weight: bold; line-height: 1.5;"></p>
-            <div style="display:flex; justify-content:center; gap:10px;">
-                <button class="tool-btn" onclick="window.closeConfirmBox(false)">취소</button>
-                <button class="tool-btn primary" onclick="window.closeConfirmBox(true)">확인</button>
+
+    <!-- App Container (Hidden initially) -->
+    <div id="app-container">
+
+        <!-- IP Block Overlay -->
+        <div id="ipBlockOverlay">
+            <i class="fa-solid fa-shield-halved" style="font-size:60px; color:#d32f2f; margin-bottom:20px;"></i>
+            <h1 style="color:#333; margin-bottom:10px;">접속 불가 지역입니다</h1>
+            <p style="color:#666;">인가된 사내 IP 네트워크에서만 접속할 수 있습니다.</p>
+            <p style="color:#999; margin-top:20px; font-size:11px;">현재 IP: <span id="displayBlockedIp"></span></p>
+        </div>
+
+        <div id="msgBoxOverlay" class="msg-box-overlay">
+            <div class="msg-box">
+                <p id="msgBoxText" style="margin-bottom: 15px; font-size: 13px; font-weight: bold;"></p>
+                <button class="tool-btn primary" style="margin: 0 auto; width: 80px;" onclick="window.closeMsgBox()">확인</button>
             </div>
         </div>
-    </div>
-
-    <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.11</span></div>
         
-        <!-- 권한 테스트용 임시 드롭다운 -->
-        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 11px; color: #666;"><i class="fa-solid fa-flask"></i> 권한 테스트 모드:</span>
-            <select onchange="window.testRoleSwitch(this.value)" style="padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 11px;">
-                <option value="관리자">관리자 (전체 메뉴)</option>
-                <option value="임금담당자">임금담당자 (시스템 설정 불가)</option>
-                <option value="기본담당자">기본담당자 (임금, 발령, 설정 불가)</option>
-                <option value="기타">기타 (모든 메뉴 불가)</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="main-wrapper">
-        <div class="sidebar">
-            <div class="menu-group auth-all">
-                <ul class="menu-list">
-                    <li class="menu-item active" onclick="window.switchMenu('home', this)"><i class="fa-solid fa-house"></i> HOME</li>
-                </ul>
-            </div>
-            
-            <div class="menu-group auth-basic-up">
-                <div class="menu-category">사원관리</div>
-                <ul class="menu-list">
-                    <li class="menu-item" onclick="window.switchMenu('mgmt-reg', this)"><i class="fa-solid fa-user-plus"></i> 사원 등록/수정</li>
-                    <li class="menu-item" onclick="window.switchMenu('mgmt-search', this)"><i class="fa-solid fa-magnifying-glass"></i> 사원 조회</li>
-                    <li class="menu-item auth-payroll-up" onclick="window.switchMenu('mgmt-appoint', this)"><i class="fa-solid fa-file-signature"></i> 인사 발령 등록</li>
-                </ul>
-            </div>
-            
-            <div class="menu-group auth-payroll-up">
-                <div class="menu-category">임금</div>
-                <ul class="menu-list">
-                    <li class="menu-item" onclick="window.switchMenu('pay-status', this)"><i class="fa-solid fa-chart-line"></i> 연봉 산정/갱신 현황</li>
-                    <li class="menu-item" onclick="window.switchMenu('pay-history', this)"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</li>
-                </ul>
-            </div>
-            
-            <div class="menu-group auth-basic-up">
-                <div class="menu-category">평가</div>
-                <ul class="menu-list">
-                    <li class="menu-item" onclick="window.switchMenu('eval-probation', this)"><i class="fa-solid fa-clipboard-user"></i> 수습평가</li>
-                    <li class="menu-item" onclick="window.switchMenu('eval-kpi', this)"><i class="fa-solid fa-bullseye"></i> KPI평가</li>
-                </ul>
-            </div>
-            
-            <div class="menu-group auth-admin-only">
-                <div class="menu-category">시스템 설정</div>
-                <ul class="menu-list">
-                    <li class="menu-item" onclick="window.switchMenu('sys-code', this)"><i class="fa-solid fa-code-branch"></i> 공통 코드 관리</li>
-                    <li class="menu-item" onclick="window.switchMenu('sys-ip', this)"><i class="fa-solid fa-network-wired"></i> 접속 IP 설정</li>
-                    <li class="menu-item" onclick="window.switchMenu('sys-log', this)"><i class="fa-solid fa-list-check"></i> Log 기록</li>
-                    <li class="menu-item" onclick="window.switchMenu('account', this)"><i class="fa-solid fa-users-gear"></i> 계정 관리</li>
-                </ul>
+        <!-- 공용 확인 창 (Yes/No) -->
+        <div id="confirmBoxOverlay" class="msg-box-overlay" style="z-index: 3100;">
+            <div class="msg-box" style="padding: 25px 40px;">
+                <p id="confirmBoxText" style="margin-bottom: 20px; font-size: 14px; font-weight: bold; line-height: 1.5;"></p>
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <button class="tool-btn" onclick="window.closeConfirmBox(false)">취소</button>
+                    <button class="tool-btn primary" onclick="window.closeConfirmBox(true)">확인</button>
+                </div>
             </div>
         </div>
 
-        <div class="content-area">
-            <!-- HOME Page -->
-            <div id="page-home" class="page-content active">
-                <div class="empty-page">
-                    <i class="fa-solid fa-house" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                    <p style="font-size:16px; font-weight:bold; color:#444;">히포케이메논 ERP에 오신 것을 환영합니다.</p>
-                    <p style="color:#888; margin-top:5px;">좌측 메뉴를 선택하여 업무를 시작하세요.</p>
+        <div class="header">
+            <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.12</span></div>
+            <div style="margin-left: auto; font-size: 12px; color: #555;">
+                <span id="displayLoggedInUser" style="font-weight: bold;"></span> 님 로그인 중
+            </div>
+        </div>
+
+        <div class="main-wrapper">
+            <div class="sidebar">
+                <div class="menu-group auth-all">
+                    <ul class="menu-list">
+                        <li class="menu-item active" onclick="window.switchMenu('home', this)"><i class="fa-solid fa-house"></i> HOME</li>
+                    </ul>
+                </div>
+                
+                <div class="menu-group auth-basic-up">
+                    <div class="menu-category">사원관리</div>
+                    <ul class="menu-list">
+                        <li class="menu-item" onclick="window.switchMenu('mgmt-reg', this)"><i class="fa-solid fa-user-plus"></i> 사원 등록/수정</li>
+                        <li class="menu-item" onclick="window.switchMenu('mgmt-search', this)"><i class="fa-solid fa-magnifying-glass"></i> 사원 조회</li>
+                        <li class="menu-item auth-payroll-up" onclick="window.switchMenu('mgmt-appoint', this)"><i class="fa-solid fa-file-signature"></i> 인사 발령 등록</li>
+                    </ul>
+                </div>
+                
+                <div class="menu-group auth-payroll-up">
+                    <div class="menu-category">임금</div>
+                    <ul class="menu-list">
+                        <li class="menu-item" onclick="window.switchMenu('pay-status', this)"><i class="fa-solid fa-chart-line"></i> 연봉 산정/갱신 현황</li>
+                        <li class="menu-item" onclick="window.switchMenu('pay-history', this)"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</li>
+                    </ul>
+                </div>
+                
+                <div class="menu-group auth-basic-up">
+                    <div class="menu-category">평가</div>
+                    <ul class="menu-list">
+                        <li class="menu-item" onclick="window.switchMenu('eval-probation', this)"><i class="fa-solid fa-clipboard-user"></i> 수습평가</li>
+                        <li class="menu-item" onclick="window.switchMenu('eval-kpi', this)"><i class="fa-solid fa-bullseye"></i> KPI평가</li>
+                    </ul>
+                </div>
+                
+                <div class="menu-group auth-admin-only">
+                    <div class="menu-category">시스템 설정</div>
+                    <ul class="menu-list">
+                        <li class="menu-item" onclick="window.switchMenu('sys-code', this)"><i class="fa-solid fa-code-branch"></i> 공통 코드 관리</li>
+                        <li class="menu-item" onclick="window.switchMenu('sys-ip', this)"><i class="fa-solid fa-network-wired"></i> 접속 IP 설정</li>
+                        <li class="menu-item" onclick="window.switchMenu('sys-log', this)"><i class="fa-solid fa-list-check"></i> Log 기록</li>
+                        <li class="menu-item" onclick="window.switchMenu('account', this)"><i class="fa-solid fa-users-gear"></i> 계정 관리</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- 평가 Pages -->
-            <div id="page-eval-probation" class="page-content">
-                <div class="empty-page">
-                    <i class="fa-solid fa-clipboard-user" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                    <p>수습평가 메뉴 준비 중입니다.</p>
-                </div>
-            </div>
-            <div id="page-eval-kpi" class="page-content">
-                <div class="empty-page">
-                    <i class="fa-solid fa-bullseye" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                    <p>KPI평가 메뉴 준비 중입니다.</p>
-                </div>
-            </div>
-
-            <!-- 시스템 설정 Pages -->
-            <div id="page-sys-code" class="page-content">
-                <div class="empty-page">
-                    <i class="fa-solid fa-code-branch" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                    <p>공통 코드(드롭다운 항목 등) 관리 메뉴 준비 중입니다.</p>
-                </div>
-            </div>
-            <div id="page-sys-ip" class="page-content">
-                <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-network-wired"></i> 접속 IP 허용 설정</div></div>
-                <div class="list-panel" style="padding:20px;">
-                    <div style="background:#f4f6f8; padding:15px; border-radius:4px; margin-bottom:20px; border:1px solid var(--icube-border);">
-                        <p style="font-weight:bold; color:var(--icube-blue); margin-bottom:5px;">현재 접속 중인 IP: <span id="currentIpDisplay">조회 중...</span></p>
-                        <p style="color:#666; font-size:11px;">사외 접속을 차단하기 위해 등록된 IP에서만 ERP 접속을 허용합니다. (목록이 비어있으면 모든 IP 허용)</p>
+            <div class="content-area">
+                <!-- HOME Page -->
+                <div id="page-home" class="page-content active">
+                    <div class="empty-page">
+                        <i class="fa-solid fa-house" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                        <p style="font-size:16px; font-weight:bold; color:#444;">히포케이메논 ERP에 오신 것을 환영합니다.</p>
+                        <p style="color:#888; margin-top:5px;">좌측 메뉴를 선택하여 업무를 시작하세요.</p>
                     </div>
-                    <div style="display:flex; gap:10px; margin-bottom:15px;">
-                        <input type="text" id="newIpInput" placeholder="허용할 IP 주소 입력 (예: 123.45.67.89)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
-                        <input type="text" id="newIpMemo" placeholder="설명 (예: 본사 1층)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
-                        <button class="tool-btn primary" onclick="window.addAllowedIp()">IP 추가</button>
-                    </div>
-                    <table class="icube-grid">
-                        <thead><tr><th width="200">허용된 IP</th><th>설명</th><th width="80">삭제</th></tr></thead>
-                        <tbody id="ipListBody"></tbody>
-                    </table>
                 </div>
-            </div>
-            <div id="page-sys-log" class="page-content">
-                <div class="toolbar">
-                    <div style="font-weight:bold;"><i class="fa-solid fa-list-check"></i> 시스템 활동 Log</div>
-                    <button class="tool-btn" onclick="window.renderLogs()" style="margin-left:auto;"><i class="fa-solid fa-rotate"></i> 새로고침</button>
-                </div>
-                <div class="list-panel" style="flex:1; overflow-y:auto;">
-                    <table class="icube-grid">
-                        <thead><tr><th width="150">일시</th><th width="120">접속 IP</th><th width="150">작업자</th><th width="150">작업 메뉴</th><th>상세 내역</th></tr></thead>
-                        <tbody id="sysLogBody"></tbody>
-                    </table>
-                </div>
-            </div>
 
-            <!-- 계정 관리 Page -->
-            <div id="page-account" class="page-content">
-                <div class="toolbar">
-                    <button class="tool-btn primary" onclick="window.openAccountModal()"><i class="fa-solid fa-plus"></i> 계정 생성</button>
-                    <button class="tool-btn" onclick="window.renderAccountGrid()"><i class="fa-solid fa-rotate"></i> 조회</button>
+                <!-- 평가 Pages -->
+                <div id="page-eval-probation" class="page-content">
+                    <div class="empty-page">
+                        <i class="fa-solid fa-clipboard-user" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                        <p>수습평가 메뉴 준비 중입니다.</p>
+                    </div>
                 </div>
-                <div class="list-panel">
-                    <div style="overflow-y:auto; flex:1">
+                <div id="page-eval-kpi" class="page-content">
+                    <div class="empty-page">
+                        <i class="fa-solid fa-bullseye" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                        <p>KPI평가 메뉴 준비 중입니다.</p>
+                    </div>
+                </div>
+
+                <!-- 시스템 설정 Pages -->
+                <div id="page-sys-code" class="page-content">
+                    <div class="empty-page">
+                        <i class="fa-solid fa-code-branch" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                        <p>공통 코드(드롭다운 항목 등) 관리 메뉴 준비 중입니다.</p>
+                    </div>
+                </div>
+                <div id="page-sys-ip" class="page-content">
+                    <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-network-wired"></i> 접속 IP 허용 설정</div></div>
+                    <div class="list-panel" style="padding:20px;">
+                        <div style="background:#f4f6f8; padding:15px; border-radius:4px; margin-bottom:20px; border:1px solid var(--icube-border);">
+                            <p style="font-weight:bold; color:var(--icube-blue); margin-bottom:5px;">현재 접속 중인 IP: <span id="currentIpDisplay">조회 중...</span></p>
+                            <p style="color:#666; font-size:11px;">사외 접속을 차단하기 위해 등록된 IP에서만 ERP 접속을 허용합니다. (목록이 비어있으면 모든 IP 허용)</p>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <input type="text" id="newIpInput" placeholder="허용할 IP 주소 입력 (예: 123.45.67.89)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
+                            <input type="text" id="newIpMemo" placeholder="설명 (예: 본사 1층)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
+                            <button class="tool-btn primary" onclick="window.addAllowedIp()">IP 추가</button>
+                        </div>
                         <table class="icube-grid">
-                            <thead>
-                                <tr>
-                                    <th width="100">이름</th><th width="100">사번</th><th width="120">부서명</th><th width="100">직위/직책</th><th width="150">계정(ID)</th><th width="120">권한 부여</th><th width="100">관리</th>
-                                </tr>
-                            </thead>
-                            <tbody id="accountGridBody"></tbody>
+                            <thead><tr><th width="200">허용된 IP</th><th>설명</th><th width="80">삭제</th></tr></thead>
+                            <tbody id="ipListBody"></tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-
-            <!-- 사원 등록/수정 -->
-            <div id="page-mgmt-reg" class="page-content">
-                <div class="toolbar">
-                    <button class="tool-btn primary" onclick="window.openModal()"><i class="fa-solid fa-plus"></i> 사원 신규등록</button>
-                    <button class="tool-btn" onclick="window.renderGrid('mgmt-reg')"><i class="fa-solid fa-rotate"></i> 조회</button>
-                </div>
-                <div class="list-panel">
-                    <div class="search-box">
-                        <div class="search-input-group">
-                            <input type="text" id="topSearch" placeholder="사번 또는 이름으로 검색" onkeyup="if(event.keyCode===13) window.renderGrid('mgmt-reg')">
-                            <button class="tool-btn" onclick="window.renderGrid('mgmt-reg')"><i class="fa-solid fa-magnifying-glass"></i> 검색</button>
-                        </div>
+                <div id="page-sys-log" class="page-content">
+                    <div class="toolbar">
+                        <div style="font-weight:bold;"><i class="fa-solid fa-list-check"></i> 시스템 활동 Log</div>
+                        <button class="tool-btn" onclick="window.renderLogs()" style="margin-left:auto;"><i class="fa-solid fa-rotate"></i> 새로고침</button>
                     </div>
-                    <div style="overflow-y:auto; flex:1">
+                    <div class="list-panel" style="flex:1; overflow-y:auto;">
                         <table class="icube-grid">
-                            <thead>
-                                <tr>
-                                    <th width="80">계약상태</th><th width="80">고용형태</th><th width="80">사번</th><th width="120">부서명</th><th width="100">성명</th><th width="100">직위/직책</th><th width="130">주민번호</th><th width="60">성별</th><th width="100">입사일</th><th width="100">퇴사일</th>
-                                </tr>
-                            </thead>
-                            <tbody id="empGridBody"></tbody>
+                            <thead><tr><th width="150">일시</th><th width="120">접속 IP</th><th width="150">작업자</th><th width="150">작업 메뉴</th><th>상세 내역</th></tr></thead>
+                            <tbody id="sysLogBody"></tbody>
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <!-- 사원 조회 (인사기록카드) -->
-            <div id="page-mgmt-search" class="page-content">
-                <div class="dual-panel-container">
-                    <div class="panel-left">
-                        <div class="search-box">
-                            <input type="text" id="recordSearch" placeholder="정규직/계약직 사번,이름 검색" style="width:100%" onkeyup="window.renderSearchList()">
-                        </div>
+                <!-- 계정 관리 Page -->
+                <div id="page-account" class="page-content">
+                    <div class="toolbar">
+                        <button class="tool-btn primary" onclick="window.openAccountModal()"><i class="fa-solid fa-plus"></i> 계정 생성</button>
+                        <button class="tool-btn" onclick="window.renderAccountGrid()"><i class="fa-solid fa-rotate"></i> 조회</button>
+                    </div>
+                    <div class="list-panel">
                         <div style="overflow-y:auto; flex:1">
                             <table class="icube-grid">
-                                <thead><tr><th width="80">사번</th><th>이름</th><th width="80">부서</th></tr></thead>
-                                <tbody id="recordEmpList"></tbody>
+                                <thead>
+                                    <tr>
+                                        <th width="100">이름</th><th width="100">사번</th><th width="120">부서명</th><th width="100">직위/직책</th><th width="150">계정(ID)</th><th width="120">권한 부여</th><th width="100">관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="accountGridBody"></tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="panel-right" style="background:#e9ecef; padding: 20px;">
-                        <div id="recordCardArea" style="display:none; margin: 0 auto; max-width: 800px;">
-                            <div class="status-header print-hide">
-                                인사기록카드 
-                                <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
+                </div>
+
+                <!-- 사원 등록/수정 -->
+                <div id="page-mgmt-reg" class="page-content">
+                    <div class="toolbar">
+                        <button class="tool-btn primary" onclick="window.openModal()"><i class="fa-solid fa-plus"></i> 사원 신규등록</button>
+                        <button class="tool-btn" onclick="window.renderGrid('mgmt-reg')"><i class="fa-solid fa-rotate"></i> 조회</button>
+                    </div>
+                    <div class="list-panel">
+                        <div class="search-box">
+                            <div class="search-input-group">
+                                <input type="text" id="topSearch" placeholder="사번 또는 이름으로 검색" onkeyup="if(event.keyCode===13) window.renderGrid('mgmt-reg')">
+                                <button class="tool-btn" onclick="window.renderGrid('mgmt-reg')"><i class="fa-solid fa-magnifying-glass"></i> 검색</button>
+                            </div>
+                        </div>
+                        <div style="overflow-y:auto; flex:1">
+                            <table class="icube-grid">
+                                <thead>
+                                    <tr>
+                                        <th width="80">계약상태</th><th width="80">고용형태</th><th width="80">사번</th><th width="120">부서명</th><th width="100">성명</th><th width="100">직위/직책</th><th width="130">주민번호</th><th width="60">성별</th><th width="100">입사일</th><th width="100">퇴사일</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empGridBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 사원 조회 (인사기록카드) -->
+                <div id="page-mgmt-search" class="page-content">
+                    <div class="dual-panel-container">
+                        <div class="panel-left">
+                            <div class="search-box">
+                                <input type="text" id="recordSearch" placeholder="정규직/계약직 사번,이름 검색" style="width:100%" onkeyup="window.renderSearchList()">
+                            </div>
+                            <div style="overflow-y:auto; flex:1">
+                                <table class="icube-grid">
+                                    <thead><tr><th width="80">사번</th><th>이름</th><th width="80">부서</th></tr></thead>
+                                    <tbody id="recordEmpList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel-right" style="background:#e9ecef; padding: 20px;">
+                            <div id="recordCardArea" style="display:none; margin: 0 auto; max-width: 800px;">
+                                <div class="status-header print-hide">
+                                    인사기록카드 
+                                    <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button>
+                                </div>
+                                
+                                <div class="record-card">
+                                    <div class="record-title">인사기록카드</div>
+                                    
+                                    <!-- Top: Photo & Basic Info -->
+                                    <div class="record-top-grid">
+                                        <div class="photo-box">사진 영역</div>
+                                        <div style="flex: 1;">
+                                            <table class="record-table" style="height:100%;">
+                                                <tr>
+                                                    <th width="15%">성 명</th><td width="20%" id="rc_name"></td>
+                                                    <th width="15%">주민등록번호</th><td width="20%" id="rc_ssn"></td>
+                                                    <th width="15%">성 별</th><td width="15%" id="rc_gender"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>사원번호</th><td id="rc_empID"></td>
+                                                    <th>입 사 일</th><td id="rc_joinDate"></td>
+                                                    <th>고용형태</th><td id="rc_contractType"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>소속부서</th><td id="rc_dept"></td>
+                                                    <th>직 위</th><td id="rc_rank"></td>
+                                                    <th>직 책</th><td id="rc_duty"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>연 락 처</th><td id="rc_phone"></td>
+                                                    <th>이 메 일</th><td colspan="3" id="rc_email"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>주 소</th><td colspan="5" id="rc_addr" style="text-align:left; padding-left:10px;"></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Middle: Re-ordered Details -->
+                                    <div class="record-section-title">가족 사항</div>
+                                    <table class="record-table" id="rc_familyTable">
+                                        <thead><tr><th width="20%">관계</th><th width="30%">성명</th><th width="30%">생년월일</th><th width="20%">동거여부</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                    <div class="record-section-title">학력 사항</div>
+                                    <table class="record-table" id="rc_eduTable">
+                                        <thead><tr><th width="30%">학교명</th><th width="25%">전공</th><th width="25%">기간</th><th width="20%">상태</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                    <div class="record-section-title">자격 및 어학</div>
+                                    <table class="record-table" id="rc_licenseTable">
+                                        <thead><tr><th width="15%">구분</th><th width="35%">자격/시험명</th><th width="30%">점수/발행처</th><th width="20%">취득일</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                    <div class="record-section-title">경력 사항</div>
+                                    <table class="record-table" id="rc_careerTable">
+                                        <thead><tr><th width="25%">회사명</th><th width="20%">부서/직급</th><th width="30%">담당업무</th><th width="25%">기간</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                    <div class="record-section-title">병역 사항</div>
+                                    <table class="record-table">
+                                        <tr>
+                                            <th width="15%">병역구분</th><td width="18%" id="rc_milType"></td>
+                                            <th width="15%">군별/계급</th><td width="18%" id="rc_milGroupRank"></td>
+                                            <th width="15%">전역/면제사유</th><td width="19%" id="rc_milReason"></td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- 임금 정보 -->
+                                    <div class="record-section-title auth-payroll-up">현재 임금정보</div>
+                                    <table class="record-table auth-payroll-up">
+                                        <tr>
+                                            <th rowspan="2" width="10%">통상임금</th>
+                                            <th width="15%">기본급</th><td width="20%" id="rc_salBase"></td>
+                                            <th width="15%">식대</th><td width="20%" id="rc_salMeal"></td>
+                                            <th width="10%">자가운전</th><td width="10%" id="rc_salDrive"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>차량유지비</th><td id="rc_salCar"></td>
+                                            <th>근속수당</th><td id="rc_salService"></td>
+                                            <th>직책수당</th><td id="rc_salRank"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>기타수당</th>
+                                            <th>고정연장수당</th><td id="rc_salFixedOver"></td>
+                                            <td colspan="4"></td>
+                                        </tr>
+                                        <tr>
+                                            <th style="background:#eef4ff;">월급여 총액</th><td colspan="2" style="font-weight:bold; color:var(--icube-blue);" id="rc_salMonth"></td>
+                                            <th style="background:#eef4ff;">연봉</th><td colspan="1" style="font-weight:bold; color:var(--icube-blue);" id="rc_salYear"></td>
+                                            <th style="background:#fffbe6;">통상시급</th><td colspan="1" style="font-weight:bold; color:#000;" id="rc_resHourPay"></td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Bottom: Merged History -->
+                                    <div class="record-section-title auth-payroll-up">연봉갱신 및 인사발령 내역 (최근 5년)</div>
+                                    <table class="record-table auth-payroll-up" id="rc_mergedHistoryTable">
+                                        <thead><tr><th>발령일자</th><th>발령구분</th><th>발령 전</th><th>발령 후</th><th>발령 전 임금</th><th>발령 후 임금</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                    <!-- Evaluation -->
+                                    <div class="record-section-title">평가 내역</div>
+                                    <table class="record-table">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="3" width="40%">수습기간 평가</th>
+                                                <th colspan="3" width="60%">KPI 정기 평가 (최근 3개년)</th>
+                                            </tr>
+                                            <tr>
+                                                <th>1차</th><th>2차</th><th>최종</th>
+                                                <th>2023년</th><th>2024년</th><th>2025년</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td>
+                                                <td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div class="print-footer">HYPOKEIMENON</div>
+                                </div>
                             </div>
                             
-                            <div class="record-card">
-                                <div class="record-title">인사기록카드</div>
-                                
-                                <!-- Top: Photo & Basic Info -->
-                                <div class="record-top-grid">
-                                    <div class="photo-box">사진 영역</div>
-                                    <div style="flex: 1;">
-                                        <table class="record-table" style="height:100%;">
-                                            <tr>
-                                                <th width="15%">성 명</th><td width="20%" id="rc_name"></td>
-                                                <th width="15%">주민등록번호</th><td width="20%" id="rc_ssn"></td>
-                                                <th width="15%">성 별</th><td width="15%" id="rc_gender"></td>
-                                            </tr>
-                                            <tr>
-                                                <th>사원번호</th><td id="rc_empID"></td>
-                                                <th>입 사 일</th><td id="rc_joinDate"></td>
-                                                <th>고용형태</th><td id="rc_contractType"></td>
-                                            </tr>
-                                            <tr>
-                                                <th>소속부서</th><td id="rc_dept"></td>
-                                                <th>직 위</th><td id="rc_rank"></td>
-                                                <th>직 책</th><td id="rc_duty"></td>
-                                            </tr>
-                                            <tr>
-                                                <th>연 락 처</th><td id="rc_phone"></td>
-                                                <th>이 메 일</th><td colspan="3" id="rc_email"></td>
-                                            </tr>
-                                            <tr>
-                                                <th>주 소</th><td colspan="5" id="rc_addr" style="text-align:left; padding-left:10px;"></td>
-                                            </tr>
-                                        </table>
-                                    </div>
+                            <div id="recordEmptyArea" class="empty-page" style="background:#e9ecef;">
+                                <i class="fa-solid fa-user-magnifying-glass" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                                <p>좌측 목록에서 사원을 선택하면 인사기록카드가 표시됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 인사 발령 등록 -->
+                <div id="page-mgmt-appoint" class="page-content">
+                    <div class="dual-panel-container">
+                        <div class="panel-left">
+                            <div class="search-box"><input type="text" id="appointSearch" placeholder="사번/이름 검색" style="width:100%" onkeyup="window.renderAppointList()"></div>
+                            <div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="appointEmpList"></tbody></table></div>
+                        </div>
+                        <div class="panel-right" style="background:#e9ecef;">
+                            <div id="appointContentArea" style="display:none; flex-direction:column; height:100%; background:white; padding:20px; border:1px solid var(--icube-border);">
+                                <div class="status-header">인사발령</div>
+                                <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; margin-bottom:15px; align-items:end;">
+                                    <div><label style="font-size:11px;">발령일</label><input id="appDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div>
+                                    <div><label style="font-size:11px;">발령내용</label><select id="appType" onchange="window.syncAppointOptions()" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"><option value="">선택</option><option value="부서명변경">부서명변경</option><option value="직책부여">직책부여</option><option value="직위승진">직위승진</option></select></div>
+                                    <div><label style="font-size:11px;">발령 전</label><div id="appBeforeContainer"><input id="appBefore" readonly class="read-only" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div></div>
+                                    <div><label style="font-size:11px;">발령 후</label><div id="appAfterContainer"><input id="appAfter" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"></div></div>
+                                    <div><label style="font-size:11px;">임금변동</label><select id="appWage" style="width:100%; border:1px solid var(--icube-border); height:26px; padding:0 8px; margin-top:5px;"><option value="유지">유지</option><option value="변동">변동</option></select></div>
                                 </div>
-
-                                <!-- Middle: Re-ordered Details -->
-                                <div class="record-section-title">가족 사항</div>
-                                <table class="record-table" id="rc_familyTable">
-                                    <thead><tr><th width="20%">관계</th><th width="30%">성명</th><th width="30%">생년월일</th><th width="20%">동거여부</th></tr></thead>
-                                    <tbody></tbody>
-                                </table>
-
-                                <div class="record-section-title">학력 사항</div>
-                                <table class="record-table" id="rc_eduTable">
-                                    <thead><tr><th width="30%">학교명</th><th width="25%">전공</th><th width="25%">기간</th><th width="20%">상태</th></tr></thead>
-                                    <tbody></tbody>
-                                </table>
-
-                                <div class="record-section-title">자격 및 어학</div>
-                                <table class="record-table" id="rc_licenseTable">
-                                    <thead><tr><th width="15%">구분</th><th width="35%">자격/시험명</th><th width="30%">점수/발행처</th><th width="20%">취득일</th></tr></thead>
-                                    <tbody></tbody>
-                                </table>
-
-                                <div class="record-section-title">경력 사항</div>
-                                <table class="record-table" id="rc_careerTable">
-                                    <thead><tr><th width="25%">회사명</th><th width="20%">부서/직급</th><th width="30%">담당업무</th><th width="25%">기간</th></tr></thead>
-                                    <tbody></tbody>
-                                </table>
-
-                                <div class="record-section-title">병역 사항</div>
-                                <table class="record-table">
-                                    <tr>
-                                        <th width="15%">병역구분</th><td width="18%" id="rc_milType"></td>
-                                        <th width="15%">군별/계급</th><td width="18%" id="rc_milGroupRank"></td>
-                                        <th width="15%">전역/면제사유</th><td width="19%" id="rc_milReason"></td>
-                                    </tr>
-                                </table>
-
-                                <!-- 임금 정보 -->
-                                <div class="record-section-title auth-payroll-up">현재 임금정보</div>
-                                <table class="record-table auth-payroll-up">
-                                    <tr>
-                                        <th rowspan="2" width="10%">통상임금</th>
-                                        <th width="15%">기본급</th><td width="20%" id="rc_salBase"></td>
-                                        <th width="15%">식대</th><td width="20%" id="rc_salMeal"></td>
-                                        <th width="10%">자가운전</th><td width="10%" id="rc_salDrive"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>차량유지비</th><td id="rc_salCar"></td>
-                                        <th>근속수당</th><td id="rc_salService"></td>
-                                        <th>직책수당</th><td id="rc_salRank"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>기타수당</th>
-                                        <th>고정연장수당</th><td id="rc_salFixedOver"></td>
-                                        <td colspan="4"></td>
-                                    </tr>
-                                    <tr>
-                                        <th style="background:#eef4ff;">월급여 총액</th><td colspan="2" style="font-weight:bold; color:var(--icube-blue);" id="rc_salMonth"></td>
-                                        <th style="background:#eef4ff;">연봉</th><td colspan="1" style="font-weight:bold; color:var(--icube-blue);" id="rc_salYear"></td>
-                                        <th style="background:#fffbe6;">통상시급</th><td colspan="1" style="font-weight:bold; color:#000;" id="rc_resHourPay"></td>
-                                    </tr>
-                                </table>
-
-                                <!-- Bottom: Merged History -->
-                                <div class="record-section-title auth-payroll-up">연봉갱신 및 인사발령 내역 (최근 5년)</div>
-                                <table class="record-table auth-payroll-up" id="rc_mergedHistoryTable">
-                                    <thead><tr><th>발령일자</th><th>발령구분</th><th>발령 전</th><th>발령 후</th><th>발령 전 임금</th><th>발령 후 임금</th></tr></thead>
-                                    <tbody></tbody>
-                                </table>
-
-                                <!-- Evaluation -->
-                                <div class="record-section-title">평가 내역</div>
-                                <table class="record-table">
-                                    <thead>
-                                        <tr>
-                                            <th colspan="3" width="40%">수습기간 평가</th>
-                                            <th colspan="3" width="60%">KPI 정기 평가 (최근 3개년)</th>
-                                        </tr>
-                                        <tr>
-                                            <th>1차</th><th>2차</th><th>최종</th>
-                                            <th>2023년</th><th>2024년</th><th>2025년</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td>
-                                            <td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td><td style="color:#aaa;">- / -</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                
-                                <div class="print-footer">HYPOKEIMENON</div>
+                                <div style="text-align:right; margin-bottom:20px"><button class="tool-btn success" onclick="window.saveAppointment()">발령 저장</button></div>
+                                <div class="status-header">이전 발령 내역 <button class="tool-btn" onclick="window.viewAppointHistory()" style="padding: 2px 8px; font-size: 11px;">삭제 이력 조회</button></div>
+                                <table class="icube-grid"><thead><tr><th width="90">발령일</th><th width="90">내용</th><th width="120">전</th><th width="120">후</th><th>임금변동</th><th width="60">삭제</th></tr></thead><tbody id="appointHistoryBody"></tbody></table>
                             </div>
-                        </div>
-                        
-                        <div id="recordEmptyArea" class="empty-page" style="background:#e9ecef;">
-                            <i class="fa-solid fa-user-magnifying-glass" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                            <p>좌측 목록에서 사원을 선택하면 인사기록카드가 표시됩니다.</p>
+                            <!-- Empty State -->
+                            <div id="appointEmptyArea" class="empty-page">
+                                <i class="fa-solid fa-file-signature" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                                <p>좌측 목록에서 사원을 선택하면 인사발령을 등록할 수 있습니다.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 인사 발령 등록 -->
-            <div id="page-mgmt-appoint" class="page-content">
-                <div class="dual-panel-container">
-                    <div class="panel-left">
-                        <div class="search-box"><input type="text" id="appointSearch" placeholder="사번/이름 검색" style="width:100%" onkeyup="window.renderAppointList()"></div>
-                        <div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="appointEmpList"></tbody></table></div>
-                    </div>
-                    <div class="panel-right">
-                        <div class="status-header">인사발령</div>
-                        <div id="appointFormArea" style="opacity:0.5; pointer-events:none;">
-                            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; margin-bottom:15px; align-items:end;">
-                                <div><label style="font-size:11px;">발령일</label><input id="appDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></div>
-                                <div><label style="font-size:11px;">발령내용</label><select id="appType" onchange="window.syncAppointOptions()"><option value="">선택</option><option value="부서명변경">부서명변경</option><option value="직책부여">직책부여</option><option value="직위승진">직위승진</option></select></div>
-                                <div><label style="font-size:11px;">발령 전</label><div id="appBeforeContainer"><input id="appBefore" readonly class="read-only"></div></div>
-                                <div><label style="font-size:11px;">발령 후</label><div id="appAfterContainer"><input id="appAfter"></div></div>
-                                <div><label style="font-size:11px;">임금변동</label><select id="appWage"><option value="유지">유지</option><option value="변동">변동</option></select></div>
+                <!-- 연봉 산정/갱신 현황 -->
+                <div id="page-pay-status" class="page-content">
+                    <div class="salary-status-container dual-panel-container">
+                        <div class="panel-left">
+                            <div class="search-box"><input type="text" id="salStatusSearch" placeholder="사번/이름 검색" onkeyup="window.renderSalaryStatusList()" style="width:100%"></div>
+                            <div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="salStatusEmpList"></tbody></table></div>
+                        </div>
+                        <div class="panel-right" style="background:#e9ecef;">
+                            <div id="salaryContentArea" class="salary-calc-grid" style="display:none; height:100%; gap:20px;">
+                                <div style="flex:1; background:white; padding:20px; border:1px solid var(--icube-border);">
+                                    <div class="status-header">연봉 산정/갱신</div>
+                                    <table class="salary-input-table">
+                                        <thead><tr><th>산정/갱신일</th><th>사유</th></tr></thead>
+                                        <tbody><tr><td><input id="salDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td><td><select id="salReason"><option>임금인상</option><option>인사발령</option></select></td></tr></tbody>
+                                    </table>
+                                    <table class="salary-input-table">
+                                        <thead><tr><th colspan="2">임금구성</th></tr></thead>
+                                        <tbody id="salStatusDetailBody"></tbody>
+                                    </table>
+                                    <div style="text-align:right; margin-top:15px;"><button class="tool-btn success" onclick="window.saveSalaryUpdate()">갱신 내용 저장</button></div>
+                                </div>
+                                <div style="flex:1; background:white; padding:20px; border:1px solid var(--icube-border);">
+                                    <div class="status-header">연봉 현황</div>
+                                    <table class="icube-grid"><thead><tr><th>사유</th><th width="100">시작일</th><th>월급여</th><th>연봉</th></tr></thead><tbody id="salHistoryBody"></tbody></table>
+                                </div>
                             </div>
-                            <div style="text-align:right; margin-bottom:20px"><button class="tool-btn success" onclick="window.saveAppointment()">발령 저장</button></div>
-                            <div class="status-header">이전 발령 내역 <button class="tool-btn" onclick="window.viewAppointHistory()" style="padding: 2px 8px; font-size: 11px;">삭제 이력 조회</button></div>
-                            <table class="icube-grid"><thead><tr><th width="90">발령일</th><th width="90">내용</th><th width="120">전</th><th width="120">후</th><th>임금변동</th><th width="60">삭제</th></tr></thead><tbody id="appointHistoryBody"></tbody></table>
+                            <!-- Empty State -->
+                            <div id="salaryEmptyArea" class="empty-page">
+                                <i class="fa-solid fa-file-invoice-dollar" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                                <p>좌측 목록에서 사원을 선택하면 연봉 정보를 갱신할 수 있습니다.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 연봉 산정/갱신 현황 -->
-            <div id="page-pay-status" class="page-content">
-                <div class="salary-status-container dual-panel-container">
-                    <div class="panel-left">
-                        <div class="search-box"><input type="text" id="salStatusSearch" placeholder="사번/이름 검색" onkeyup="window.renderSalaryStatusList()" style="width:100%"></div>
-                        <div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="salStatusEmpList"></tbody></table></div>
-                    </div>
-                    <div class="panel-right">
-                        <div class="salary-calc-grid">
-                            <div id="salCalcFormArea" style="opacity: 0.5; pointer-events: none;">
-                                <div class="status-header">연봉 산정/갱신</div>
-                                <table class="salary-input-table">
-                                    <thead><tr><th>산정/갱신일</th><th>사유</th></tr></thead>
-                                    <tbody><tr><td><input id="salDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td><td><select id="salReason"><option>임금인상</option><option>인사발령</option></select></td></tr></tbody>
-                                </table>
-                                <table class="salary-input-table">
-                                    <thead><tr><th colspan="2">임금구성</th></tr></thead>
-                                    <tbody id="salStatusDetailBody"></tbody>
-                                </table>
-                                <div style="text-align:right; margin-top:15px;"><button class="tool-btn success" onclick="window.saveSalaryUpdate()">갱신 내용 저장</button></div>
-                                <div class="status-header" style="margin-top:30px">연봉 현황</div>
-                                <table class="icube-grid"><thead><tr><th>사유</th><th width="100">시작일</th><th>월급여</th><th>연봉</th></tr></thead><tbody id="salHistoryBody"></tbody></table>
+                <div id="page-pay-history" class="page-content">
+                    <!-- 급여지급내역 Empty Logic Prepared -->
+                    <div class="dual-panel-container">
+                        <div class="panel-left">
+                            <div class="search-box"><input type="text" placeholder="사번/이름 검색 (준비 중)" style="width:100%"></div>
+                            <div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th>이름</th><th>사번</th></tr></thead><tbody></tbody></table></div>
+                        </div>
+                        <div class="panel-right" style="background:#e9ecef;">
+                            <div class="empty-page">
+                                <i class="fa-solid fa-coins" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                                <p>좌측 목록에서 사원을 선택하면 급여지급내역이 표시됩니다. (현재 메뉴 준비 중)</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div id="page-pay-history" class="page-content"><div class="empty-page"><p>급여지급내역 준비 중</p></div></div>
         </div>
-    </div>
+    </div> <!-- End of App Container -->
 
     <!-- 사원 상세 모달 -->
     <div id="empModal" class="modal-overlay">
@@ -705,7 +766,7 @@
     <div id="pwdModal" class="modal-overlay" style="z-index:1100">
         <div class="modal-content" style="width:300px">
             <div class="modal-header"><h2>보안 확인</h2><button class="close-btn" onclick="window.closePwdModal()">&times;</button></div>
-            <div class="modal-body" style="padding:20px"><input type="password" id="salaryPwd" placeholder="암호 입력" onkeyup="if(event.keyCode===13) window.verifySalaryPwd()"></div>
+            <div class="modal-body" style="padding:20px"><input type="password" id="salaryPwd" placeholder="암호 입력" onkeyup="if(event.keyCode===13) window.verifySalaryPwd()" style="width: 100%; height: 30px; border: 1px solid #ccc; padding: 0 8px;"></div>
             <div class="modal-footer"><button class="tool-btn" onclick="window.closePwdModal()">취소</button><button class="tool-btn primary" onclick="window.verifySalaryPwd()">확인</button></div>
         </div>
     </div>
@@ -861,8 +922,8 @@
         let confirmCallback = null;
         let cancelCallback = null;
         
-        // Mock logged-in user name (Since no actual login page exists yet)
-        const currentLoggedInUserName = "최고관리자 (Admin)";
+        // Logged-in state
+        let currentLoggedInUserName = "";
 
         const salaryKeys = [
             {id: 'salProbationRate', label: '수습 급여 적용률 (%)', type: 'num'},
@@ -875,6 +936,33 @@
             {id: 'salRank', label: '직책수당'},
             {id: 'salFixedOver', label: '고정연장수당'}
         ];
+
+        // ------------------------------------------
+        // Login Logic
+        // ------------------------------------------
+        window.handleLogin = () => {
+            const id = document.getElementById('loginId').value.trim();
+            const pw = document.getElementById('loginPw').value.trim();
+            if(!id || !pw) return window.showMessageBox("아이디와 비밀번호를 모두 입력해주세요.");
+            
+            const acc = accounts.find(a => a.accountId === id);
+            if(acc && acc.password === pw) {
+                // Success
+                currentLoggedInUserName = acc.name;
+                document.getElementById('displayLoggedInUser').innerText = acc.name;
+                document.body.setAttribute('data-role', acc.role);
+                
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                
+                window.logSystemAction('시스템', '로그인', `${acc.name}(${acc.accountId}) 님이 로그인했습니다.`);
+                
+                // Initialize default menu
+                window.switchMenu('home', document.querySelector('.menu-list .menu-item'));
+            } else {
+                window.showMessageBox("아이디 또는 비밀번호가 일치하지 않습니다.");
+            }
+        };
 
         // ------------------------------------------
         // System Logging & IP Functions
@@ -890,14 +978,12 @@
                 target: targetStr,
                 details: detailsStr
             };
-            // Unique ID based on timestamp
             await setDoc(doc(logsRef, now.getTime().toString()), logDoc);
         };
 
         window.renderLogs = () => {
             const b = document.getElementById('sysLogBody');
             if(!b) return;
-            // Sort desc
             const sortedLogs = [...syslogs].sort((a,b) => parseInt(b.id) - parseInt(a.id));
             b.innerHTML = sortedLogs.map(l => `
                 <tr>
@@ -945,7 +1031,7 @@
         };
 
         const checkIpAccess = () => {
-            if(allowedIps.length === 0) return; // If list is empty, allow all
+            if(allowedIps.length === 0) return; 
             const isAllowed = allowedIps.some(ipObj => ipObj.ip === currentIp);
             if(!isAllowed) {
                 document.getElementById('displayBlockedIp').innerText = currentIp;
@@ -955,7 +1041,6 @@
             }
         };
 
-        // Fetch IP on load
         fetch('https://api.ipify.org?format=json')
             .then(r => r.json())
             .then(d => { 
@@ -984,25 +1069,20 @@
             if(!result && cancelCallback) cancelCallback();
         };
 
-        window.testRoleSwitch = (role) => {
-            document.body.setAttribute('data-role', role);
-            // Hide all active menus and go to home to prevent glitch
-            window.switchMenu('home', document.querySelector('.menu-item'));
-            window.showMessageBox(`테스트 권한이 '${role}'(으)로 변경되었습니다.\n좌측 메뉴 구성을 확인해보세요.`);
-        };
-        
         window.switchMenu = (id, el) => { 
             // Reset states when leaving certain menus
             if(id !== 'mgmt-appoint') {
-                const form = document.getElementById('appointFormArea');
-                if(form) { form.style.opacity = '0.5'; form.style.pointerEvents = 'none'; }
+                const content = document.getElementById('appointContentArea');
+                const empty = document.getElementById('appointEmptyArea');
+                if(content && empty) { content.style.display = 'none'; empty.style.display = 'flex'; }
                 document.querySelectorAll('#appointEmpList tr').forEach(r => r.classList.remove('selected'));
                 selectedEmpForAppoint = null;
                 document.getElementById('appointSearch').value = '';
             }
             if(id !== 'pay-status') {
-                const form = document.getElementById('salCalcFormArea');
-                if(form) { form.style.opacity = '0.5'; form.style.pointerEvents = 'none'; }
+                const content = document.getElementById('salaryContentArea');
+                const empty = document.getElementById('salaryEmptyArea');
+                if(content && empty) { content.style.display = 'none'; empty.style.display = 'flex'; }
                 document.querySelectorAll('#salStatusEmpList tr').forEach(r => r.classList.remove('selected'));
                 selectedEmpForSalary = null;
                 document.getElementById('salStatusSearch').value = '';
@@ -1222,6 +1302,7 @@
 
                 const updatedLogs = targetEmp.ssnAuditLogs ? [...targetEmp.ssnAuditLogs, logEntry] : [logEntry];
 
+                // Update DB immediately
                 await updateDoc(doc(empRef, empId), {
                     ssn: newSsn,
                     ssnAuditLogs: updatedLogs
@@ -1340,6 +1421,7 @@
             let total = 0;
             salaryKeys.filter(k=>!k.type).forEach(k => total += parseInt(data[k.id]) || 0);
 
+            // 임금정보 최초 등록 연동 로직
             if (history.length === 0) {
                 history = [{ date: jd, reason: "입사", monthly: total.toLocaleString() + "원", annual: (total * 12).toLocaleString() + "원" }];
             } else {
@@ -1717,7 +1799,10 @@
         window.selectForAppoint = (id, tr) => {
             document.querySelectorAll('#appointEmpList tr').forEach(r => r.classList.remove('selected')); tr.classList.add('selected');
             selectedEmpForAppoint = emps.find(e => e.empID === id);
-            document.getElementById('appointFormArea').style.opacity = '1'; document.getElementById('appointFormArea').style.pointerEvents = 'auto';
+            
+            document.getElementById('appointEmptyArea').style.display = 'none';
+            document.getElementById('appointContentArea').style.display = 'flex';
+            
             window.renderAppointHistory();
         };
         window.syncAppointOptions = () => {
@@ -1772,7 +1857,10 @@
         window.selectForSalaryStatus = (id, tr) => {
             document.querySelectorAll('#salStatusEmpList tr').forEach(r => r.classList.remove('selected')); tr.classList.add('selected');
             selectedEmpForSalary = emps.find(e => e.empID === id);
-            document.getElementById('salCalcFormArea').style.opacity = '1'; document.getElementById('salCalcFormArea').style.pointerEvents = 'auto';
+            
+            document.getElementById('salaryEmptyArea').style.display = 'none';
+            document.getElementById('salaryContentArea').style.display = 'flex';
+            
             const b = document.getElementById('salStatusDetailBody'); b.innerHTML = '';
             salaryKeys.filter(k=>!k.type).forEach(k => {
                 b.innerHTML += `<tr><th>${k.label}</th><td><input id="st_${k.id}" value="${parseInt(selectedEmpForSalary[k.id]||0).toLocaleString()}"></td></tr>`;
@@ -1822,15 +1910,27 @@
         window.renderAccountGrid = () => {
             const b = document.getElementById('accountGridBody');
             if(!b) return;
-            b.innerHTML = accounts.map(a => `
+            // Sorting to put hypo-hr at top
+            const sortedAccounts = [...accounts].sort((a, b) => {
+                if(a.accountId === 'hypo-hr') return -1;
+                if(b.accountId === 'hypo-hr') return 1;
+                return 0;
+            });
+
+            b.innerHTML = sortedAccounts.map(a => {
+                const deleteBtn = a.accountId === 'hypo-hr' 
+                    ? `<button class="tool-btn disabled-field" style="padding:2px 6px; margin:0 auto;" title="기본 계정 삭제 불가"><i class="fa-solid fa-ban"></i></button>`
+                    : `<button class="tool-btn" style="padding:2px 6px; color:#d32f2f; margin:0 auto;" onclick="window.requestAccountDelete('${a.accountId}')" title="계정 삭제"><i class="fa-solid fa-trash"></i></button>`;
+
+                return `
                 <tr>
-                    <td style="font-weight:bold; color:var(--icube-blue);">${a.name}</td>
-                    <td>${a.empID}</td>
-                    <td>${a.dept}</td>
-                    <td>${a.rankDuty}</td>
+                    <td style="font-weight:bold; color:var(--icube-blue);">${a.name} ${a.accountId === 'hypo-hr' ? '<i class="fa-solid fa-star text-amber-400 text-[10px] ml-1"></i>' : ''}</td>
+                    <td>${a.empID || '-'}</td>
+                    <td>${a.dept || '-'}</td>
+                    <td>${a.rankDuty || '-'}</td>
                     <td>${a.accountId}</td>
                     <td>
-                        <select style="width:100px; height:24px; border:1px solid #ddd;" onchange="window.updateAccountRole('${a.accountId}', this.value)">
+                        <select style="width:100px; height:24px; border:1px solid #ddd;" onchange="window.updateAccountRole('${a.accountId}', this.value)" ${a.accountId === 'hypo-hr' ? 'disabled' : ''}>
                             <option value="관리자" ${a.role==='관리자'?'selected':''}>관리자</option>
                             <option value="임금담당자" ${a.role==='임금담당자'?'selected':''}>임금담당자</option>
                             <option value="기본담당자" ${a.role==='기본담당자'?'selected':''}>기본담당자</option>
@@ -1840,11 +1940,12 @@
                     <td>
                         <div style="display:flex; justify-content:center; gap:5px;">
                             <button class="tool-btn" style="padding:2px 6px;" onclick="window.resetAccountPassword('${a.accountId}', '${a.name}')" title="비밀번호 초기화"><i class="fa-solid fa-key"></i></button>
-                            <button class="tool-btn" style="padding:2px 6px; color:#d32f2f;" onclick="window.requestAccountDelete('${a.accountId}')" title="계정 삭제"><i class="fa-solid fa-trash"></i></button>
+                            ${deleteBtn}
                         </div>
                     </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
             if(accounts.length === 0) b.innerHTML = `<tr><td colspan="7">등록된 계정이 없습니다.</td></tr>`;
         };
 
@@ -1922,6 +2023,7 @@
         };
 
         window.updateAccountRole = async (accId, newRole) => {
+            if(accId === 'hypo-hr') return; // Admin fallback protection
             await updateDoc(doc(accountRef, accId), { role: newRole });
             window.logSystemAction('설정 변경', '계정 권한', `계정(${accId}) 권한 변경: ${newRole}`);
             window.showMessageBox("권한이 업데이트되었습니다.");
@@ -1936,6 +2038,10 @@
         };
 
         window.requestAccountDelete = (accId) => {
+            if(accId === 'hypo-hr') {
+                return window.showMessageBox("이 계정은 기본 관리자 계정으로 삭제할 수 없습니다.");
+            }
+
             auditActionContext = { type: 'ACCOUNT_DEL', accountId: accId };
             document.getElementById('auditTitle').innerText = "계정 삭제 권한 요청";
             
@@ -1953,8 +2059,18 @@
         // App Initialization
         async function start() {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); }
-            onAuthStateChanged(auth, user => {
+            onAuthStateChanged(auth, async user => {
                 if(user) {
+                    
+                    // Hardcoded Admin Account Check/Create
+                    const adminDoc = await getDoc(doc(accountRef, 'hypo-hr'));
+                    if(!adminDoc.exists()) {
+                        await setDoc(doc(accountRef, 'hypo-hr'), {
+                            accountId: 'hypo-hr', password: 'glvhzpdlapshs1!!', name: '관리자(Admin)',
+                            role: '관리자', empID: 'admin', dept: '시스템관리', rankDuty: '최고관리자', isBuiltIn: true
+                        });
+                    }
+
                     onSnapshot(empRef, snap => {
                         emps = snap.docs.map(d => ({...d.data(), id: d.id}));
                         window.renderGrid();
@@ -1986,6 +2102,8 @@
 
         document.addEventListener('input', e => {
             const t = e.target;
+            if (t.id === 'salaryPwd' || t.id === 'loginPw') return;
+
             if (t.dataset.type === 'phone') {
                 let v = t.value.replace(/[^0-9]/g, '');
                 if (v.startsWith('02')) { if(v.length <= 2) t.value = v; else if(v.length <= 5) t.value = v.slice(0,2) + '-' + v.slice(2,5) + '-' + v.slice(5,9); else t.value = v.slice(0,2) + '-' + v.slice(2,6) + '-' + v.slice(6,10); }
