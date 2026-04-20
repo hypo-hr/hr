@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>히포케이메논 ERP V.2.8.10 - 통합 관리</title>
+    <title>히포케이메논 ERP V.2.8.11 - 통합 관리</title>
     <!-- Daum Postcode Service -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <!-- SheetJS for Excel Processing -->
@@ -24,6 +24,16 @@
         }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Malgun Gothic', 'Dotum', sans-serif; font-size: 12px; background: var(--icube-bg); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* 권한 제어 (CSS 기반 숨김 처리) */
+        body[data-role="기본담당자"] .auth-admin-only,
+        body[data-role="기본담당자"] .auth-payroll-up { display: none !important; }
+        
+        body[data-role="임금담당자"] .auth-admin-only { display: none !important; }
+        
+        body[data-role="기타"] .auth-admin-only,
+        body[data-role="기타"] .auth-payroll-up,
+        body[data-role="기타"] .auth-basic-up { display: none !important; }
 
         /* Layout */
         .header { height: 50px; background: white; border-bottom: 1px solid var(--icube-border); display: flex; align-items: center; padding: 0 20px; z-index: 20; flex-shrink: 0; }
@@ -132,7 +142,7 @@
         .msg-box { background: white; padding: 20px 30px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; }
         .empty-page { justify-content: center; align-items: center; background: #f9f9f9; text-align: center; color: #999; height: 100%; display: flex; flex-direction: column; }
         
-        /* Personnel Record Card Styles (For '사원 조회') */
+        /* Personnel Record Card Styles */
         .record-card { background: white; border: 1px solid #000; padding: 20px; color: #000; font-family: 'Malgun Gothic', serif; position: relative; max-width: 800px; margin: 0 auto; }
         .record-title { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; letter-spacing: 5px; }
         .record-top-grid { display: flex; gap: 15px; margin-bottom: 15px; }
@@ -170,13 +180,23 @@
             .record-table th { background: #e0e0e0 !important; }
         }
 
-        /* Account Modals specific styles */
+        /* Account Modals & Settings */
         .account-form-grid { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; margin-bottom: 10px; }
         .account-form-grid label { font-weight: bold; font-size: 12px; color: #444; }
-        .account-form-grid input { height: 28px; border: 1px solid var(--icube-border); padding: 0 8px; border-radius: 2px; }
+        .account-form-grid input, .account-form-grid select { height: 28px; border: 1px solid var(--icube-border); padding: 0 8px; border-radius: 2px; width: 100%; }
+        
+        #ipBlockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
     </style>
 </head>
-<body>
+<body data-role="관리자">
+
+    <!-- IP Block Overlay -->
+    <div id="ipBlockOverlay">
+        <i class="fa-solid fa-shield-halved" style="font-size:60px; color:#d32f2f; margin-bottom:20px;"></i>
+        <h1 style="color:#333; margin-bottom:10px;">접속 불가 지역입니다</h1>
+        <p style="color:#666;">인가된 사내 IP 네트워크에서만 접속할 수 있습니다.</p>
+        <p style="color:#999; margin-top:20px; font-size:11px;">현재 IP: <span id="displayBlockedIp"></span></p>
+    </div>
 
     <div id="msgBoxOverlay" class="msg-box-overlay">
         <div class="msg-box">
@@ -197,36 +217,59 @@
     </div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.10</span></div>
+        <div class="header-title" onclick="window.switchMenu('home', null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.2.8.11</span></div>
+        
+        <!-- 권한 테스트용 임시 드롭다운 -->
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 11px; color: #666;"><i class="fa-solid fa-flask"></i> 권한 테스트 모드:</span>
+            <select onchange="window.testRoleSwitch(this.value)" style="padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 11px;">
+                <option value="관리자">관리자 (전체 메뉴)</option>
+                <option value="임금담당자">임금담당자 (시스템 설정 불가)</option>
+                <option value="기본담당자">기본담당자 (임금, 발령, 설정 불가)</option>
+                <option value="기타">기타 (모든 메뉴 불가)</option>
+            </select>
+        </div>
     </div>
 
     <div class="main-wrapper">
         <div class="sidebar">
-            <div class="menu-group">
-                <div class="menu-category">사원관리</div>
+            <div class="menu-group auth-all">
                 <ul class="menu-list">
-                    <li class="menu-item active" onclick="window.switchMenu('mgmt-reg', this)"><i class="fa-solid fa-user-plus"></i> 사원 등록/수정</li>
-                    <li class="menu-item" onclick="window.switchMenu('mgmt-search', this)"><i class="fa-solid fa-magnifying-glass"></i> 사원 조회</li>
-                    <li class="menu-item" onclick="window.switchMenu('mgmt-appoint', this)"><i class="fa-solid fa-file-signature"></i> 인사 발령 등록</li>
+                    <li class="menu-item active" onclick="window.switchMenu('home', this)"><i class="fa-solid fa-house"></i> HOME</li>
                 </ul>
             </div>
-            <div class="menu-group">
+            
+            <div class="menu-group auth-basic-up">
+                <div class="menu-category">사원관리</div>
+                <ul class="menu-list">
+                    <li class="menu-item" onclick="window.switchMenu('mgmt-reg', this)"><i class="fa-solid fa-user-plus"></i> 사원 등록/수정</li>
+                    <li class="menu-item" onclick="window.switchMenu('mgmt-search', this)"><i class="fa-solid fa-magnifying-glass"></i> 사원 조회</li>
+                    <li class="menu-item auth-payroll-up" onclick="window.switchMenu('mgmt-appoint', this)"><i class="fa-solid fa-file-signature"></i> 인사 발령 등록</li>
+                </ul>
+            </div>
+            
+            <div class="menu-group auth-payroll-up">
                 <div class="menu-category">임금</div>
                 <ul class="menu-list">
                     <li class="menu-item" onclick="window.switchMenu('pay-status', this)"><i class="fa-solid fa-chart-line"></i> 연봉 산정/갱신 현황</li>
                     <li class="menu-item" onclick="window.switchMenu('pay-history', this)"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</li>
                 </ul>
             </div>
-            <div class="menu-group">
+            
+            <div class="menu-group auth-basic-up">
                 <div class="menu-category">평가</div>
                 <ul class="menu-list">
                     <li class="menu-item" onclick="window.switchMenu('eval-probation', this)"><i class="fa-solid fa-clipboard-user"></i> 수습평가</li>
                     <li class="menu-item" onclick="window.switchMenu('eval-kpi', this)"><i class="fa-solid fa-bullseye"></i> KPI평가</li>
                 </ul>
             </div>
-            <div class="menu-group">
+            
+            <div class="menu-group auth-admin-only">
                 <div class="menu-category">시스템 설정</div>
                 <ul class="menu-list">
+                    <li class="menu-item" onclick="window.switchMenu('sys-code', this)"><i class="fa-solid fa-code-branch"></i> 공통 코드 관리</li>
+                    <li class="menu-item" onclick="window.switchMenu('sys-ip', this)"><i class="fa-solid fa-network-wired"></i> 접속 IP 설정</li>
+                    <li class="menu-item" onclick="window.switchMenu('sys-log', this)"><i class="fa-solid fa-list-check"></i> Log 기록</li>
                     <li class="menu-item" onclick="window.switchMenu('account', this)"><i class="fa-solid fa-users-gear"></i> 계정 관리</li>
                 </ul>
             </div>
@@ -234,10 +277,11 @@
 
         <div class="content-area">
             <!-- HOME Page -->
-            <div id="page-home" class="page-content">
+            <div id="page-home" class="page-content active">
                 <div class="empty-page">
                     <i class="fa-solid fa-house" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
-                    <p>HOME 메인 대시보드 준비 중입니다.</p>
+                    <p style="font-size:16px; font-weight:bold; color:#444;">히포케이메논 ERP에 오신 것을 환영합니다.</p>
+                    <p style="color:#888; margin-top:5px;">좌측 메뉴를 선택하여 업무를 시작하세요.</p>
                 </div>
             </div>
 
@@ -255,6 +299,44 @@
                 </div>
             </div>
 
+            <!-- 시스템 설정 Pages -->
+            <div id="page-sys-code" class="page-content">
+                <div class="empty-page">
+                    <i class="fa-solid fa-code-branch" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
+                    <p>공통 코드(드롭다운 항목 등) 관리 메뉴 준비 중입니다.</p>
+                </div>
+            </div>
+            <div id="page-sys-ip" class="page-content">
+                <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-network-wired"></i> 접속 IP 허용 설정</div></div>
+                <div class="list-panel" style="padding:20px;">
+                    <div style="background:#f4f6f8; padding:15px; border-radius:4px; margin-bottom:20px; border:1px solid var(--icube-border);">
+                        <p style="font-weight:bold; color:var(--icube-blue); margin-bottom:5px;">현재 접속 중인 IP: <span id="currentIpDisplay">조회 중...</span></p>
+                        <p style="color:#666; font-size:11px;">사외 접속을 차단하기 위해 등록된 IP에서만 ERP 접속을 허용합니다. (목록이 비어있으면 모든 IP 허용)</p>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="text" id="newIpInput" placeholder="허용할 IP 주소 입력 (예: 123.45.67.89)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
+                        <input type="text" id="newIpMemo" placeholder="설명 (예: 본사 1층)" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
+                        <button class="tool-btn primary" onclick="window.addAllowedIp()">IP 추가</button>
+                    </div>
+                    <table class="icube-grid">
+                        <thead><tr><th width="200">허용된 IP</th><th>설명</th><th width="80">삭제</th></tr></thead>
+                        <tbody id="ipListBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="page-sys-log" class="page-content">
+                <div class="toolbar">
+                    <div style="font-weight:bold;"><i class="fa-solid fa-list-check"></i> 시스템 활동 Log</div>
+                    <button class="tool-btn" onclick="window.renderLogs()" style="margin-left:auto;"><i class="fa-solid fa-rotate"></i> 새로고침</button>
+                </div>
+                <div class="list-panel" style="flex:1; overflow-y:auto;">
+                    <table class="icube-grid">
+                        <thead><tr><th width="150">일시</th><th width="120">접속 IP</th><th width="150">작업자</th><th width="150">작업 메뉴</th><th>상세 내역</th></tr></thead>
+                        <tbody id="sysLogBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- 계정 관리 Page -->
             <div id="page-account" class="page-content">
                 <div class="toolbar">
@@ -266,7 +348,7 @@
                         <table class="icube-grid">
                             <thead>
                                 <tr>
-                                    <th width="100">이름</th><th width="100">사번</th><th width="120">부서명</th><th width="100">직위/직책</th><th width="120">입사일</th><th width="150">계정(ID)</th><th width="80">삭제</th>
+                                    <th width="100">이름</th><th width="100">사번</th><th width="120">부서명</th><th width="100">직위/직책</th><th width="150">계정(ID)</th><th width="120">권한 부여</th><th width="100">관리</th>
                                 </tr>
                             </thead>
                             <tbody id="accountGridBody"></tbody>
@@ -276,7 +358,7 @@
             </div>
 
             <!-- 사원 등록/수정 -->
-            <div id="page-mgmt-reg" class="page-content active">
+            <div id="page-mgmt-reg" class="page-content">
                 <div class="toolbar">
                     <button class="tool-btn primary" onclick="window.openModal()"><i class="fa-solid fa-plus"></i> 사원 신규등록</button>
                     <button class="tool-btn" onclick="window.renderGrid('mgmt-reg')"><i class="fa-solid fa-rotate"></i> 조회</button>
@@ -356,7 +438,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Middle: Re-ordered Details (Full Width for all) -->
+                                <!-- Middle: Re-ordered Details -->
                                 <div class="record-section-title">가족 사항</div>
                                 <table class="record-table" id="rc_familyTable">
                                     <thead><tr><th width="20%">관계</th><th width="30%">성명</th><th width="30%">생년월일</th><th width="20%">동거여부</th></tr></thead>
@@ -369,21 +451,18 @@
                                     <tbody></tbody>
                                 </table>
 
-                                <!-- 자격 및 어학 (Full width) -->
                                 <div class="record-section-title">자격 및 어학</div>
                                 <table class="record-table" id="rc_licenseTable">
                                     <thead><tr><th width="15%">구분</th><th width="35%">자격/시험명</th><th width="30%">점수/발행처</th><th width="20%">취득일</th></tr></thead>
                                     <tbody></tbody>
                                 </table>
 
-                                <!-- 경력 사항 (Full width) -->
                                 <div class="record-section-title">경력 사항</div>
                                 <table class="record-table" id="rc_careerTable">
                                     <thead><tr><th width="25%">회사명</th><th width="20%">부서/직급</th><th width="30%">담당업무</th><th width="25%">기간</th></tr></thead>
                                     <tbody></tbody>
                                 </table>
 
-                                <!-- 병역 사항 (Full width) -->
                                 <div class="record-section-title">병역 사항</div>
                                 <table class="record-table">
                                     <tr>
@@ -393,9 +472,9 @@
                                     </tr>
                                 </table>
 
-                                <!-- 임금 정보 (Full width with Corrected Grouping & Layout) -->
-                                <div class="record-section-title">현재 임금정보</div>
-                                <table class="record-table">
+                                <!-- 임금 정보 -->
+                                <div class="record-section-title auth-payroll-up">현재 임금정보</div>
+                                <table class="record-table auth-payroll-up">
                                     <tr>
                                         <th rowspan="2" width="10%">통상임금</th>
                                         <th width="15%">기본급</th><td width="20%" id="rc_salBase"></td>
@@ -419,14 +498,14 @@
                                     </tr>
                                 </table>
 
-                                <!-- Bottom: Merged History (Last 5 Years) -->
-                                <div class="record-section-title">연봉갱신 및 인사발령 내역 (최근 5년)</div>
-                                <table class="record-table" id="rc_mergedHistoryTable">
+                                <!-- Bottom: Merged History -->
+                                <div class="record-section-title auth-payroll-up">연봉갱신 및 인사발령 내역 (최근 5년)</div>
+                                <table class="record-table auth-payroll-up" id="rc_mergedHistoryTable">
                                     <thead><tr><th>발령일자</th><th>발령구분</th><th>발령 전</th><th>발령 후</th><th>발령 전 임금</th><th>발령 후 임금</th></tr></thead>
                                     <tbody></tbody>
                                 </table>
 
-                                <!-- Evaluation (Placeholders) -->
+                                <!-- Evaluation -->
                                 <div class="record-section-title">평가 내역</div>
                                 <table class="record-table">
                                     <thead>
@@ -450,7 +529,7 @@
                                 <div class="print-footer">HYPOKEIMENON</div>
                             </div>
                         </div>
-                        <!-- Empty State -->
+                        
                         <div id="recordEmptyArea" class="empty-page" style="background:#e9ecef;">
                             <i class="fa-solid fa-user-magnifying-glass" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i>
                             <p>좌측 목록에서 사원을 선택하면 인사기록카드가 표시됩니다.</p>
@@ -529,7 +608,7 @@
                     <div class="tab-item" data-tab="license" onclick="window.switchTab('license')">자격사항</div>
                     <div class="tab-item" data-tab="family" onclick="window.switchTab('family')">가족사항</div>
                     <div class="tab-item" data-tab="military" onclick="window.switchTab('military')">병역사항</div>
-                    <div class="tab-item" data-tab="salary" onclick="window.switchTab('salary')">임금정보</div>
+                    <div class="tab-item auth-payroll-up" data-tab="salary" onclick="window.switchTab('salary')">임금정보</div>
                 </div>
                 
                 <div class="tab-content-container">
@@ -763,9 +842,15 @@
         
         const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees');
         const accountRef = collection(db, 'artifacts', appId, 'public', 'data', 'accounts');
+        const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'syslogs');
+        const settingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'settings');
 
         let emps = [];
-        let accounts = []; // Stores accounts data
+        let accounts = []; 
+        let syslogs = [];
+        let allowedIps = [];
+        let currentIp = '조회 불가';
+
         let isEditMode = false;
         let isSalaryLocked = true;
         let selectedEmpForSalary = null;
@@ -791,7 +876,99 @@
             {id: 'salFixedOver', label: '고정연장수당'}
         ];
 
+        // ------------------------------------------
+        // System Logging & IP Functions
+        // ------------------------------------------
+        window.logSystemAction = async (actionName, targetStr, detailsStr) => {
+            const now = new Date();
+            const logDoc = {
+                date: now.toISOString().slice(0,10),
+                time: now.toTimeString().slice(0,8),
+                ip: currentIp,
+                user: currentLoggedInUserName,
+                action: actionName,
+                target: targetStr,
+                details: detailsStr
+            };
+            // Unique ID based on timestamp
+            await setDoc(doc(logsRef, now.getTime().toString()), logDoc);
+        };
+
+        window.renderLogs = () => {
+            const b = document.getElementById('sysLogBody');
+            if(!b) return;
+            // Sort desc
+            const sortedLogs = [...syslogs].sort((a,b) => parseInt(b.id) - parseInt(a.id));
+            b.innerHTML = sortedLogs.map(l => `
+                <tr>
+                    <td>${l.date} ${l.time}</td>
+                    <td>${l.ip}</td>
+                    <td>${l.user}</td>
+                    <td><span class="status-badge" style="background:#f0f0f0; color:#333; border:1px solid #ccc;">${l.action}</span></td>
+                    <td style="text-align:left; padding-left:10px;">[대상: ${l.target}] ${l.details}</td>
+                </tr>
+            `).join('');
+            if(sortedLogs.length === 0) b.innerHTML = `<tr><td colspan="5">시스템 로그가 없습니다.</td></tr>`;
+        };
+
+        window.renderIpSettings = () => {
+            const b = document.getElementById('ipListBody');
+            if(!b) return;
+            document.getElementById('currentIpDisplay').innerText = currentIp;
+            b.innerHTML = allowedIps.map(ipObj => `
+                <tr>
+                    <td style="font-weight:bold; color:var(--icube-blue);">${ipObj.ip}</td>
+                    <td>${ipObj.memo}</td>
+                    <td><button class="tool-btn" style="padding:2px 6px; color:#d32f2f; margin:0 auto;" onclick="window.removeAllowedIp('${ipObj.id}')"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+            if(allowedIps.length === 0) b.innerHTML = `<tr><td colspan="3" style="color:#999;">허용된 IP가 없습니다. (현재 모든 IP에서 접속 가능)</td></tr>`;
+        };
+
+        window.addAllowedIp = async () => {
+            const ip = document.getElementById('newIpInput').value.trim();
+            const memo = document.getElementById('newIpMemo').value.trim();
+            if(!ip) return window.showMessageBox("허용할 IP를 입력하세요.");
+            
+            const newId = new Date().getTime().toString();
+            await setDoc(doc(settingsRef, 'ip_' + newId), { type: 'IP', ip: ip, memo: memo });
+            document.getElementById('newIpInput').value = '';
+            document.getElementById('newIpMemo').value = '';
+            window.logSystemAction('설정 변경', '접속 IP 설정', `새로운 IP 허용 등록: ${ip}`);
+            window.showMessageBox("IP가 허용 목록에 추가되었습니다.");
+        };
+
+        window.removeAllowedIp = async (id) => {
+            await deleteDoc(doc(settingsRef, id));
+            window.logSystemAction('설정 변경', '접속 IP 설정', `허용 IP 삭제`);
+            window.showMessageBox("IP가 허용 목록에서 삭제되었습니다.");
+        };
+
+        const checkIpAccess = () => {
+            if(allowedIps.length === 0) return; // If list is empty, allow all
+            const isAllowed = allowedIps.some(ipObj => ipObj.ip === currentIp);
+            if(!isAllowed) {
+                document.getElementById('displayBlockedIp').innerText = currentIp;
+                document.getElementById('ipBlockOverlay').style.display = 'flex';
+            } else {
+                document.getElementById('ipBlockOverlay').style.display = 'none';
+            }
+        };
+
+        // Fetch IP on load
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(d => { 
+                currentIp = d.ip; 
+                if(document.getElementById('currentIpDisplay')) document.getElementById('currentIpDisplay').innerText = currentIp;
+                checkIpAccess();
+            })
+            .catch(e => console.log("IP fetch failed"));
+
+
+        // ==========================================
         // UI & Global Binding
+        // ==========================================
         window.showMessageBox = (t) => { const e = document.getElementById('msgBoxText'), o = document.getElementById('msgBoxOverlay'); if(e && o) { e.innerText = t; o.style.display = 'flex'; } };
         window.closeMsgBox = () => { document.getElementById('msgBoxOverlay').style.display = 'none'; };
         
@@ -806,8 +983,31 @@
             if(result && confirmCallback) confirmCallback();
             if(!result && cancelCallback) cancelCallback();
         };
+
+        window.testRoleSwitch = (role) => {
+            document.body.setAttribute('data-role', role);
+            // Hide all active menus and go to home to prevent glitch
+            window.switchMenu('home', document.querySelector('.menu-item'));
+            window.showMessageBox(`테스트 권한이 '${role}'(으)로 변경되었습니다.\n좌측 메뉴 구성을 확인해보세요.`);
+        };
         
         window.switchMenu = (id, el) => { 
+            // Reset states when leaving certain menus
+            if(id !== 'mgmt-appoint') {
+                const form = document.getElementById('appointFormArea');
+                if(form) { form.style.opacity = '0.5'; form.style.pointerEvents = 'none'; }
+                document.querySelectorAll('#appointEmpList tr').forEach(r => r.classList.remove('selected'));
+                selectedEmpForAppoint = null;
+                document.getElementById('appointSearch').value = '';
+            }
+            if(id !== 'pay-status') {
+                const form = document.getElementById('salCalcFormArea');
+                if(form) { form.style.opacity = '0.5'; form.style.pointerEvents = 'none'; }
+                document.querySelectorAll('#salStatusEmpList tr').forEach(r => r.classList.remove('selected'));
+                selectedEmpForSalary = null;
+                document.getElementById('salStatusSearch').value = '';
+            }
+
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active')); 
             if(el) el.classList.add('active'); 
             
@@ -824,13 +1024,16 @@
                     recCard.style.display = 'none';
                 }
                 document.querySelectorAll('#recordEmpList tr').forEach(r => r.classList.remove('selected'));
+                document.getElementById('recordSearch').value = '';
             } else {
                 window.renderSearchList();
             }
 
-            if(id === 'account') {
-                window.renderAccountGrid();
-            }
+            if(id === 'account') window.renderAccountGrid();
+            if(id === 'sys-log') window.renderLogs();
+            if(id === 'sys-ip') window.renderIpSettings();
+            if(id === 'mgmt-appoint') window.renderAppointList();
+            if(id === 'pay-status') window.renderSalaryStatusList();
         };
 
         window.switchTab = (id) => { document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === id)); document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'content-' + id)); if(id === 'salary') window.updateSalaryCalc(); };
@@ -942,7 +1145,6 @@
             auditActionContext = { type: 'SSN_EDIT' };
             document.getElementById('auditTitle').innerText = "주민등록번호 수정 권한 요청";
             
-            // Auto-fill and lock modifier name
             const modEl = document.getElementById('auditModifier');
             modEl.value = currentLoggedInUserName;
             modEl.classList.add('read-only');
@@ -1020,13 +1222,13 @@
 
                 const updatedLogs = targetEmp.ssnAuditLogs ? [...targetEmp.ssnAuditLogs, logEntry] : [logEntry];
 
-                // Update DB immediately
                 await updateDoc(doc(empRef, empId), {
                     ssn: newSsn,
                     ssnAuditLogs: updatedLogs
                 });
                 
                 document.getElementById('formSSN').value = newSsn;
+                window.logSystemAction('정보 수정', '사원 정보', `${targetEmp.name}(${empId}) 주민번호 수정`);
                 window.showMessageBox("주민등록번호가 성공적으로 수정되었습니다.");
 
             } else if (auditActionContext.type === 'APPOINT_DEL') {
@@ -1055,6 +1257,7 @@
                 selectedEmpForAppoint.appointments = newAppointments;
                 selectedEmpForAppoint.appointAuditLogs = updatedLogs;
                 
+                window.logSystemAction('정보 삭제', '인사 발령', `${selectedEmpForAppoint.name}(${selectedEmpForAppoint.empID}) 발령 내역 삭제`);
                 window.showMessageBox("발령 내역이 삭제되었습니다.");
                 window.renderAppointHistory();
 
@@ -1062,18 +1265,10 @@
                 document.getElementById('auditModal').style.display = 'none';
                 const accId = auditActionContext.accountId;
                 
-                const logEntry = {
-                    date: new Date().toISOString().slice(0,10),
-                    modifier: mod,
-                    reason: rsn,
-                    deletedId: accId
-                };
-
-                // Remove from DB collection
                 await deleteDoc(doc(accountRef, accId));
                 
+                window.logSystemAction('정보 삭제', '계정 관리', `계정 삭제: ${accId} (사유: ${rsn})`);
                 window.showMessageBox(`계정(${accId})이 삭제되었습니다.`);
-                window.renderAccountGrid();
             }
             auditActionContext = null;
         };
@@ -1085,10 +1280,8 @@
             modal.style.display = 'flex';
             document.getElementById('modalTitle').innerText = edit ? "사원 정보 수정" : "사원 정보 등록";
             
-            // Readonly processing
             ['formName', 'formJoinDate'].forEach(id => { const el = document.getElementById(id); if(el) { el.classList.toggle('disabled-field', edit); if(el.tagName === 'INPUT') el.readOnly = edit; } });
             
-            // SSN processing
             const ssnEl = document.getElementById('formSSN');
             if(edit) {
                 ssnEl.classList.add('read-only'); ssnEl.readOnly = true;
@@ -1147,7 +1340,6 @@
             let total = 0;
             salaryKeys.filter(k=>!k.type).forEach(k => total += parseInt(data[k.id]) || 0);
 
-            // 임금정보 최초 등록 연동 로직
             if (history.length === 0) {
                 history = [{ date: jd, reason: "입사", monthly: total.toLocaleString() + "원", annual: (total * 12).toLocaleString() + "원" }];
             } else {
@@ -1160,7 +1352,9 @@
             }
             data.salaryHistory = history;
 
-            await setDoc(doc(empRef, id), data); window.showMessageBox("저장 완료"); window.closeModal();
+            await setDoc(doc(empRef, id), data); 
+            window.logSystemAction(isEditMode ? '정보 수정' : '신규 등록', '사원 정보', `${name}(${id}) 정보 ${isEditMode ? '수정' : '등록'}`);
+            window.showMessageBox("저장 완료"); window.closeModal();
         };
 
         // Grid & Section Rendering
@@ -1442,6 +1636,7 @@
             if(t === '직책부여') updateObj.duty = a; else if(t === '직위승진') updateObj.rank = a; else updateObj.dept = a;
             
             await updateDoc(doc(empRef, qsTargetEmp.empID), updateObj); 
+            window.logSystemAction('정보 등록', '인사 발령', `${qsTargetEmp.name}(${qsTargetEmp.empID}) 신규 발령 등록`);
             
             document.getElementById('quickAppointModal').style.display = 'none';
             window.showMessageBox("인사발령 등록이 완료되었습니다.");
@@ -1503,6 +1698,7 @@
             qsTargetEmp.salaryHistory.push(newHistory);
             
             document.getElementById('quickSalModal').style.display = 'none';
+            window.logSystemAction('정보 갱신', '연봉 관리', `${qsTargetEmp.name}(${qsTargetEmp.empID}) 연봉 갱신`);
             window.showMessageBox("연봉 갱신이 완료되었습니다.");
             
             // Refresh pay status UI if currently active
@@ -1541,18 +1737,16 @@
             
             const newAppoint = { date: d, type: t, before: document.getElementById('appBefore').value, after: a, wage: document.getElementById('appWage').value };
             
-            // Update local first for instant render
-            if(!selectedEmpForAppoint.appointments) selectedEmpForAppoint.appointments = [];
-            selectedEmpForAppoint.appointments.push(newAppoint);
-            
-            const updateObj = { appointments: selectedEmpForAppoint.appointments };
+            const updateObj = { appointments: arrayUnion(newAppoint) };
             if(t === '직책부여') updateObj.duty = a; else if(t === '직위승진') updateObj.rank = a; else updateObj.dept = a;
             
             await updateDoc(doc(empRef, selectedEmpForAppoint.empID), updateObj); 
+            window.logSystemAction('정보 등록', '인사 발령', `${selectedEmpForAppoint.name}(${selectedEmpForAppoint.empID}) 신규 발령 등록`);
             
+            if(!selectedEmpForAppoint.appointments) selectedEmpForAppoint.appointments = [];
+            selectedEmpForAppoint.appointments.push(newAppoint);
             window.renderAppointHistory();
 
-            // Link to Quick Salary update if Wage Changed
             if(newAppoint.wage === '변동') {
                 window.showConfirmBox(`${selectedEmpForAppoint.name}님의 연봉 갱신 업데이트를 하시겠습니까?`, () => {
                     window.openQuickSalaryModal(selectedEmpForAppoint, d);
@@ -1602,12 +1796,13 @@
             updateObj.salaryHistory = arrayUnion(newHistory);
             
             await updateDoc(doc(empRef, selectedEmpForSalary.empID), updateObj); 
+            window.logSystemAction('정보 갱신', '연봉 관리', `${selectedEmpForSalary.name}(${selectedEmpForSalary.empID}) 연봉 갱신`);
+
             if (!selectedEmpForSalary.salaryHistory) selectedEmpForSalary.salaryHistory = [];
             selectedEmpForSalary.salaryHistory.push(newHistory); // 빠른 화면 갱신
             
             window.renderSalaryHistory(); 
 
-            // Link to Quick Appointment update if Reason is '인사발령'
             if(r === '인사발령') {
                 window.showConfirmBox("연봉 업데이트가 완료되었습니다.\n인사발령 등록을 연이어 하시겠습니까?", () => {
                     window.openQuickAppointModal(selectedEmpForSalary, d);
@@ -1633,9 +1828,21 @@
                     <td>${a.empID}</td>
                     <td>${a.dept}</td>
                     <td>${a.rankDuty}</td>
-                    <td>${a.joinDate}</td>
                     <td>${a.accountId}</td>
-                    <td><button class="tool-btn" style="padding:2px 6px; color:#d32f2f; margin:0 auto;" onclick="window.requestAccountDelete('${a.accountId}')" title="계정 삭제"><i class="fa-solid fa-trash"></i></button></td>
+                    <td>
+                        <select style="width:100px; height:24px; border:1px solid #ddd;" onchange="window.updateAccountRole('${a.accountId}', this.value)">
+                            <option value="관리자" ${a.role==='관리자'?'selected':''}>관리자</option>
+                            <option value="임금담당자" ${a.role==='임금담당자'?'selected':''}>임금담당자</option>
+                            <option value="기본담당자" ${a.role==='기본담당자'?'selected':''}>기본담당자</option>
+                            <option value="기타" ${a.role==='기타'?'selected':''}>기타</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:5px;">
+                            <button class="tool-btn" style="padding:2px 6px;" onclick="window.resetAccountPassword('${a.accountId}', '${a.name}')" title="비밀번호 초기화"><i class="fa-solid fa-key"></i></button>
+                            <button class="tool-btn" style="padding:2px 6px; color:#d32f2f;" onclick="window.requestAccountDelete('${a.accountId}')" title="계정 삭제"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
                 </tr>
             `).join('');
             if(accounts.length === 0) b.innerHTML = `<tr><td colspan="7">등록된 계정이 없습니다.</td></tr>`;
@@ -1693,7 +1900,6 @@
             if(!empID) return window.showMessageBox("사원을 검색하여 선택해주세요.");
             if(!accountId || !accountPw) return window.showMessageBox("계정 ID와 비밀번호를 모두 입력해주세요.");
             
-            // Check for duplicate account ID
             if(accounts.some(a => a.accountId === accountId)) {
                 return window.showMessageBox("이미 존재하는 계정 ID입니다.");
             }
@@ -1705,12 +1911,28 @@
                 rankDuty: document.getElementById('accRankDuty').value,
                 joinDate: document.getElementById('accJoinDate').value,
                 accountId: accountId,
-                password: accountPw // In a real app, never store plain text PW
+                role: '기본담당자',
+                password: accountPw 
             };
 
             await setDoc(doc(accountRef, accountId), accData);
+            window.logSystemAction('설정 변경', '계정 관리', `신규 계정 생성: ${accountId}`);
             window.showMessageBox("계정이 성공적으로 등록되었습니다.");
             document.getElementById('accountModal').style.display = 'none';
+        };
+
+        window.updateAccountRole = async (accId, newRole) => {
+            await updateDoc(doc(accountRef, accId), { role: newRole });
+            window.logSystemAction('설정 변경', '계정 권한', `계정(${accId}) 권한 변경: ${newRole}`);
+            window.showMessageBox("권한이 업데이트되었습니다.");
+        };
+
+        window.resetAccountPassword = async (accId, accName) => {
+            window.showConfirmBox(`${accName}님의 계정(${accId}) 비밀번호를 초기화하시겠습니까?`, async () => {
+                await updateDoc(doc(accountRef, accId), { password: 'glvhzpdlapshs1' });
+                window.logSystemAction('보안 설정', '계정 비밀번호', `계정(${accId}) 비밀번호 초기화`);
+                window.showMessageBox(`${accName}님의 ${accId} 계정의 비밀번호는 'glvhzpdlapshs1'로 초기화되었습니다.`);
+            }, null);
         };
 
         window.requestAccountDelete = (accId) => {
@@ -1744,6 +1966,17 @@
                     onSnapshot(accountRef, snap => {
                         accounts = snap.docs.map(d => ({...d.data(), id: d.id}));
                         if(document.getElementById('page-account').classList.contains('active')) window.renderAccountGrid();
+                    }, err => console.error(err));
+
+                    onSnapshot(logsRef, snap => {
+                        syslogs = snap.docs.map(d => ({...d.data(), id: d.id}));
+                        if(document.getElementById('page-sys-log').classList.contains('active')) window.renderLogs();
+                    }, err => console.error(err));
+
+                    onSnapshot(settingsRef, snap => {
+                        allowedIps = snap.docs.map(d => ({...d.data(), id: d.id})).filter(s => s.type === 'IP');
+                        checkIpAccess();
+                        if(document.getElementById('page-sys-ip').classList.contains('active')) window.renderIpSettings();
                     }, err => console.error(err));
                 }
             });
