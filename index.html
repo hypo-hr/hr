@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.3.3.9 - 통합 관리</title>
+<title>히포케이메논 ERP V.3.4.0 - 통합 관리</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -932,7 +932,7 @@ window.addRow = (tid, data = {}) => {
         const types = ['고등학교', '전문대학', '대학교', '대학원(석사)', '대학원(박사)'], status = ['졸업', '재학', '휴학', '자퇴', '수료'];
         tr.innerHTML = `<td><select>${types.map(o=>`<option ${data.type===o?'selected':''}>${o}</option>`).join('')}</select></td><td><input class="auto-hyphen" data-type="date-range" value="${data.period||''}" placeholder="YYYY.MM ~ YYYY.MM"></td><td><input value="${data.school||''}"></td><td><input value="${data.major||''}"></td><td><select>${status.map(o=>`<option ${data.status===o?'selected':''}>${o}</option>`).join('')}</select></td>${delBtn}`;
     } else if(tid === 'careerBody') {
-        tr.innerHTML = `<td><input class="auto-hyphen" data-type="date-range" value="${data.period||''}" oninput="window.updateCareerMonths(this)" placeholder="YYYY.MM.DD ~ YYYY.MM.DD"></td><td><input value="${data.company||''}"></td><td><input value="${data.dept||''}"></td><td><input value="${data.rank||''}"></td><td><input value="${data.duty||''}"></td><td><input value="${data.reason||''}"></td><td><input class="month-calc-output read-only" readonly value="${data.months||'0'}"></td>${delBtn}`;
+        tr.innerHTML = `<td><input class="auto-hyphen" data-type="date-range" value="${data.period||''}" oninput="window.updateCareerMonths(this)" placeholder="YYYY.MM ~ YYYY.MM"></td><td><input value="${data.company||''}"></td><td><input value="${data.dept||''}"></td><td><input value="${data.rank||''}"></td><td><input value="${data.duty||''}"></td><td><input value="${data.reason||''}"></td><td><input class="month-calc-output read-only" readonly value="${data.months||'0'}"></td>${delBtn}`;
     } else if(tid === 'familyBody') {
         const rels = ['부','모','배우자','자녀','형제/자매','기타'], isOther = data.relation && !rels.slice(0,-1).includes(data.relation);
         tr.innerHTML = `<td><div class="relation-container"><select onchange="window.handleRelationChange(this)">${rels.map(o=>`<option value="${o}" ${(data.relation===o||(isOther&&o==='기타'))?'selected':''}>${o}</option>`).join('')}</select><input class="other-input ${isOther?'show':''}" placeholder="관계입력" value="${isOther?data.relation:''}"></div></td><td><input value="${data.name||''}"></td><td><input class="auto-hyphen" data-type="date" value="${data.birth||''}" placeholder="YYYY-MM-DD"></td><td><select><option ${data.living==='동거'?'selected':''}>동거</option><option ${data.living==='비동거'?'selected':''}>비동거</option></select></td><td><input value="${data.job||''}"></td><td><input value="${data.memo||''}"></td>${delBtn}`;
@@ -960,14 +960,18 @@ window.getTableData = (tid) => {
 window.updateCareerMonths = (el) => {
     if(el) {
         const tr = el.closest('tr'); if(tr) {
-            if (el.value.length >= 17) {
-                const p = el.value.split(' ~ '); if (p.length === 2) {
-                    const s = p[0].split('.'), e = p[1].split('.');
-                    if (s.length === 2 && e.length === 2) {
-                        const ms=(parseInt(s[0])*12)+parseInt(s[1]), me=(parseInt(e[0])*12)+parseInt(e[1]);
-                        const d=me-ms+1; const output = tr.querySelector('.month-calc-output'); if(output) output.value = d>0?d:0;
-                    }
-                }
+            const raw = String(el.value||'');
+            const normalized = raw.slice(0, 17);
+            if (raw !== normalized) el.value = normalized;
+            if (/^\d{4}\.\d{2} ~ \d{4}\.\d{2}$/.test(normalized)) {
+                const p = normalized.split(' ~ ');
+                const s = p[0].split('.'), e = p[1].split('.');
+                const sm = parseInt(s[1], 10), em = parseInt(e[1], 10);
+                const output = tr.querySelector('.month-calc-output');
+                if (sm >= 1 && sm <= 12 && em >= 1 && em <= 12) {
+                    const ms=(parseInt(s[0],10)*12)+sm, me=(parseInt(e[0],10)*12)+em;
+                    const d=me-ms+1; if(output) output.value = d>0?d:0;
+                } else if(output) output.value = 0;
             } else { const out = tr.querySelector('.month-calc-output'); if(out) out.value = 0; }
         }
     }
@@ -2171,7 +2175,7 @@ document.addEventListener('input', e => {
     else if(t.dataset.type==='ssn'){ let v=t.value.replace(/[^0-9]/g,''); t.value=v.length<=6?v:v.slice(0,6)+'-'+v.slice(6,13); }
     else if(t.dataset.type==='date'){ let v=t.value.replace(/[^0-9]/g,''); t.value=v.length<=4?v:v.length<=6?v.slice(0,4)+'-'+v.slice(4):v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6,8); }
     else if(t.dataset.type==='year-month'){ let v=t.value.replace(/[^0-9]/g,''); t.value=v.length<=4?v:v.slice(0,4)+'-'+v.slice(4,6); }
-    else if(t.dataset.type==='date-range'){ let v=t.value.replace(/[^0-9]/g,''); t.value=v.length<=4?v:v.length<=6?v.slice(0,4)+'.'+v.slice(4):v.length<=10?v.slice(0,4)+'.'+v.slice(4,6)+' ~ '+v.slice(6,10):v.slice(0,4)+'.'+v.slice(4,6)+' ~ '+v.slice(6,10)+'.'+v.slice(10,12); }
+    else if(t.dataset.type==='date-range'){ let v=t.value.replace(/[^0-9]/g,'').slice(0,12); t.value=v.length<=4?v:v.length<=6?v.slice(0,4)+'.'+v.slice(4):v.length<=10?v.slice(0,4)+'.'+v.slice(4,6)+' ~ '+v.slice(6,10):v.slice(0,4)+'.'+v.slice(4,6)+' ~ '+v.slice(6,10)+'.'+v.slice(10,12); }
     else if(t.dataset.type==='account'){ t.value=String(t.value||'').replace(/[^0-9]/g,''); window.formatAccount(); }
 });
 
