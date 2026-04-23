@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.3.4.0 - 통합 관리</title>
+<title>히포케이메논 ERP V.3.5.6 - 통합 관리</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -36,7 +36,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 .msg-box-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);display:none;justify-content:center;align-items:center;z-index:3000} .msg-box{background:white;padding:25px 30px;border-radius:4px;box-shadow:0 4px 15px rgba(0,0,0,0.2);text-align:center;display:flex;flex-direction:column;max-height:90vh} .empty-page{justify-content:center;align-items:center;background:#f9f9f9;text-align:center;color:#999;height:100%;display:flex;flex-direction:column;min-height:400px;border:1px solid var(--icube-border);border-radius:4px}
 .record-card{background:white;border:1px solid #000;padding:20px;color:#000;font-family:'Malgun Gothic',serif;position:relative;max-width:800px;margin:0 auto} .record-title{text-align:center;font-size:24px;font-weight:bold;margin-bottom:20px;letter-spacing:5px} .record-top-grid{display:flex;gap:15px;margin-bottom:15px} .photo-box{width:130px;height:170px;border:1px solid #000;display:flex;justify-content:center;align-items:center;background:#f9f9f9;color:#999;flex-shrink:0} .record-table{width:100%;border-collapse:collapse;margin-bottom:15px;table-layout:fixed} .record-table th,.record-table td{border:1px solid #000;padding:6px;font-size:11px;text-align:center;vertical-align:middle;word-wrap:break-word} .record-table th{background:#f0f0f0;font-weight:bold} .record-section-title{font-size:13px;font-weight:bold;margin-bottom:5px;border-left:3px solid #000;padding-left:8px;margin-top:10px}
 .print-footer{display:none;text-align:center;font-size:16px;font-weight:bold;letter-spacing:3px;color:#000;margin-top:30px;page-break-inside:avoid;padding-bottom:10px}.basic-info-flex{display:flex;gap:15px;align-items:flex-start}.profile-upload-box{width:140px;min-width:140px;border:1px solid var(--icube-border);background:#fbfbfb;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px}.profile-upload-preview{width:118px;height:150px;border:1px solid #cfd6dc;background:#fff center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px}.profile-upload-actions{display:flex;flex-direction:column;gap:6px;width:100%}.profile-upload-actions .tool-btn{width:100%;padding:4px 8px;font-size:11px}
-.home-layout{display:flex;gap:20px;height:100%;overflow:hidden} .home-left{flex:1.5;display:flex;flex-direction:column;gap:15px;overflow:hidden} .home-right{flex:1;display:flex;flex-direction:column;gap:15px;overflow-y:auto} .home-card{background:white;border:1px solid var(--icube-border);border-radius:4px;padding:15px;display:flex;flex-direction:column} .home-card-title{font-size:14px;font-weight:bold;color:var(--icube-blue);border-bottom:2px solid var(--icube-blue);padding-bottom:5px;margin-bottom:10px;display:flex;justify-content:space-between} .stat-table{width:100%;border-collapse:collapse;text-align:center;font-size:12px} .stat-table th{background:#f8f8f8;border:1px solid var(--icube-border);padding:6px} .stat-table td{border:1px solid var(--icube-border);padding:8px;font-weight:bold;font-size:14px} .mini-list-table{width:100%;border-collapse:collapse;text-align:center;font-size:11px} .mini-list-table th{background:#f4f6f8;border:1px solid var(--icube-border);padding:4px} .mini-list-table td{border:1px solid var(--icube-border);padding:4px}
+.home-layout{display:flex;gap:20px;height:100%;overflow:hidden;min-height:0} .home-left{flex:1.5;display:flex;flex-direction:column;gap:15px;overflow:hidden;min-height:0} .home-right{flex:1;display:flex;flex-direction:column;gap:15px;overflow-y:auto;min-height:0} .home-card{background:white;border:1px solid var(--icube-border);border-radius:4px;padding:15px;display:flex;flex-direction:column;min-height:0} .home-card-title{font-size:14px;font-weight:bold;color:var(--icube-blue);border-bottom:2px solid var(--icube-blue);padding-bottom:5px;margin-bottom:10px;display:flex;justify-content:space-between} .stat-table{width:100%;border-collapse:collapse;text-align:center;font-size:12px} .stat-table th{background:#f8f8f8;border:1px solid var(--icube-border);padding:6px} .stat-table td{border:1px solid var(--icube-border);padding:8px;font-weight:bold;font-size:14px} .mini-list-table{width:100%;border-collapse:collapse;text-align:center;font-size:11px} .mini-list-table th{background:#f4f6f8;border:1px solid var(--icube-border);padding:4px} .mini-list-table td{border:1px solid var(--icube-border);padding:4px}
 .quick-links{display:flex;gap:15px;justify-content:center;padding:15px;background:white;border:1px solid var(--icube-border);margin-bottom:20px;border-radius:4px} .quick-link-btn{padding:10px 20px;background:#fff;border:1px solid var(--icube-blue);color:var(--icube-blue);font-weight:bold;border-radius:20px;text-decoration:none;transition:all 0.2s;display:flex;align-items:center;gap:8px} .quick-link-btn:hover{background:var(--icube-blue);color:white;box-shadow:0 4px 10px rgba(49,98,199,0.3)}
 .org-tree{display:flex;flex-direction:column;gap:10px;padding:15px;background:#fbfbfb;border:1px solid #eee;border-radius:4px;overflow-x:auto;margin-bottom:20px} .tree ul{padding-top:20px;position:relative;display:flex;justify-content:center;gap:10px;margin:0;padding-left:0} .tree li{float:left;text-align:center;list-style-type:none;position:relative;padding:20px 5px 0 5px} .tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;border-top:3px solid #8ea6d8;width:50%;height:22px} .tree li::after{right:auto;left:50%;border-left:3px solid #8ea6d8} .tree li:only-child::after,.tree li:only-child::before{display:none} .tree li:only-child{padding-top:0} .tree li:first-child::before,.tree li:last-child::after{border:0 none} .tree li:last-child::before{border-right:3px solid #8ea6d8;border-radius:0 5px 0 0} .tree li:first-child::after{border-radius:5px 0 0 0} .tree ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:3px solid #8ea6d8;width:0;height:22px;margin-left:-1px} .tree-node{border:2px solid var(--icube-blue);padding:10px 20px;color:#333;font-weight:bold;display:inline-block;border-radius:6px;background:white;box-shadow:0 2px 4px rgba(0,0,0,0.05);cursor:pointer;min-width:120px;transition:all 0.2s} .tree-node:hover,.tree-node.active{background:var(--icube-blue);color:white}
 .permission-grid{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:0;border:1px solid var(--icube-border);background:#fff}
@@ -48,10 +48,11 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
 .report-temp-banner{background:#fff8e1;border:1px solid #f0d98c;color:#8a6d1d;padding:8px 12px;border-radius:4px;font-size:11px;margin-bottom:10px}
 .report-page-wrap{display:flex;flex-direction:column;gap:12px;height:100%}
-.report-box{background:white;border:1px solid var(--icube-border);padding:14px;border-radius:2px}
-.report-header-center{text-align:center;margin-bottom:10px}.report-header-center .corp{font-size:16px;font-weight:bold}.report-header-center .title{font-size:24px;font-weight:900;letter-spacing:8px;margin-top:8px}
+.report-box{background:white;border:1px solid var(--icube-border);padding:18px 20px;border-radius:2px}
+.report-header-center{text-align:center;margin-bottom:14px}.report-header-center .corp{font-size:14px;font-weight:bold}.report-header-center .title{font-size:30px;font-weight:900;letter-spacing:10px;margin-top:6px}
 .report-date-row{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin:8px 0 16px 0}.report-date-row input{height:28px;border:1px solid var(--icube-border);padding:0 8px}
-.report-table{width:100%;border-collapse:collapse;table-layout:fixed;background:white}.report-table th,.report-table td{border:1px solid #333;padding:6px 4px;font-size:11px;text-align:center;vertical-align:middle}.report-table th{background:#f6f6f6;font-weight:bold}.report-section-title{font-size:13px;font-weight:bold;margin:14px 0 6px 0}
+.report-table{width:100%;border-collapse:collapse;table-layout:fixed;background:white}.report-table th,.report-table td{border:1px solid #333;padding:5px 4px;font-size:11px;text-align:center;vertical-align:middle}.report-table th{background:#f2f2f2;font-weight:bold}.report-section-title{font-size:13px;font-weight:bold;margin:16px 0 6px 0}
+.report-table td.left{text-align:left;padding-left:8px}
 .report-write-layout{display:flex;gap:12px;min-height:0;flex:1}.report-write-left{width:320px;flex-shrink:0;background:white;border:1px solid var(--icube-border);display:flex;flex-direction:column}.report-write-right{flex:1;background:white;border:1px solid var(--icube-border);display:flex;flex-direction:column;min-width:0}.report-write-toolbar{padding:12px;border-bottom:1px solid var(--icube-border);display:flex;gap:8px;align-items:center;background:#fbfbfb}.report-write-toolbar input,.report-write-toolbar select{height:28px;border:1px solid var(--icube-border);padding:0 8px}.report-write-list{flex:1;overflow:auto}.report-write-empty{display:flex;align-items:center;justify-content:center;flex:1;color:#999}
 .report-write-form{padding:16px;overflow:auto}.report-write-grid{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center}.report-write-grid input,.report-write-grid select,.report-write-grid textarea{width:100%;border:1px solid var(--icube-border);padding:6px 8px;font-size:12px}.report-write-grid textarea{min-height:70px;resize:vertical}
 .small-note{font-size:11px;color:#777}
@@ -68,7 +69,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 </style>
 </head>
 <body data-role="관리자">
-<!-- V.3.1.5 전반 점검 보정: 메뉴 진입/렌더 null-safe 보강, 버튼 줄바꿈 방지, 기본 날짜 자동세팅, 목록 비어있을 때 기본 문구 정리 -->
+<!-- V.3.5.6 반영: 근무지 관리/근무지 일괄업로드/인원현황보고 서식 보정 -->
 
 <div id="login-screen">
     <div class="login-box">
@@ -84,9 +85,19 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
     <div id="ipBlockOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:9999;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center"><i class="fa-solid fa-shield-halved" style="font-size:60px;color:#d32f2f;margin-bottom:20px"></i><h1 style="color:#333;margin-bottom:10px">접속 불가 지역</h1><p style="color:#666">사내 네트워크에서만 접속할 수 있습니다.</p><p id="displayBlockedIp" style="color:#999;margin-top:20px;font-size:11px"></p></div>
     <div id="msgBoxOverlay" class="msg-box-overlay"><div class="msg-box"><p id="msgBoxText" style="margin-bottom:15px;font-weight:bold"></p><button class="tool-btn primary" style="margin:0 auto;width:80px" onclick="window.closeMsgBox()">확인</button></div></div>
     <div id="confirmBoxOverlay" class="msg-box-overlay" style="z-index:3100"><div class="msg-box" style="padding:25px 40px"><p id="confirmBoxText" style="margin-bottom:20px;font-weight:bold;line-height:1.5"></p><div style="display:flex;justify-content:center;gap:10px"><button class="tool-btn" onclick="window.closeConfirmBox(false)">취소</button><button class="tool-btn primary" onclick="window.closeConfirmBox(true)">확인</button></div></div></div>
+    <div id="loadingOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.28);z-index:3200;display:none;align-items:center;justify-content:center;">
+        <div style="width:320px;background:#fff;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.2);padding:22px 24px;display:flex;flex-direction:column;gap:12px;text-align:center;">
+            <div id="loadingTitle" style="font-size:16px;font-weight:bold;color:#333;">진행중...</div>
+            <div style="height:10px;background:#eef2f7;border-radius:999px;overflow:hidden;">
+                <div id="loadingProgressBar" style="height:100%;width:0%;background:#3162C7;transition:width .2s ease;"></div>
+            </div>
+            <div id="loadingPercent" style="font-size:13px;font-weight:bold;color:#3162C7;">0%</div>
+            <div id="loadingDetail" style="font-size:12px;color:#666;min-height:16px;">작업 준비 중...</div>
+        </div>
+    </div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.3.5</span></div>
+        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.5.6</span></div>
         <div style="margin-left:auto;font-size:12px;color:#555;display:flex;align-items:center;gap:15px">
             <span><span id="displayLoggedInUser" style="font-weight:bold;color:var(--icube-blue)"></span> 님 로그인 중</span>
             <button id="notifyBellBtn" class="tool-btn" onclick="window.openNotificationCenter()" style="position:relative;width:34px;height:28px;padding:0;min-width:34px"><i class="fa-regular fa-bell"></i><span id="notifyUnreadDot" style="display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#2f80ff"></span></button>
@@ -133,6 +144,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                     <li class="menu-item" onclick="window.switchMenu('sys-site',this)"><i class="fa-solid fa-link"></i> 사이트 관리</li>
                     <li class="menu-item" onclick="window.switchMenu('org-dept',this)"><i class="fa-solid fa-building"></i> 부서명 관리</li>
                     <li class="menu-item" onclick="window.switchMenu('org-rank',this)"><i class="fa-solid fa-medal"></i> 직위/직책 관리</li>
+                    <li class="menu-item" onclick="window.switchMenu('sys-workplace',this)"><i class="fa-solid fa-location-dot"></i> 근무지 관리</li>
                     <li class="menu-item" onclick="window.switchMenu('sys-ip',this)"><i class="fa-solid fa-network-wired"></i> 접속 IP 설정</li>
                     <li class="menu-item" onclick="window.switchMenu('sys-log',this)"><i class="fa-solid fa-list-check"></i> Log 기록</li>
                     <li class="menu-item" onclick="window.switchMenu('account',this)"><i class="fa-solid fa-users-gear"></i> 계정 관리</li>
@@ -152,7 +164,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                 <div class="home-layout">
                     <div class="home-left">
                         <div class="home-card"><div class="home-card-title"><span>현재기준 인원 현황</span></div><table class="stat-table"><thead><tr><th>총 인원수</th><th>정규직</th><th>계약직</th><th>일용직</th><th>위탁직</th><th>프리랜서</th></tr></thead><tbody><tr><td id="st_tot">0명</td><td id="st_reg">0명</td><td id="st_con">0명</td><td id="st_dai">0명</td><td id="st_out">0명</td><td id="st_fre">0명</td></tr></tbody></table></div>
-                        <div class="home-card" style="flex:1;"><div class="home-card-title"><span>전체 인원 명부</span><div><select id="homeDeptFilter" onchange="window.renderHomeData()" style="padding:2px 5px; border:1px solid #ccc; height:22px;"><option value="">전체 부서 보기</option></select></div></div><div style="overflow:auto; flex:1;"><table class="icube-grid" style="min-width:900px;"><thead><tr><th width="70">고용형태</th><th width="80">사번</th><th width="100">부서명</th><th width="80">이름</th><th width="100">직위/직책</th><th width="80">입사일</th><th width="100">연락처</th><th>주소</th><th width="120">이메일</th><th width="120">근속기간</th></tr></thead><tbody id="homeEmpListBody"></tbody></table></div></div>
+                        <div class="home-card" style="flex:1;"><div class="home-card-title"><span>전체 인원 명부</span><div><select id="homeDeptFilter" onchange="window.renderHomeData()" style="padding:2px 5px; border:1px solid #ccc; height:22px;"><option value="">전체 부서 보기</option></select></div></div><div style="overflow:auto; flex:1; min-height:0;"><table class="icube-grid" style="min-width:900px;"><thead><tr><th width="70">고용형태</th><th width="80">사번</th><th width="100">부서명</th><th width="80">이름</th><th width="100">직위/직책</th><th width="80">입사일</th><th width="100">연락처</th><th>주소</th><th width="120">이메일</th><th width="120">근속기간</th></tr></thead><tbody id="homeEmpListBody"></tbody></table></div></div>
                     </div>
                     <div class="home-right">
                         <div class="home-card"><div class="home-card-title"><span>당월 입/퇴사자</span></div><table class="stat-table"><thead><tr><th>입사자</th><th>퇴사자</th></tr></thead><tbody><tr><td id="st_join">0명</td><td id="st_quit">0명</td></tr></tbody></table></div>
@@ -288,7 +300,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                     <div class="list-panel" style="padding:20px; flex:1;">
                         <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-users"></i> 사원 일괄 업로드</h3>
                         <p style="color:#666; margin-bottom:15px;">전체 사원의 137개 항목(기본, 학력, 경력, 자격 등)을 엑셀로 일괄 업로드합니다.</p>
-                        <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="tool-btn primary" onclick="window.downloadEmpTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 받기</button><button class="tool-btn primary" onclick="document.getElementById('empBulkInput').click()"><i class="fa-solid fa-upload"></i> 파일 업로드</button><input type="file" id="empBulkInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleEmpBulkUpload(event)"></div>
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;"><button class="tool-btn primary" onclick="window.downloadEmpTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 받기</button><button class="tool-btn primary" onclick="document.getElementById('empBulkInput').click()"><i class="fa-solid fa-upload"></i> 파일 업로드</button><button class="tool-btn danger" onclick="window.deleteAllEmployees()"><i class="fa-solid fa-trash"></i> 전체 사원 삭제</button><input type="file" id="empBulkInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleEmpBulkUpload(event)"></div>
                     </div>
                     <div class="list-panel" style="padding:20px; flex:1;">
                         <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-file-signature"></i> 인사 발령 일괄 업로드</h3>
@@ -366,6 +378,27 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                 <div class="dual-panel-container">
                     <div class="list-panel" style="padding:20px; flex:1;"><h3 style="margin-top:0;">직위 (Rank) 목록</h3><div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="newRankName" placeholder="신규 직위 입력" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><button class="tool-btn primary" onclick="window.addRank()">추가</button></div><table class="icube-grid"><thead><tr><th>직위명</th><th width="120">관리</th></tr></thead><tbody id="rankListBody"></tbody></table></div>
                     <div class="list-panel" style="padding:20px; flex:1;"><h3 style="margin-top:0;">직책 (Duty) 목록</h3><div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="newDutyName" placeholder="신규 직책 입력" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;"><button class="tool-btn primary" onclick="window.addDuty()">추가</button></div><table class="icube-grid"><thead><tr><th>직책명</th><th width="120">관리</th></tr></thead><tbody id="dutyListBody"></tbody></table></div>
+                </div>
+            </div>
+
+            <div id="page-sys-workplace" class="page-content">
+                <div class="toolbar"><div style="font-weight:bold;"><i class="fa-solid fa-location-dot"></i> 근무지 관리</div></div>
+                <div class="list-panel" style="padding:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px;">
+                        <div id="hqAddressBar" style="font-weight:bold;color:var(--icube-blue)">본점 주소 : 미등록</div>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <button class="tool-btn" onclick="window.openWorkplaceAddressSearch('HQ')"><i class="fa-solid fa-magnifying-glass-location"></i> 본점 주소 검색</button>
+                            <button class="tool-btn" onclick="window.editHeadquartersAddress()">수정</button>
+                            <button class="tool-btn" style="color:#d32f2f" onclick="window.deleteHeadquartersAddress()">삭제</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="text" id="newWorkplaceName" placeholder="근무지명 입력" style="flex:1; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
+                        <input type="text" id="newWorkplaceAddr" placeholder="주소" readonly class="read-only" style="flex:2; height:30px; border:1px solid var(--icube-border); padding:0 10px;">
+                        <button class="tool-btn" onclick="window.openWorkplaceAddressSearch()"><i class="fa-solid fa-magnifying-glass-location"></i> 주소 검색</button>
+                        <button class="tool-btn primary" onclick="window.addWorkplace()">추가</button>
+                    </div>
+                    <table class="icube-grid"><thead><tr><th width="180">근무지</th><th>주소</th><th width="140">관리</th></tr></thead><tbody id="workplaceListBody"></tbody></table>
                 </div>
             </div>
 
@@ -554,10 +587,11 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                     </div>
                     <div class="section-divider"><hr><span>인사 정보</span><hr></div>
                     <table class="detail-table">
-                        <tr><th>고용형태</th><td><select id="formContractType" onchange="window.handleContractTypeChange()"><option value="정규직">정규직</option><option value="계약직">계약직</option><option value="일용직">일용직</option><option value="위탁직">위탁직</option><option value="프리랜서">프리랜서</option></select></td><th>사원번호</th><td><input id="formEmpID" class="read-only" readonly></td></tr>
-                        <tr><th class="required">입사일</th><td><input id="formJoinDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" onchange="window.generateEmpID(this.value)"></td><th>수습종료(예정)일</th><td><input id="formProbationEnd" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td></tr>
-                        <tr><th>부서명</th><td><select id="formDept"></select></td><th>직위</th><td><select id="formRank"><option value="">선택</option><option value="직위없음">직위없음</option></select></td></tr>
-                        <tr><th>직책</th><td><select id="formDuty"><option value="직책없음">직책없음</option></select></td><th>퇴사일</th><td><input id="formQuitDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td></tr>
+                        <tr><th>고용형태</th><td><select id="formContractType" onchange="window.handleContractTypeChange()"><option value="임원">임원</option><option value="정규직">정규직</option><option value="계약직">계약직</option><option value="단시간근로">단시간근로</option><option value="일용직">일용직</option><option value="위탁직">위탁직</option><option value="프리랜서">프리랜서</option></select></td><th>사원번호</th><td><input id="formEmpID" class="read-only" readonly></td></tr>
+                        <tr><th class="required">입사일</th><td><input id="formJoinDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" onchange="window.generateEmpID(this.value)"></td><th id="employmentDateLabel">수습종료(예정)일</th><td><input id="formProbationEnd" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td></tr>
+                        <tr><th>근무지</th><td><select id="formWorkplace"><option value="">선택</option></select></td><th>부서명</th><td><select id="formDept"></select></td></tr>
+                        <tr><th>직위</th><td><select id="formRank"><option value="">선택</option><option value="직위없음">직위없음</option></select></td><th>직책</th><td><select id="formDuty"><option value="직책없음">직책없음</option></select></td></tr>
+                        <tr><th>퇴사일</th><td><input id="formQuitDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td><td colspan="2"></td></tr>
                     </table>
                 </div>
 
@@ -675,14 +709,14 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, updateDoc, arrayUnion, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
 const fbCfg = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : JSON.parse('{"apiKey":"AIzaSyBohhdlBOkvjEPpdxc2NS_qEDOTvR0hl18","authDomain":"hypo-erp-5b661.firebaseapp.com","projectId":"hypo-erp-5b661","storageBucket":"hypo-erp-5b661.firebasestorage.app"}');
 const app = initializeApp(fbCfg); const db = getFirestore(app); const auth = getAuth(app); const appId = typeof __app_id !== 'undefined' ? __app_id : 'hypo-erp-v1';
 const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees'), accountRef = collection(db, 'artifacts', appId, 'public', 'data', 'accounts'), logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'syslogs'), settingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'settings'), backupRef = collection(db, 'artifacts', appId, 'public', 'data', 'backups'), reportRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_reports'), downloadApprovalRef = collection(db, 'artifacts', appId, 'public', 'data', 'employee_download_requests');
 
-let emps=[], accounts=[], syslogs=[], allowedIps=[], siteLinks=[], sysDepts=[], sysRanks=[], sysDuties=[], backups=[], dailyReports=[], downloadRequests=[];
+let emps=[], accounts=[], syslogs=[], allowedIps=[], siteLinks=[], sysDepts=[], sysRanks=[], sysDuties=[], sysWorkplaces=[], headquartersSetting=null, backups=[], dailyReports=[], downloadRequests=[];
 let currentIp='조회 불가', currentLoggedInUserName="관리자(테스트)", currentLoginAcc=null;
 let currentEditPhotoData='';
 let isEditMode=false, isSalaryLocked=true, qsTargetEmp=null, selectedEmpForSalary=null, selectedEmpForAppoint=null;
@@ -759,12 +793,84 @@ const resolveEmployeeFieldAfterAppointmentDelete = (appointmentsAfter=[], delete
 };
 const safeRun = fn => { try { if(typeof fn === 'function') fn(); } catch(err){ console.error(err); window.showMessageBox?.('화면을 불러오는 중 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.'); } };
 const normalizeUrl = (url='') => { const s=String(url||'').trim(); if(!s) return '#'; return /^https?:\/\//i.test(s) ? s : 'https://' + s; };
+const getDeptOrderValue = (deptName='') => {
+    const idx = sysDepts.findIndex(d => d.name === deptName);
+    return idx === -1 ? 9999 : idx;
+};
+const sortByDeptOrder = (list=[]) => [...list].sort((a,b)=>{
+    const da = getDeptOrderValue(a.dept||''), db = getDeptOrderValue(b.dept||'');
+    if(da !== db) return da - db;
+    return String(a.name||'').localeCompare(String(b.name||''));
+});
+const getBirthSortKey = (emp={}) => {
+    const ssn = String(emp.ssn||'');
+    const mm = ssn.substring(2,4);
+    const dd = ssn.substring(4,6);
+    return `${mm}${dd}`;
+};
+
 const getDisplayRole = (e) => (e?.duty && e.duty !== '직책없음' ? e.duty : (e?.rank || '사원'));
-const getSettingsSnapshot = () => [...siteLinks, ...sysDepts, ...sysRanks, ...sysDuties, ...allowedIps].map(x=>({...x}));
+const getSettingsSnapshot = () => [...siteLinks, ...sysDepts, ...sysRanks, ...sysDuties, ...sysWorkplaces, ...(headquartersSetting?[headquartersSetting]:[]), ...allowedIps].map(x=>({...x}));
+window.ensureDefaultRanks = async () => {
+    const desired = ['대표이사','이사','수석부장','부장','책임','전임','선임','주임','사원','팀원','애널리스트','웰시연구원','훈련생','프리랜서','PM','아르바이트'];
+    const existing = new Set(sysRanks.map(r=>r.name));
+    for(let i=0;i<desired.length;i++){
+        if(!existing.has(desired[i])){
+            await setDoc(doc(settingsRef, 'rank_patch_'+desired[i]), {type:'RANK', name:desired[i], order:i});
+        }
+    }
+};
+
+window.showLoading = (title='진행중...', percent=null, detail='') => {
+    const overlay=$('loadingOverlay'), titleEl=$('loadingTitle'), percentEl=$('loadingPercent'), detailEl=$('loadingDetail'), barEl=$('loadingProgressBar');
+    if(!overlay || !titleEl || !percentEl || !detailEl || !barEl) return;
+    titleEl.innerText=title;
+    if(percent==null){ percentEl.innerText=''; barEl.style.width='18%'; }
+    else { const safe=Math.max(0, Math.min(100, Number(percent)||0)); percentEl.innerText=`${safe}%`; barEl.style.width=`${safe}%`; }
+    detailEl.innerText=detail || '작업 준비 중...';
+    overlay.style.display='flex';
+};
+window.setLoadingProgress = (percent=null, detail='') => {
+    const percentEl=$('loadingPercent'), detailEl=$('loadingDetail'), barEl=$('loadingProgressBar');
+    if(percentEl && barEl){
+        if(percent==null){ percentEl.innerText=''; barEl.style.width='18%'; }
+        else { const safe=Math.max(0, Math.min(100, Number(percent)||0)); percentEl.innerText=`${safe}%`; barEl.style.width=`${safe}%`; }
+    }
+    if(detailEl && detail) detailEl.innerText=detail;
+};
+window.hideLoading = () => { const overlay=$('loadingOverlay'); if(overlay) overlay.style.display='none'; };
+const runBatched = async (items=[], handler, batchSize=400, progressTitle='진행중...') => {
+    const total = items.length;
+    if(!total) return;
+    window.showLoading(progressTitle, 0, `0 / ${total} 처리 중`);
+    let processed = 0;
+    for(let i=0; i<items.length; i+=batchSize){
+        const batch = writeBatch(db);
+        const chunk = items.slice(i, i+batchSize);
+        chunk.forEach(item => handler(batch, item));
+        await batch.commit();
+        processed += chunk.length;
+        window.setLoadingProgress(Math.round((processed/total)*100), `${processed} / ${total} 처리 중`);
+    }
+};
+const runMixedBatched = async (operations=[], batchSize=400, progressTitle='진행중...') => {
+    const total = operations.length;
+    if(!total) return;
+    window.showLoading(progressTitle, 0, `0 / ${total} 처리 중`);
+    let processed = 0;
+    for(let i=0; i<operations.length; i+=batchSize){
+        const batch = writeBatch(db);
+        const chunk = operations.slice(i, i+batchSize);
+        chunk.forEach(fn => fn(batch));
+        await batch.commit();
+        processed += chunk.length;
+        window.setLoadingProgress(Math.round((processed/total)*100), `${processed} / ${total} 처리 중`);
+    }
+};
 window.renderBackupPages = () => { const render=(id)=>{ const body=$(id); if(!body) return; const rows=[...backups].sort((a,b)=>String(b.id).localeCompare(String(a.id))); body.innerHTML=rows.length?rows.map(b=>`<tr><td>${b.date||''} ${b.time||''}</td><td>${b.mode||'-'}</td><td>${b.user||'-'}</td><td style="text-align:left;padding-left:10px">${b.reason||'-'}</td><td><button class="tool-btn" onclick="window.restoreBackup('${b.id}')">복원</button></td></tr>`).join(''):'<tr><td colspan="5" style="padding:20px;color:#999">백업 이력이 없습니다.</td></tr>'; }; render('backupListBody'); render('restoreListBody'); };
 window.createBackup = async (mode='AUTO', reason='자동 백업', snapshot=null) => { const payload=snapshot||{ employees: emps.map(x=>({...x})), accounts: accounts.map(x=>({...x})), settings: getSettingsSnapshot(), dailyReports: dailyReports.map(x=>({...x})) }; const now=new Date(); await setDoc(doc(backupRef, String(now.getTime())), { date:now.toISOString().slice(0,10), time:now.toTimeString().slice(0,8), user:currentLoggedInUserName, mode, reason, payload }); };
-window.createManualBackup = async () => { await window.createBackup('MANUAL', '수동 백업'); window.showMessageBox('백업 완료'); };
-window.restoreBackup = async (backupId) => { const backup=backups.find(b=>b.id===backupId); if(!backup) return window.showMessageBox('백업 데이터를 찾을 수 없습니다.'); window.showConfirmBox('복원 전 현재 데이터도 자동 백업됩니다. 계속 진행하시겠습니까?', async ()=>{ await window.createBackup('AUTO', `복원 전 자동 백업 (${backup.date||''} ${backup.time||''})`); for(const e of emps) await deleteDoc(doc(empRef, e.empID)); for(const a of accounts) await deleteDoc(doc(accountRef, a.accountId)); for(const s of getSettingsSnapshot()) await deleteDoc(doc(settingsRef, s.id)); for(const r of dailyReports) await deleteDoc(doc(reportRef, r.id)); for(const e of (backup.payload?.employees||[])) await setDoc(doc(empRef, e.empID), e); for(const a of (backup.payload?.accounts||[])) await setDoc(doc(accountRef, a.accountId), a); for(const s of (backup.payload?.settings||[])) await setDoc(doc(settingsRef, s.id), s); for(const r of (backup.payload?.dailyReports||[])) await setDoc(doc(reportRef, r.id), r); await window.logSystemAction('복원', '데이터 복원', `${backup.date||''} ${backup.time||''} 백업본으로 복원`); window.showMessageBox('복원 완료'); }, null); };
+window.createManualBackup = async () => { window.showLoading('백업 생성 중...', 15, '백업 데이터를 준비하고 있습니다.'); try { await window.createBackup('MANUAL', '수동 백업'); window.setLoadingProgress(100, '백업이 완료되었습니다.'); window.showMessageBox('백업 완료'); } finally { setTimeout(()=>window.hideLoading(), 200); } };
+window.restoreBackup = async (backupId) => { const backup=backups.find(b=>b.id===backupId); if(!backup) return window.showMessageBox('백업 데이터를 찾을 수 없습니다.'); window.showConfirmBox('복원 전 현재 데이터도 자동 백업됩니다. 계속 진행하시겠습니까?', async ()=>{ try { window.showLoading('복구 중...', 5, '복원 전 자동 백업을 생성하고 있습니다.'); await window.createBackup('AUTO', `복원 전 자동 백업 (${backup.date||''} ${backup.time||''})`); const ops=[]; for(const e of emps) ops.push(batch=>batch.delete(doc(empRef, e.empID))); for(const a of accounts) ops.push(batch=>batch.delete(doc(accountRef, a.accountId))); for(const s of getSettingsSnapshot()) ops.push(batch=>batch.delete(doc(settingsRef, s.id))); for(const r of dailyReports) ops.push(batch=>batch.delete(doc(reportRef, r.id))); await runMixedBatched(ops, 400, '복구 중... (기존 데이터 정리)'); const writeOps=[]; for(const e of (backup.payload?.employees||[])) writeOps.push(batch=>batch.set(doc(empRef, e.empID), e)); for(const a of (backup.payload?.accounts||[])) writeOps.push(batch=>batch.set(doc(accountRef, a.accountId), a)); for(const s of (backup.payload?.settings||[])) writeOps.push(batch=>batch.set(doc(settingsRef, s.id), s)); for(const r of (backup.payload?.dailyReports||[])) writeOps.push(batch=>batch.set(doc(reportRef, r.id), r)); await runMixedBatched(writeOps, 400, '복구 중... (백업 데이터 반영)'); await window.logSystemAction('복원', '데이터 복원', `${backup.date||''} ${backup.time||''} 백업본으로 복원`); window.setLoadingProgress(100, '복원이 완료되었습니다.'); window.showMessageBox('복원 완료'); } finally { setTimeout(()=>window.hideLoading(), 250); } }, null); };
 
 const parseNum = v => parseInt(String(v||'').replace(/,/g,''),10)||0;
 const getGenderFromSsn = ssn => ['1','3','5','7','9'].includes((ssn||'').charAt(7)) ? '남' : (['2','4','6','8','0'].includes((ssn||'').charAt(7)) ? '여' : '-');
@@ -806,6 +912,10 @@ window.searchAddr = () => {
         oncomplete: data => {
             const selectedAddr = data.roadAddress || data.jibunAddress || data.address || '';
             if(!selectedAddr){ window.showMessageBox('선택된 주소를 불러오지 못했습니다. 다시 선택해주세요.'); return; }
+            if(window.handleAddressSelected(selectedAddr)){
+                window.closeAddrSearch();
+                return;
+            }
             $sv('formAddr', selectedAddr);
             window.closeAddrSearch();
             setTimeout(() => { if($('formAddrDetail')) $('formAddrDetail').focus(); }, 50);
@@ -877,11 +987,18 @@ window.generateEmpID = (joinDate) => {
 };
 window.handleContractTypeChange = () => {
     const ct = $v('formContractType');
-    const rankEl = $('formRank'), dutyEl = $('formDuty'), probationEl = $('formProbationEnd');
+    const rankEl = $('formRank'), dutyEl = $('formDuty'), probationEl = $('formProbationEnd'), employmentLabel = $('employmentDateLabel');
     const isFreelancer = ct === '프리랜서';
     if(rankEl){ if(isFreelancer) rankEl.value='직위없음'; rankEl.disabled=isFreelancer; rankEl.classList.toggle('disabled-field', isFreelancer); }
     if(dutyEl){ if(isFreelancer) dutyEl.value='직책없음'; dutyEl.disabled=isFreelancer; dutyEl.classList.toggle('disabled-field', isFreelancer); }
-    if(probationEl){ const disabled = ct !== '정규직'; if(disabled) probationEl.value=''; probationEl.readOnly=disabled; probationEl.classList.toggle('disabled-field', disabled); }
+    if(employmentLabel) employmentLabel.textContent = ct === '계약직' ? '계약만료예정일' : '수습종료(예정)일';
+    if(probationEl){
+        const disabled = !['정규직','계약직'].includes(ct);
+        if(disabled) probationEl.value='';
+        probationEl.readOnly=disabled;
+        probationEl.classList.toggle('disabled-field', disabled);
+        probationEl.placeholder='YYYY-MM-DD';
+    }
 };
 window.renderAppointHistory = () => {
     const b = $('appointHistoryBody');
@@ -1247,7 +1364,11 @@ window.downloadEmployeeInfoExcel = async () => {
     const selected = window.getSelectedEmployeeDownloadOptions();
     if(!Object.values(selected).some(Boolean)) return window.showMessageBox('출력 항목을 하나 이상 선택해주세요.');
     const { validApproved, latestPending, latestApprovedExpired } = window.getEmployeeDownloadApprovalForCurrentUser();
-    if(validApproved) return window.performEmployeeInfoExcelDownload(validApproved);
+    if(validApproved){
+        window.showLoading('엑셀 생성 중...', 15, '사원정보 엑셀 파일을 준비하고 있습니다.');
+        try { await window.performEmployeeInfoExcelDownload(validApproved); window.setLoadingProgress(100, '엑셀 다운로드 준비가 완료되었습니다.'); } finally { setTimeout(()=>window.hideLoading(), 250); }
+        return;
+    }
     if(latestPending) return window.showMessageBox('사원정보 다운로드 승인 대기 중입니다. 승인 완료 후 다시 다운로드해주세요.');
     if(latestApprovedExpired) return window.showConfirmBox('다운로드 가능한 기간이 만료되었습니다. 다시 요청하시겠습니까?', ()=>window.openEmpDownloadRequestModal(), null);
     return window.showConfirmBox('다운로드 승인이 필요합니다. 승인 요청을 하시겠습니까?', ()=>window.openEmpDownloadRequestModal(), null);
@@ -1257,7 +1378,7 @@ window.getTodayStr = () => new Date().toISOString().slice(0,10);
 window.getDailyReportDoc = (dateStr) => dailyReports.find(r => r.id===dateStr || r.date===dateStr) || { id:dateStr, date:dateStr, entries:{} };
 window.getReportEligibleEmployees = (targetDate='') => {
     return emps.filter(e => {
-        if(!['정규직','계약직','위탁직'].includes(e.contractType||'')) return false;
+        if(!['정규직','계약직','위탁직','임원'].includes(e.contractType||'')) return false;
         if(targetDate){
             if(!e.joinDate || e.joinDate > targetDate) return false;
             if(e.quitDate && e.quitDate.trim() && e.quitDate < targetDate) return false;
@@ -1265,36 +1386,38 @@ window.getReportEligibleEmployees = (targetDate='') => {
         return true;
     }).sort((a,b)=>(a.dept||'').localeCompare(b.dept||'') || (a.empID||'').localeCompare(b.empID||''));
 };
-window.getWorkerGroupLabel = (emp) => (emp.contractType==='위탁직' ? '사업' : '근로');
+window.getWorkerGroupLabel = (emp) => (emp.contractType==='위탁직' ? '사업' : (emp.contractType==='임원' ? '임원' : '근로'));
 window.renderTodayReport = () => {
     const input = $('reportTodayDate');
     if(input && !input.value) input.value = window.getTodayStr();
     const targetDate = input ? input.value : window.getTodayStr();
     const report = window.getDailyReportDoc(targetDate);
-    const eligible = window.getReportEligibleEmployees(targetDate);
+    const eligible = sortByDeptOrder(window.getReportEligibleEmployees(targetDate));
     const entries = report.entries || {};
     const 사업자 = eligible.filter(e=>e.contractType==='위탁직');
     const 근로자 = eligible.filter(e=>['정규직','계약직'].includes(e.contractType));
+    const 임원 = eligible.filter(e=>e.contractType==='임원');
     const all = eligible;
     const countByStatus = (status) => all.filter(e => (entries[e.empID]?.status||'출근')===status).length;
     const byDept = {};
     all.forEach(e=>{ if(!byDept[e.dept||'미지정']) byDept[e.dept||'미지정']=[]; byDept[e.dept||'미지정'].push(e); });
+    const orderedDeptNames = Object.keys(byDept).sort((a,b)=>getDeptOrderValue(a)-getDeptOrderValue(b) || a.localeCompare(b));
     const detailStatuses = ['지각','연차','반차','반반차','휴가','결근','조퇴','재택근무','입사','퇴사','기타','휴직'];
     const detailRows = [];
     detailStatuses.forEach(st => {
-        all.forEach(e => {
+        sortByDeptOrder(all).forEach(e => {
             const en = entries[e.empID] || {};
             if((en.status||'출근')===st){
-                detailRows.push(`<tr><td>${st}</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td style="text-align:left;padding-left:8px;">${en.reason||en.startTime||''}</td></tr>`);
+                detailRows.push(`<tr><td>${st}</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td class="left">${en.reason||en.startTime||''}</td></tr>`);
             }
         });
     });
-    const quitRows = all.filter(e => (entries[e.empID]?.status||'')==='퇴사').map(e=>`<tr><td>퇴사</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td style="text-align:left;padding-left:8px;">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="6">-</td></tr>';
-    const probationRows = all.filter(e => e.probationEndDate && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))>=0 && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))<=7).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td>${e.probationEndDate||''}</td><td></td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>';
-    const joinRows = all.filter(e => (entries[e.empID]?.status||'')==='입사').map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td></td><td style="text-align:left;padding-left:8px;">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>';
+    const quitRows = sortByDeptOrder(all.filter(e => (entries[e.empID]?.status||'')==='퇴사')).map(e=>`<tr><td>퇴사</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td class="left">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="6">-</td></tr>';
+    const probationRows = sortByDeptOrder(all.filter(e => e.probationEndDate && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))>=0 && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))<=7)).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td>${e.probationEndDate||''}</td><td></td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>';
+    const joinRows = sortByDeptOrder(all.filter(e => (entries[e.empID]?.status||'')==='입사')).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td></td><td class="left">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>';
     const month = targetDate.substring(5,7);
-    const birthRows = all.filter(e => (e.ssn||'').substring(2,4)===month).map(e=>`<tr><td>생일</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${(e.ssn||'').substring(2,4)}월 ${(e.ssn||'').substring(4,6)}일</td></tr>`).join('') || '<tr><td colspan="5">-</td></tr>';
-    const deptRows = Object.keys(byDept).sort().map(dept => {
+    const birthRows = [...all].filter(e => (e.ssn||'').substring(2,4)===month).sort((a,b)=>getBirthSortKey(a).localeCompare(getBirthSortKey(b)) || getDeptOrderValue(a.dept||'')-getDeptOrderValue(b.dept||'')).map(e=>`<tr><td>생일</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${(e.ssn||'').substring(2,4)}월 ${(e.ssn||'').substring(4,6)}일</td></tr>`).join('') || '<tr><td colspan="5">-</td></tr>';
+    const deptRows = orderedDeptNames.map(dept => {
         const arr = byDept[dept];
         const total = arr.length;
         const present = arr.filter(e => (entries[e.empID]?.status||'출근')==='출근').length;
@@ -1310,12 +1433,12 @@ window.renderTodayReport = () => {
         const quit = arr.filter(e => (entries[e.empID]?.status||'')==='퇴사').length;
         const etc = arr.filter(e => (entries[e.empID]?.status||'')==='기타').length;
         const leave = arr.filter(e => (entries[e.empID]?.status||'')==='휴직').length;
-        const kind = arr.every(e=>e.contractType==='위탁직') ? '사업' : (arr.every(e=>['정규직','계약직'].includes(e.contractType)) ? '근로' : '혼합');
+        const kind = arr.every(e=>e.contractType==='위탁직') ? '사업' : (arr.every(e=>['정규직','계약직'].includes(e.contractType)) ? '근로' : (arr.every(e=>e.contractType==='임원') ? '임원' : '혼합'));
         return `<tr><td>${dept}</td><td>${kind}</td><td>${total}</td><td>${present}</td><td>${late}</td><td>${annual}</td><td>${half}</td><td>${halfhalf}</td><td>${vac}</td><td>${absent}</td><td>${early}</td><td>${remote}</td><td>${join}</td><td>${quit}</td><td>${etc}</td><td>${leave}</td></tr>`;
     }).join('') || '<tr><td colspan="16">-</td></tr>';
     const html = `
         <div class="report-section-title">1. 재적 인원 현황</div>
-        <table class="report-table"><thead><tr><th>사업자</th><th>근로자</th><th>총계</th></tr></thead><tbody><tr><td>${사업자.length}</td><td>${근로자.length}</td><td>${all.length}</td></tr></tbody></table>
+        <table class="report-table"><thead><tr><th>사업자</th><th>근로자</th><th>임원</th><th>총계</th></tr></thead><tbody><tr><td>${사업자.length}</td><td>${근로자.length}</td><td>${임원.length}</td><td>${all.length}</td></tr></tbody></table>
         <div class="report-section-title">2. 부서별 현황</div>
         <table class="report-table"><thead><tr><th style="width:180px;">소속</th><th style="width:60px;">근로구분</th><th>재적</th><th>출근</th><th>지각</th><th>연차</th><th>반차</th><th>반반차</th><th>휴가</th><th>결근</th><th>조퇴</th><th>재택근무</th><th>입사</th><th>퇴사</th><th>기타</th><th>휴직</th></tr></thead><tbody>${deptRows}<tr><th colspan="2">총계</th><th>${all.length}</th><th>${countByStatus('출근')}</th><th>${countByStatus('지각')}</th><th>${countByStatus('연차')}</th><th>${countByStatus('반차')}</th><th>${countByStatus('반반차')}</th><th>${countByStatus('휴가')}</th><th>${countByStatus('결근')}</th><th>${countByStatus('조퇴')}</th><th>${countByStatus('재택근무')}</th><th>${countByStatus('입사')}</th><th>${countByStatus('퇴사')}</th><th>${countByStatus('기타')}</th><th>${countByStatus('휴직')}</th></tr></tbody></table>
         <div class="report-section-title">3. 근태 상세내용</div>
@@ -1472,6 +1595,7 @@ window.switchMenu = (id, el) => {
         'sys-site': ()=>window.syncOrgSettings(),
         'org-dept': ()=>window.syncOrgSettings(),
         'org-rank': ()=>window.syncOrgSettings(),
+        'sys-workplace': ()=>window.syncOrgSettings(),
         'org-chart': ()=>window.syncOrgSettings()
     };
     if(runnerMap[id]) window.safeRun(runnerMap[id], id);
@@ -1566,18 +1690,21 @@ window.renderHomeData = () => {
 
 // 5. ORG SETTINGS
 window.syncOrgSettings = () => {
-    sysDepts.sort((a,b)=>a.order-b.order); siteLinks.sort((a,b)=>a.order-b.order);
+    sysDepts.sort((a,b)=>a.order-b.order); siteLinks.sort((a,b)=>a.order-b.order); sysWorkplaces.sort((a,b)=>(a.order||999)-(b.order||999) || String(a.name||'').localeCompare(String(b.name||'')));
     const hl = $('homeQuickLinks'); if(hl) hl.innerHTML = siteLinks.length ? siteLinks.map(s=>`<a href="${normalizeUrl(s.url)}" target="_blank" rel="noopener noreferrer" class="quick-link-btn"><i class="fa-solid fa-link"></i> ${s.name}</a>`).join('') : '<div style="color:#999;font-size:12px">등록된 사이트가 없습니다.</div>';
     const sl = $('siteListBody'); if(sl) sl.innerHTML = siteLinks.map(s=>`<tr><td>${s.order}</td><td style="font-weight:bold">${s.name}</td><td style="text-align:left;padding-left:10px"><a href="${normalizeUrl(s.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--icube-blue)">${s.url}</a></td><td><div style="display:flex;gap:5px;justify-content:center"><button class="tool-btn" onclick="window.requestSiteEditById('${s.id}')">수정</button><button class="tool-btn" style="color:#d32f2f" onclick="window.removeDoc('settings', '${s.id}')">삭제</button></div></td></tr>`).join('');
-    
+
     const pD = (id, items, def) => { const el = $(id); if(el) { const c = el.value; el.innerHTML = def + items.map(i=>`<option value="${i.name}">${i.name}</option>`).join(''); if(Array.from(el.options).some(o=>o.value===c)) el.value = c; } };
     pD('formDept', sysDepts, '<option value="">선택</option>'); pD('formRank', sysRanks, '<option value="">선택</option><option value="직위없음">직위없음</option>'); pD('formDuty', sysDuties, '<option value="직책없음">직책없음</option>');
+    pD('formWorkplace', sysWorkplaces, '<option value="">선택</option>');
     pD('homeDeptFilter', sysDepts, '<option value="">전체 부서 보기</option>');
-    
+
     const ps = $('newDeptParent'); if(ps) { const cur=ps.value; ps.innerHTML='<option value="">최상위 부서 (상위 부서 없음)</option>'+sysDepts.map(d=>`<option value="${d.id}">${d.name}</option>`).join(''); ps.value=cur; }
-    const db = $('deptListBody'); if(db) db.innerHTML = sysDepts.map(d=>`<tr><td style="font-weight:bold">${d.name}</td><td>${sysDepts.find(x=>x.id===d.parentId)?.name||'-'}</td><td><div style="display:flex;gap:5px;justify-content:center"><button class="tool-btn" onclick="window.requestOrgEdit('${d.id}', 'DEPT', '${d.name}')">수정</button><button class="tool-btn" style="color:#d32f2f" onclick="window.requestOrgDelete('${d.id}', 'DEPT', '${d.name}')">삭제</button></div></td></tr>`).join('');
+    const db = $('deptListBody'); if(db) db.innerHTML = sysDepts.map((d,idx)=>`<tr draggable="true" data-id="${d.id}" ondragstart="window.handleDeptDragStart(event)" ondragover="window.handleDeptDragOver(event)" ondrop="window.handleDeptDrop(event)" style="cursor:move"><td style="font-weight:bold">${idx+1}. ${d.name}</td><td>${sysDepts.find(x=>x.id===d.parentId)?.name||'-'}</td><td><div style="display:flex;gap:5px;justify-content:center"><button class="tool-btn" onclick="window.requestOrgEdit('${d.id}', 'DEPT', '${d.name}')">수정</button><button class="tool-btn" style="color:#d32f2f" onclick="window.requestOrgDelete('${d.id}', 'DEPT', '${d.name}')">삭제</button></div></td></tr>`).join('');
     const rb = $('rankListBody'); if(rb) rb.innerHTML = sysRanks.map(r=>`<tr><td>${r.name}</td><td><div style="display:flex;gap:5px;justify-content:center"><button class="tool-btn" onclick="window.requestOrgEdit('${r.id}', 'RANK', '${r.name}')">수정</button><button class="tool-btn" style="color:#d32f2f" onclick="window.requestOrgDelete('${r.id}', 'RANK', '${r.name}')">삭제</button></div></td></tr>`).join('');
     const dtb = $('dutyListBody'); if(dtb) dtb.innerHTML = sysDuties.map(d=>`<tr><td>${d.name}</td><td><div style="display:flex;gap:5px;justify-content:center"><button class="tool-btn" onclick="window.requestOrgEdit('${d.id}', 'DUTY', '${d.name}')">수정</button><button class="tool-btn" style="color:#d32f2f" onclick="window.requestOrgDelete('${d.id}', 'DUTY', '${d.name}')">삭제</button></div></td></tr>`).join('');
+    const wpb = $('workplaceListBody'); if(wpb) wpb.innerHTML = sysWorkplaces.map(w=>`<tr><td>${w.name}</td><td style="text-align:left;padding-left:10px">${w.addr||''}</td><td><div style="display:flex;gap:5px;justify-content:center"><button class="tool-btn" onclick="window.editWorkplace('${w.id}')">수정</button><button class="tool-btn" style="color:#d32f2f" onclick="window.removeDoc('settings', '${w.id}')">삭제</button></div></td></tr>`).join('') || '<tr><td colspan="3" style="padding:20px;color:#999">등록된 근무지가 없습니다.</td></tr>';
+    if($('hqAddressBar')) $('hqAddressBar').innerText = `본점 주소 : ${headquartersSetting?.addr || '미등록'}`;
 
     const buildTreeNode = (parentId='') => { const children=sysDepts.filter(d=>(d.parentId||'')===(parentId||'')); if(!children.length) return ''; return `<ul>${children.map(c=>`<li><div class="tree-node" onclick="window.renderHomeEmpTable('${c.name}')">${c.name}</div>${buildTreeNode(c.id)}</li>`).join('')}</ul>`; };
     const treeHtml = sysDepts.length ? `<div class="tree">${buildTreeNode('')}</div>` : "";
@@ -1585,11 +1712,73 @@ window.syncOrgSettings = () => {
     const mo = $('mainOrgTreeView'); if(mo) mo.innerHTML = treeHtml;
 };
 
-window.addDepartment = async () => { const n=$v('newDeptName'), p=$v('newDeptParent'), o=$v('newDeptOrder'); if(!n) return; await setDoc(doc(settingsRef,'dept_'+Date.now()),{type:'DEPT',name:n,parentId:p,order:parseInt(o)||99}); $sv('newDeptName',''); $sv('newDeptOrder',''); window.logSystemAction('등록', '부서명', n); };
+window.addDepartment = async () => { const n=$v('newDeptName'), p=$v('newDeptParent'); if(!n) return; await setDoc(doc(settingsRef,'dept_'+Date.now()),{type:'DEPT',name:n,parentId:p,order:sysDepts.length+1}); $sv('newDeptName',''); window.logSystemAction('등록', '부서명', n); };
 window.addRank = async () => { const n=$v('newRankName'); if(!n) return; await setDoc(doc(settingsRef,'rank_'+Date.now()),{type:'RANK',name:n,order:sysRanks.length+1}); $sv('newRankName',''); window.logSystemAction('등록', '직위', n); };
 window.addDuty = async () => { const n=$v('newDutyName'); if(!n) return; await setDoc(doc(settingsRef,'duty_'+Date.now()),{type:'DUTY',name:n,order:sysDuties.length+1}); $sv('newDutyName',''); window.logSystemAction('등록', '직책', n); };
 window.addSiteLink = async () => { const n=$v('newSiteName'), u=$v('newSiteUrl'), o=$v('newSiteOrder'); if(n&&u) await setDoc(doc(settingsRef,'site_'+Date.now()),{type:'SITE',name:n,url:u,order:parseInt(o)||99}); $sv('newSiteName',''); $sv('newSiteUrl',''); $sv('newSiteOrder',''); window.logSystemAction('등록', '사이트', n); };
-window.removeDoc = async (coll, id) => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id)); window.showMessageBox("삭제 완료"); window.logSystemAction('삭제', coll, id); };
+window.addWorkplace = async () => {
+    const n=$v('newWorkplaceName').trim(), a=$v('newWorkplaceAddr').trim();
+    if(!n || !a) return window.showMessageBox('근무지명과 주소를 입력해주세요.');
+    await setDoc(doc(settingsRef,'workplace_'+Date.now()),{type:'WORKPLACE',name:n,addr:a,order:sysWorkplaces.length+1});
+    $sv('newWorkplaceName',''); $sv('newWorkplaceAddr','');
+    window.logSystemAction('등록', '근무지', n);
+};
+window.openWorkplaceAddressSearch = (mode='NEW', targetId='') => {
+    window.workplaceAddressTarget = { mode, targetId };
+    window.searchAddr();
+};
+window.editWorkplace = async (id) => {
+    const item = sysWorkplaces.find(x=>x.id===id); if(!item) return;
+    const newName = prompt('수정할 근무지명을 입력하세요:', item.name);
+    if(newName===null) return;
+    window.workplaceAddressTarget = { mode:'EDIT', targetId:id, pendingName:newName.trim() || item.name };
+    window.searchAddr();
+};
+window.editHeadquartersAddress = () => { window.openWorkplaceAddressSearch('HQ'); };
+window.deleteHeadquartersAddress = async () => {
+    if(!headquartersSetting) return window.showMessageBox('등록된 본점 주소가 없습니다.');
+    await window.removeDoc('settings', headquartersSetting.id);
+};
+window.handleAddressSelected = (selectedAddr='') => {
+    if(window.workplaceAddressTarget){
+        const target = window.workplaceAddressTarget;
+        if(target.mode==='HQ'){
+            const id = target.targetId || (headquartersSetting?.id || 'hq_address');
+            setDoc(doc(settingsRef, id), { type:'HQ', addr:selectedAddr }).then(()=>window.logSystemAction('수정','본점주소',selectedAddr));
+        } else if(target.mode==='EDIT' && target.targetId){
+            const item = sysWorkplaces.find(x=>x.id===target.targetId);
+            const payload = { ...(item||{}), type:'WORKPLACE', name: target.pendingName || item?.name || '', addr:selectedAddr, order:item?.order||999 };
+            setDoc(doc(settingsRef, target.targetId), payload).then(()=>window.logSystemAction('수정','근무지',payload.name));
+        } else {
+            $sv('newWorkplaceAddr', selectedAddr);
+        }
+        window.workplaceAddressTarget = null;
+        return true;
+    }
+    return false;
+};
+window.handleDeptDragStart = (event) => {
+    const id = event.currentTarget?.dataset?.id;
+    if(id) event.dataTransfer.setData('text/plain', id);
+};
+window.handleDeptDragOver = (event) => { event.preventDefault(); };
+window.handleDeptDrop = async (event) => {
+    event.preventDefault();
+    const draggedId = event.dataTransfer.getData('text/plain');
+    const targetId = event.currentTarget?.dataset?.id;
+    if(!draggedId || !targetId || draggedId===targetId) return;
+    const ordered = [...sysDepts].sort((a,b)=>a.order-b.order);
+    const fromIdx = ordered.findIndex(x=>x.id===draggedId), toIdx = ordered.findIndex(x=>x.id===targetId);
+    if(fromIdx<0 || toIdx<0) return;
+    const moved = ordered.splice(fromIdx,1)[0];
+    ordered.splice(toIdx,0,moved);
+    const batch = writeBatch(db);
+    ordered.forEach((dept, idx) => batch.set(doc(settingsRef, dept.id), { ...dept, order: idx+1 }));
+    await batch.commit();
+    window.logSystemAction('수정', '부서정렬', `${moved.name} 위치 변경`);
+};
+
+window.removeDoc = async (coll, id) => { window.showLoading('삭제 중...', 30, '데이터를 삭제하고 있습니다.'); try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id)); window.setLoadingProgress(100, '삭제가 완료되었습니다.'); window.showMessageBox("삭제 완료"); window.logSystemAction('삭제', coll, id); } finally { setTimeout(()=>window.hideLoading(), 250); } };
 
 window.requestOrgEdit = (id, type, oldName) => {
     const newName = prompt("수정할 이름을 입력하세요:", oldName);
@@ -1641,7 +1830,9 @@ window.requestEmployeeDelete = () => { const empId=$v('formEmpID'); if(!empId) r
 
 window.doSave = async () => {
     const id=$v('formEmpID'), nm=$v('formName'), jd=$v('formJoinDate'); if(!id||!nm||!jd) return window.showMessageBox("사번/성명/입사일 누락");
-    let d = { empID:id, name:nm, joinDate:jd, ssn:$v('formSSN'), photoData:currentEditPhotoData, dept:$v('formDept'), rank:$v('formRank')||"사원", duty:$v('formDuty')||"직책없음", contractType:$v('formContractType')||"정규직", phone:$v('formPhone'), email:$v('formEmail'), zip:'', addr:$v('formAddr'), addrDetail:$v('formAddrDetail'), bank:$v('formBank'), account:$v('formAccount'), quitDate:$v('formQuitDate'), probationEndDate:$v('formProbationEnd'), milType:$v('formMilType')||"해당없음", milGroup:$v('formMilGroup'), milExit:$v('formMilExit'), milRank:$v('formMilRank'), milS:$v('formMilS'), milE:$v('formMilE'), milReason:$v('formMilReason'), educations:window.getTableData('eduBody'), careers:window.getTableData('careerBody'), languages:window.getTableData('langBody'), licenses:window.getTableData('licenseBody'), families:window.getTableData('familyBody') };
+    const selectedContractType = $v('formContractType')||"정규직";
+    const employmentDateValue = $v('formProbationEnd');
+    let d = { empID:id, name:nm, joinDate:jd, ssn:$v('formSSN'), photoData:currentEditPhotoData, workplace:$v('formWorkplace'), dept:$v('formDept'), rank:$v('formRank')||"사원", duty:$v('formDuty')||"직책없음", contractType:selectedContractType, phone:$v('formPhone'), email:$v('formEmail'), zip:'', addr:$v('formAddr'), addrDetail:$v('formAddrDetail'), bank:$v('formBank'), account:$v('formAccount'), quitDate:$v('formQuitDate'), probationEndDate:selectedContractType==='정규직'?employmentDateValue:'', contractEndDate:selectedContractType==='계약직'?employmentDateValue:'', milType:$v('formMilType')||"해당없음", milGroup:$v('formMilGroup'), milExit:$v('formMilExit'), milRank:$v('formMilRank'), milS:$v('formMilS'), milE:$v('formMilE'), milReason:$v('formMilReason'), educations:window.getTableData('eduBody'), careers:window.getTableData('careerBody'), languages:window.getTableData('langBody'), licenses:window.getTableData('licenseBody'), families:window.getTableData('familyBody') };
     ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>{ const el=$(k); if(el) d[k]=el.value.replace(/,/g,''); });
     ['salWorkDay','salProbationRate'].forEach(k=>{ const el=$(k); if(el) d[k]=el.value; });
     const ex=isEditMode?emps.find(e=>e.empID===id)||{}:{}; let h=ex.salaryHistory||[], t=0; ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>t+=parseInt(d[k])||0);
@@ -1657,7 +1848,7 @@ window.doSave = async () => {
 window.viewDetail = (id) => {
     const e = emps.find(x=>x.empID===id); if(!e) return; window.openModal(true);
     const sV = (k,v)=>{const el=$(k); if(el)el.value=v||'';};
-    sV('formName',e.name); sV('formSSN',e.ssn); currentEditPhotoData=e.photoData||''; window.renderProfilePhotoPreview(currentEditPhotoData); sV('formEmpID',e.empID); sV('formDept',e.dept); sV('formJoinDate',e.joinDate); sV('formRank',e.rank||'사원'); sV('formDuty',e.duty||'직책없음'); sV('formContractType',e.contractType); sV('formPhone',e.phone); sV('formEmail',e.email); sV('formAddr',e.addr); sV('formAddrDetail',e.addrDetail); sV('formBank',e.bank); sV('formAccount',e.account); sV('formQuitDate',e.quitDate); sV('formProbationEnd',e.probationEndDate);
+    sV('formName',e.name); sV('formSSN',e.ssn); currentEditPhotoData=e.photoData||''; window.renderProfilePhotoPreview(currentEditPhotoData); sV('formEmpID',e.empID); sV('formWorkplace',e.workplace||''); sV('formDept',e.dept); sV('formJoinDate',e.joinDate); sV('formRank',e.rank||'사원'); sV('formDuty',e.duty||'직책없음'); sV('formContractType',e.contractType||'정규직'); sV('formPhone',e.phone); sV('formEmail',e.email); sV('formAddr',e.addr); sV('formAddrDetail',e.addrDetail); sV('formBank',e.bank); sV('formAccount',e.account); sV('formQuitDate',e.quitDate); sV('formProbationEnd',(e.contractType==='계약직'?(e.contractEndDate||''):(e.probationEndDate||'')));
     ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>{ const el=$(k); if(el) el.value=parseInt(e[k]||0).toLocaleString(); });
     sV('salWorkDay', e.salWorkDay||'8'); sV('salProbationRate', e.salProbationRate||'100'); window.updateSalaryCalc(); window.handleContractTypeChange();
     sV('formMilType',e.milType||'해당없음'); sV('formMilGroup',e.milGroup||''); window.toggleMil(); sV('formMilExit',e.milExit||''); sV('formMilRank',e.milRank||''); sV('formMilS',e.milS||''); sV('formMilE',e.milE||''); sV('formMilReason',e.milReason||'');
@@ -1901,80 +2092,212 @@ window.saveQuickSalary = async () => {
 window.deleteAllEmployees = async () => {
     window.showConfirmBox("정말 등록된 모든 사원 데이터를 영구적으로 삭제하시겠습니까?", () => {
         window.showConfirmBox("삭제된 데이터는 절대로 복구할 수 없습니다. 계속 진행하시겠습니까?", async () => {
-            for(let e of emps) { await deleteDoc(doc(empRef, e.empID)); }
-            window.logSystemAction('초기화', '시스템 DB', '모든 사원 데이터 일괄 삭제 실행'); window.showMessageBox("삭제 완료"); window.renderGrid(); window.renderSearchList(); window.renderHomeData();
+            try {
+            const ops=[]; for(const e of emps) ops.push(batch=>batch.delete(doc(empRef, e.empID)));
+            await runMixedBatched(ops, 400, '삭제 중...');
+            window.logSystemAction('초기화', '시스템 DB', '모든 사원 데이터 일괄 삭제 실행'); window.setLoadingProgress(100, '삭제가 완료되었습니다.'); window.showMessageBox("삭제 완료"); window.renderGrid(); window.renderSearchList(); window.renderHomeData();
+            } finally { setTimeout(()=>window.hideLoading(), 250); }
         }, null);
     }, null);
 };
 
 window.downloadEmpTemplate = () => { 
-    const r1 = ["기본사항"]; for(let i=0;i<13;i++) r1.push(""); r1.push("학력사항"); for(let i=0;i<11;i++) r1.push(""); r1.push("경력사항"); for(let i=0;i<34;i++) r1.push(""); r1.push("어학사항"); for(let i=0;i<19;i++) r1.push(""); r1.push("자격사항"); for(let i=0;i<19;i++) r1.push(""); r1.push("가족사항"); for(let i=0;i<29;i++) r1.push(""); r1.push("병역사항"); for(let i=0;i<5;i++) r1.push("");
-    const r2 = ["사번(수정시기입)","성명(필수)","주민번호(필수)","연락처","이메일","주소(상세포함)","은행명","계좌번호","고용형태","입사일(필수)","수습종료일","부서명","직위","직책"];
+    const basicCols = 16;
+    const eduCols = 12;
+    const careerCols = 35;
+    const langCols = 20;
+    const licenseCols = 20;
+    const familyCols = 30;
+    const militaryCols = 7;
+
+    const r1 = ["기본사항"]; for(let i=0;i<basicCols-1;i++) r1.push("");
+    r1.push("학력사항"); for(let i=0;i<eduCols-1;i++) r1.push("");
+    r1.push("경력사항"); for(let i=0;i<careerCols-1;i++) r1.push("");
+    r1.push("어학사항"); for(let i=0;i<langCols-1;i++) r1.push("");
+    r1.push("자격사항"); for(let i=0;i<licenseCols-1;i++) r1.push("");
+    r1.push("가족사항"); for(let i=0;i<familyCols-1;i++) r1.push("");
+    r1.push("병역사항"); for(let i=0;i<militaryCols-1;i++) r1.push("");
+
+    const r2 = ["사번(수정시기입)","성명","주민번호","연락처","이메일","주소(상세포함)","은행명","계좌번호","고용형태","입사일","퇴사일","근무지","수습종료일","부서명","직위","직책"];
     for(let i=1; i<=2; i++) r2.push(`학력구분${i}`,`시작월${i}`,`종료월${i}`,`학교${i}`,`전공${i}`,`상태${i}`);
     for(let i=1; i<=5; i++) r2.push(`시작월${i}`,`종료월${i}`,`회사명${i}`,`부서${i}`,`직급/직책${i}`,`담당업무${i}`,`퇴사사유${i}`);
     for(let i=1; i<=5; i++) r2.push(`시험명${i}`,`점수${i}`,`취득일${i}`,`기관${i}`);
     for(let i=1; i<=5; i++) r2.push(`자격명${i}`,`발행처${i}`,`취득일${i}`,`사유${i}`);
     for(let i=1; i<=5; i++) r2.push(`관계${i}`,`성명${i}`,`생년월일${i}`,`동거${i}`,`직업${i}`,`비고${i}`);
-    r2.push("병역구분","군별","사유(미필/면제)","계급","복무시작일","복무종료일");
-    
-    const r3 = ["비워두면 자동생성","문자열","000000-0000000","숫자또는-","이메일형식","문자열","가이드 시트 참조","숫자만입력","가이드 참조","YYYYMMDD","YYYYMMDD","가이드 참조","가이드 참조","가이드 참조"];
-    for(let i=1; i<=2; i++) r3.push("가이드 참조","YYYYMM","YYYYMM","문자열","문자열","가이드 참조");
-    for(let i=1; i<=5; i++) r3.push("YYYYMMDD","YYYYMMDD","문자열","문자열","문자열","문자열","문자열");
-    for(let i=1; i<=5; i++) r3.push("문자열","문자열","YYYYMM","문자열");
-    for(let i=1; i<=5; i++) r3.push("문자열","문자열","YYYYMM","문자열");
-    for(let i=1; i<=5; i++) r3.push("가이드 참조","문자열","YYYYMMDD","동거/비동거","문자열","문자열");
-    r3.push("가이드 참조","가이드 참조","문자열","문자열","YYYYMMDD","YYYYMMDD");
+    r2.push("병역구분","군별","전역사유","사유(미필/면제)","계급","복무시작일","복무종료일");
+
+    const r3 = ["비워두면 자동생성","텍스트","텍스트","텍스트","텍스트","기본주소, 상세주소 형태 권장","가이드 시트 참조","텍스트(숫자만 입력 가능)","가이드 참조","YYYYMMDD","YYYYMMDD","가이드 참조","YYYYMMDD","가이드 참조","가이드 참조","가이드 참조"];
+    for(let i=1; i<=2; i++) r3.push("가이드 참조","YYYYMM","YYYYMM","텍스트","텍스트","가이드 참조");
+    for(let i=1; i<=5; i++) r3.push("YYYYMMDD","YYYYMMDD","텍스트","텍스트","텍스트","텍스트","텍스트");
+    for(let i=1; i<=5; i++) r3.push("텍스트","텍스트","YYYYMM","텍스트");
+    for(let i=1; i<=5; i++) r3.push("텍스트","텍스트","YYYYMM","텍스트");
+    for(let i=1; i<=5; i++) r3.push("가이드 참조","텍스트","YYYYMMDD","동거/비동거","텍스트","텍스트");
+    r3.push("가이드 참조","가이드 참조","텍스트","텍스트","텍스트","YYYYMMDD","YYYYMMDD");
 
     const ws = XLSX.utils.aoa_to_sheet([r1, r2, r3]); 
-    ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:13}}, {s:{r:0,c:14},e:{r:0,c:25}}, {s:{r:0,c:26},e:{r:0,c:60}}, {s:{r:0,c:61},e:{r:0,c:80}}, {s:{r:0,c:81},e:{r:0,c:100}}, {s:{r:0,c:101},e:{r:0,c:130}}, {s:{r:0,c:131},e:{r:0,c:136}}];
-    
+    ws['!merges'] = [
+        {s:{r:0,c:0},e:{r:0,c:basicCols-1}},
+        {s:{r:0,c:basicCols},e:{r:0,c:basicCols+eduCols-1}},
+        {s:{r:0,c:basicCols+eduCols},e:{r:0,c:basicCols+eduCols+careerCols-1}},
+        {s:{r:0,c:basicCols+eduCols+careerCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols-1}},
+        {s:{r:0,c:basicCols+eduCols+careerCols+langCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols-1}},
+        {s:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols+familyCols-1}},
+        {s:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols+familyCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols+familyCols+militaryCols-1}}
+    ];
+    const totalCols = basicCols + eduCols + careerCols + langCols + licenseCols + familyCols + militaryCols;
+    ws['!cols'] = Array.from({length: totalCols}, () => ({wch: 16}));
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for(let rowIdx=0; rowIdx<=300; rowIdx++){
+        for(let colIdx=0; colIdx<=range.e.c; colIdx++){
+            const ref = XLSX.utils.encode_cell({r:rowIdx, c:colIdx});
+            if(!ws[ref]) ws[ref] = { t:'s', v:'' };
+            ws[ref].z = '@';
+            if(ws[ref].t === 'n') { ws[ref].t = 's'; ws[ref].v = String(ws[ref].v ?? ''); }
+        }
+    }
+    ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:300,c:totalCols-1}});
+
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "사원일괄업로드"); 
-    
-    const guideAOA = [ ["항목", "입력 가능 값 (정확히 일치해야 함)"], ["고용형태", "정규직, 계약직, 일용직, 위탁직, 프리랜서"], ["부서명", sysDepts.map(d=>d.name).join(", ")], ["직위", sysRanks.map(r=>r.name).join(", ")], ["직책", sysDuties.map(d=>d.name).join(", ")], ["은행명", "KB국민은행, 신한은행, 우리은행, 하나은행, NH농협은행, IBK기업은행, 카카오뱅크, 토스뱅크, 케이뱅크, SC제일은행, 한국씨티은행, 새마을금고, 신협, 우체국, 수협, 대구은행, 부산은행, 광주은행, 제주은행, 전북은행, 경남은행, NH투자증권, 미래에셋증권, 삼성증권, 한국투자증권, 키움증권, 대신증권, KB증권, 신한투자증권, 하나증권"], ["학력구분", "고등학교, 전문대학, 대학교, 대학원(석사), 대학원(박사)"], ["학력상태", "졸업, 재학, 휴학, 자퇴, 수료"], ["가족관계", "부, 모, 배우자, 자녀, 형제/자매, 기타(직접입력)"], ["병역구분", "해당없음, 필, 미필, 면제"], ["군별", "육군, 해군, 공군, 해병대, 사회복무요원, 산업기능요원, 전문연구요원, 의무경찰, 해양경찰, 의무소방"] ];
-    const wsGuide = XLSX.utils.aoa_to_sheet(guideAOA); wsGuide['!cols'] = [{wch: 15}, {wch: 100}]; XLSX.utils.book_append_sheet(wb, wsGuide, "코드 입력 안내");
-    XLSX.writeFile(wb, "사원_일괄업로드_양식.xlsx");
+
+    const guideAOA = [ ["항목", "입력 가능 값 (정확히 일치해야 함)"], ["고용형태", "임원, 정규직, 계약직, 단시간근로, 일용직, 위탁직, 프리랜서"], ["근무지", sysWorkplaces.map(w=>w.name).join(", ") || "시스템 설정 > 근무지 관리에 등록된 값"], ["부서명", sysDepts.map(d=>d.name).join(", ")], ["직위", sysRanks.map(r=>r.name).join(", ")], ["직책", sysDuties.map(d=>d.name).join(", ")], ["은행명", "KB국민은행, 신한은행, 우리은행, 하나은행, NH농협은행, IBK기업은행, 카카오뱅크, 토스뱅크, 케이뱅크, SC제일은행, 한국씨티은행, 새마을금고, 신협, 우체국, 수협, 대구은행, 부산은행, 광주은행, 제주은행, 전북은행, 경남은행, NH투자증권, 미래에셋증권, 삼성증권, 한국투자증권, 키움증권, 대신증권, KB증권, 신한투자증권, 하나증권"], ["학력구분", "고등학교, 전문대학, 대학교, 대학원(석사), 대학원(박사)"], ["학력상태", "졸업, 재학, 휴학, 자퇴, 수료"], ["가족관계", "부, 모, 배우자, 자녀, 형제/자매, 기타(직접입력)"], ["병역구분", "해당없음, 필, 미필, 면제"], ["군별", "육군, 해군, 공군, 해병대, 사회복무요원, 산업기능요원, 전문연구요원, 의무경찰, 해양경찰, 의무소방"], ["주소 입력 방식", "주소, 상세주소 형태로 입력 시 쉼표(,) 뒤 문자열을 상세주소로 자동 분리"], ["부분 업데이트", "기존 사번을 입력하고 일부 항목만 작성하면 입력한 항목만 수정되고 빈칸 항목은 기존값 유지"], ["퇴사일", "YYYYMMDD 형식 입력 시 퇴사일로 반영"], ["근무지", "입력값이 있으면 사원 기본정보의 근무지 항목으로 반영" ] ];
+    const wsGuide = XLSX.utils.aoa_to_sheet(guideAOA); wsGuide['!cols'] = [{wch: 18}, {wch: 120}];
+    XLSX.utils.book_append_sheet(wb, wsGuide, "코드 입력 안내");
+    XLSX.writeFile(wb, "사원_일괄업로드_양식.xlsx", { cellStyles:true });
 };
 window.downloadAppointTemplate = () => { const ws=XLSX.utils.aoa_to_sheet([["사번(필수)","발령일(필수)","발령내용(필수)","발령 전","발령 후(필수)","임금변동"],["260101","YYYY-MM-DD","부서명변경/직위승진/직책부여","참고용","변경될값","변동/유지"]]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"발령양식"); XLSX.writeFile(wb,"인사발령_일괄업로드_양식.xlsx"); };
 
 window.handleEmpBulkUpload = (e) => {
-    const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+    const f=e.target?.files?.[0]; if(!f) return;
+    const r=new FileReader();
     r.onload=async(ev)=>{
-        const data = new Uint8Array(ev.target.result); const workbook = XLSX.read(data, {type: 'array'});
+        const data = new Uint8Array(ev.target.result);
+        const workbook = XLSX.read(data, {type: 'array', raw: false, cellText: true, cellDates: false});
         const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: "", raw: false});
-        let errs=[], vd=[]; 
-        const fmtD = (v) => { if(!v) return ""; let s = String(v).replace(/[^0-9]/g, ''); return s.length === 8 ? s.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : v; }; 
-        const fmtM = (v) => { if(!v) return ""; let s = String(v).replace(/[^0-9]/g, ''); return s.length === 6 ? s.replace(/(\d{4})(\d{2})/, '$1-$2') : v; };
-        const fmtPhone = (v) => { let s = String(v).replace(/[^0-9]/g, ''); if (!s) return ""; if (s.startsWith('02')) { if (s.length === 9) return s.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3'); if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3'); } else { if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'); if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'); } return s; };
-        const fmtAccount = (v, b) => { let s = String(v).replace(/[^0-9]/g, ''); const fts = { 'KB국민은행':[6,2,6], '신한은행':[3,3,6], '우리은행':[4,3,6], '하나은행':[3,6,5], 'IBK기업은행':[3,6,2,2], 'NH농협은행':[3,4,4,2], '카카오뱅크':[4,2,7], '토스뱅크':[4,4,4], '케이뱅크':[3,3,6] }; let ft = fts[b]; if (ft) { let res = ''; let idx = 0; for (let i=0; i<ft.length; i++) { if (s.length > idx) { if (i > 0) res += '-'; res += s.slice(idx, idx + ft[i]); idx += ft[i]; } } if (s.length > idx) res += s.slice(idx); return res; } return s; };
+        let errs=[], vd=[];
+
+        const normalizeText = v => String(v ?? '').trim();
+        const hasValue = v => normalizeText(v) !== '';
+        const fmtD = (v) => { if(!hasValue(v)) return ""; let s = String(v).replace(/[^0-9]/g, ''); return s.length === 8 ? s.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : normalizeText(v); };
+        const fmtM = (v) => { if(!hasValue(v)) return ""; let s = String(v).replace(/[^0-9]/g, ''); return s.length === 6 ? s.replace(/(\d{4})(\d{2})/, '$1-$2') : normalizeText(v); };
+        const fmtPhone = (v) => { let s = String(v ?? '').replace(/[^0-9]/g, ''); if (!s) return ""; if (s.startsWith('02')) { if (s.length === 9) return s.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3'); if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3'); } else { if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'); if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'); } return s; };
+        const normalizeBankName = (v) => {
+            const raw = normalizeText(v).replace(/\s+/g,'');
+            if(!raw) return '';
+            const alias = {
+                '신한은':'신한은행','신한':'신한은행','국민':'KB국민은행','국민은행':'KB국민은행','kb국민은행':'KB국민은행',
+                '우리':'우리은행','하나':'하나은행','농협':'NH농협은행','기업':'IBK기업은행','기업은행':'IBK기업은행',
+                '카뱅':'카카오뱅크','토스':'토스뱅크','케이':'케이뱅크','우체국은행':'우체국','신한투자':'신한투자증권'
+            };
+            if(alias[raw]) return alias[raw];
+            const allBanks = ['KB국민은행','신한은행','우리은행','하나은행','NH농협은행','IBK기업은행','카카오뱅크','토스뱅크','케이뱅크','SC제일은행','한국씨티은행','새마을금고','신협','우체국','수협','대구은행','부산은행','광주은행','제주은행','전북은행','경남은행','NH투자증권','미래에셋증권','삼성증권','한국투자증권','키움증권','대신증권','KB증권','신한투자증권','하나증권'];
+            return allBanks.find(name => name.replace(/\s+/g,'') === raw || name.replace(/\s+/g,'').includes(raw) || raw.includes(name.replace(/\s+/g,''))) || normalizeText(v);
+        };
+        const fmtAccount = (v, bankName) => {
+            let s = String(v ?? '').replace(/[^0-9]/g, '');
+            if(!s) return '';
+            const bank = normalizeBankName(bankName);
+            const fts = { 'KB국민은행':[6,2,6], '신한은행':[3,3,6], '우리은행':[4,3,6], '하나은행':[3,6,5], 'IBK기업은행':[3,6,2,2], 'NH농협은행':[3,4,4,2], '카카오뱅크':[4,2,7], '토스뱅크':[4,4,4], '케이뱅크':[3,3,6], 'SC제일은행':[3,2,6], '한국씨티은행':[3,6,3], '새마을금고':[4,4,4,2], '신협':[3,4,4,1], '우체국':[3,4,4,2], '수협':[3,2,6], '대구은행':[3,2,6], '부산은행':[3,4,4,2], '광주은행':[3,2,6], '제주은행':[3,2,6], '전북은행':[3,2,6], '경남은행':[3,4,4,2], 'NH투자증권':[3,4,4,2], '미래에셋증권':[8,2], '삼성증권':[3,2,6], '한국투자증권':[8], '키움증권':[8], '대신증권':[8], 'KB증권':[3,2,6], '신한투자증권':[3,2,6], '하나증권':[3,6,5] };
+            const ft = fts[bank];
+            if (!ft) return s;
+            let res = '', idx = 0;
+            for (let i=0; i<ft.length && idx < s.length; i++) {
+                const part = s.slice(idx, idx + ft[i]);
+                if(!part) break;
+                if (i > 0) res += '-';
+                res += part;
+                idx += ft[i];
+            }
+            if (s.length > idx) res += '-' + s.slice(idx);
+            return res.replace(/-+/g,'-').replace(/^-|-$/g,'');
+        };
+        const splitAddress = (v) => {
+            const raw = normalizeText(v);
+            if(!raw) return { addr:'', addrDetail:'' };
+            const idx = raw.indexOf(',');
+            if(idx === -1) return { addr:raw, addrDetail:'' };
+            return { addr:raw.slice(0, idx).trim(), addrDetail:raw.slice(idx+1).trim() };
+        };
+        const cleanList = arr => arr.filter(item => Object.values(item).some(val => normalizeText(val) !== '' && normalizeText(val) !== '0'));
 
         for(let i=3; i<rows.length; i++) {
-            const rd = rows[i]; if(!rd || rd.length === 0) continue;
-            const name = rd[1] ? String(rd[1]).trim() : "", ssnRaw = rd[2] ? String(rd[2]).trim() : "", joinRaw = rd[9] ? String(rd[9]).trim() : "";
-            if(!name && !joinRaw) continue; 
-            let re=[]; if(!name) re.push("성명 누락"); let joinDate = fmtD(joinRaw); if(!joinDate || !/^\d{4}-\d{2}-\d{2}$/.test(joinDate)) re.push("입사일 오류");
-            let ssn = ssnRaw.replace(/[^0-9]/g, ''); if(ssn.length === 13) ssn = ssn.substring(0,6) + '-' + ssn.substring(6,13); if(!ssn || !/^\d{6}-[0-49]\d{6}$/.test(ssn)) re.push("주민번호 오류");
-            let id = rd[0] ? String(rd[0]).trim() : ""; if(id && !emps.find(x=>x.empID===id)) re.push("사번 없음(수정 불가)"); if(!id && emps.find(x=>x.ssn===ssn)) re.push("중복 주민번호");
-            if(re.length) { errs.push(`[${i+1}행] ${name||'이름없음'}: ${re.join(', ')}`); continue; }
-            
-            let eds=[], cars=[], langs=[], lics=[], fams=[];
-            for(let j=0; j<2; j++) { const bs=14+j*6; if(rd[bs]) eds.push({type:rd[bs], period:(fmtM(rd[bs+1])+(rd[bs+2]?' ~ '+fmtM(rd[bs+2]):'')).trim(), school:rd[bs+3], major:rd[bs+4], status:rd[bs+5]}); }
-            for(let j=0; j<5; j++) { const bs=26+j*7; if(rd[bs+2]) cars.push({period:(fmtD(rd[bs])+(rd[bs+1]?' ~ '+fmtD(rd[bs+1]):'')).trim(), company:rd[bs+2], dept:rd[bs+3], rank:rd[bs+4], duty:rd[bs+5], reason:rd[bs+6], months:"0"}); }
-            for(let j=0; j<5; j++) { const bs=61+j*4; if(rd[bs]) langs.push({name:rd[bs], score:rd[bs+1], date:fmtM(rd[bs+2]), issuer:rd[bs+3]}); }
-            for(let j=0; j<5; j++) { const bs=81+j*4; if(rd[bs]) lics.push({name:rd[bs], issuer:rd[bs+1], date:fmtM(rd[bs+2]), reason:rd[bs+3]}); }
-            for(let j=0; j<5; j++) { const bs=101+j*6; if(rd[bs]) fams.push({relation:rd[bs], name:rd[bs+1], birth:fmtD(rd[bs+2]), living:rd[bs+3], job:rd[bs+4], memo:rd[bs+5]}); }
+            const rd = rows[i]; if(!rd || rd.every(cell => normalizeText(cell)==='')) continue;
+            const name = normalizeText(rd[1]), ssnRaw = normalizeText(rd[2]), joinRaw = normalizeText(rd[9]);
+            if(!name && !joinRaw && !hasValue(rd[0])) continue;
+            let re=[];
+            let id = normalizeText(rd[0]);
+            const existing = id ? emps.find(x=>x.empID===id) : null;
+            const isUpdate = !!existing;
+            let joinDate = fmtD(joinRaw);
+            let ssn = ssnRaw.replace(/[^0-9]/g, ''); if(ssn.length === 13) ssn = ssn.substring(0,6) + '-' + ssn.substring(6,13);
+            const duplicateById = id && !existing && emps.find(x=>x.empID===id);
+            if(duplicateById) re.push("사번 중복");
+            if(re.length) { errs.push(`[${i+1}행] ${name||id||'이름없음'}: ${re.join(', ')}`); continue; }
 
-            vd.push({ _id:id, name, ssn, phone:fmtPhone(rd[3]), email:rd[4]||"", zip:"", addr:rd[5]||"", addrDetail:"", bank:rd[6]||"", account:fmtAccount(rd[7], rd[6]), contractType:rd[8]||"정규직", joinDate, probationEndDate:fmtD(rd[10])||"", dept:rd[11]||"", rank:rd[12]||"사원", duty:rd[13]||"직책없음", quitDate:"", educations:eds, careers:cars, languages:langs, licenses:lics, families:fams, milType:rd[131]||"해당없음", milGroup:rd[132]||"", milReason:rd[133]||"", milRank:rd[134]||"", milS:fmtD(rd[135])||"", milE:fmtD(rd[136])||"" });
+            let eds=[], cars=[], langs=[], lics=[], fams=[];
+            for(let j=0; j<2; j++) { const bs=16+j*6; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5])) eds.push({type:normalizeText(rd[bs]), period:(fmtM(rd[bs+1])+(hasValue(rd[bs+2])?' ~ '+fmtM(rd[bs+2]):'')).trim(), school:normalizeText(rd[bs+3]), major:normalizeText(rd[bs+4]), status:normalizeText(rd[bs+5])}); }
+            for(let j=0; j<5; j++) { const bs=28+j*7; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5]) || hasValue(rd[bs+6])) cars.push({period:(fmtD(rd[bs])+(hasValue(rd[bs+1])?' ~ '+fmtD(rd[bs+1]):'')).trim(), company:normalizeText(rd[bs+2]), dept:normalizeText(rd[bs+3]), rank:normalizeText(rd[bs+4]), duty:normalizeText(rd[bs+5]), reason:normalizeText(rd[bs+6]), months:'0'}); }
+            for(let j=0; j<5; j++) { const bs=63+j*4; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3])) langs.push({name:normalizeText(rd[bs]), score:normalizeText(rd[bs+1]), date:fmtM(rd[bs+2]), issuer:normalizeText(rd[bs+3])}); }
+            for(let j=0; j<5; j++) { const bs=83+j*4; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3])) lics.push({name:normalizeText(rd[bs]), issuer:normalizeText(rd[bs+1]), date:fmtM(rd[bs+2]), reason:normalizeText(rd[bs+3])}); }
+            for(let j=0; j<5; j++) { const bs=103+j*6; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5])) fams.push({relation:normalizeText(rd[bs]), name:normalizeText(rd[bs+1]), birth:fmtD(rd[bs+2]), living:normalizeText(rd[bs+3]), job:normalizeText(rd[bs+4]), memo:normalizeText(rd[bs+5])}); }
+            const addrFields = splitAddress(rd[5]);
+            const bank = normalizeBankName(rd[6]);
+            vd.push({ _id:id, isUpdate, name, ssn, phone:fmtPhone(rd[3]), email:normalizeText(rd[4]), addr:addrFields.addr, addrDetail:addrFields.addrDetail, bank, account:fmtAccount(rd[7], bank), contractType:normalizeText(rd[8])||'정규직', joinDate, quitDate:fmtD(rd[10])||'', workplace:normalizeText(rd[11])||'', probationEndDate:fmtD(rd[12])||'', dept:normalizeText(rd[13]), rank:normalizeText(rd[14])||'사원', duty:normalizeText(rd[15])||'직책없음', educations:cleanList(eds), careers:cleanList(cars), languages:cleanList(langs), licenses:cleanList(lics), families:cleanList(fams), milType:normalizeText(rd[133])||'해당없음', milGroup:normalizeText(rd[134])||'', milExit:normalizeText(rd[135])||'', milReason:normalizeText(rd[136])||'', milRank:normalizeText(rd[137])||'', milS:fmtD(rd[138])||'', milE:fmtD(rd[139])||'' });
         }
-        if(errs.length) { $('bulkValidationErrors').innerHTML = errs.join('<br>'); $('bulkValidationErrors').style.display='block'; $('bulkValidationSuccess').style.display='none'; $('bulkConfirmBtn').style.display='none'; } 
-        else { $('bulkValidationErrors').style.display='none'; $('bulkValidationSuccess').style.display='block'; $('bulkConfirmBtn').style.display='block';
+        const ssnWarningTargets = vd.filter(v=>!v.isUpdate && hasValue(v.ssn) && emps.some(x=>x.ssn===v.ssn));
+        const proceedUpload = async () => {
+            $('bulkValidationErrors').style.display='none'; $('bulkValidationSuccess').style.display='block'; $('bulkConfirmBtn').style.display='block';
             $('bulkConfirmBtn').onclick = async () => {
-                for(let v of vd) { 
-                    let nid=v._id; if(!nid){ const pre=v.joinDate.substring(2,4)+v.joinDate.substring(5,7); nid=pre+String(emps.filter(x=>x.empID.startsWith(pre)).length+1).padStart(2,'0'); emps.push({empID: nid}); }
-                    const ex=emps.find(e=>e.empID===nid)||{}; 
-                    await setDoc(doc(empRef, nid), {...ex, empID:nid, name:v.name, ssn:v.ssn, joinDate:v.joinDate, dept:v.dept, rank:v.rank, duty:v.duty, contractType:v.contractType, phone:v.phone, email:v.email, zip:v.zip, addr:v.addr, addrDetail:v.addrDetail, bank:v.bank, account:v.account, probationEndDate:v.probationEndDate, quitDate:v.quitDate, educations:v.educations, careers:v.careers, languages:v.languages, licenses:v.licenses, families:v.families, milType:v.milType, milGroup:v.milGroup, milReason:v.milReason, milRank:v.milRank, milS:v.milS, milE:v.milE}, {merge:true}); 
-                } window.showMessageBox("업로드 완료"); $('bulkValidationModal').style.display='none'; window.renderGrid();
+                try {
+                    window.showLoading('업로드 준비 중...', 5, '사원 일괄 업로드를 준비하고 있습니다.');
+                    await window.createBackup('AUTO', '사원 일괄 업로드 전 자동 백업');
+                    const existingByPrefix = {};
+                    const fieldMap = [['name','name'],['ssn','ssn'],['phone','phone'],['email','email'],['addr','addr'],['addrDetail','addrDetail'],['bank','bank'],['account','account'],['contractType','contractType'],['joinDate','joinDate'],['quitDate','quitDate'],['workplace','workplace'],['probationEndDate','probationEndDate'],['dept','dept'],['rank','rank'],['duty','duty'],['milType','milType'],['milGroup','milGroup'],['milExit','milExit'],['milReason','milReason'],['milRank','milRank'],['milS','milS'],['milE','milE']];
+                    const writeItems = vd.map(v => {
+                        let nid=v._id;
+                        if(!nid){
+                            const baseDate = hasValue(v.joinDate) && /^\d{4}-\d{2}-\d{2}$/.test(v.joinDate) ? v.joinDate : today();
+                            const pre=baseDate.substring(2,4)+baseDate.substring(5,7);
+                            if(existingByPrefix[pre] == null) existingByPrefix[pre] = emps.filter(x=>(x.empID||'').startsWith(pre)).length;
+                            existingByPrefix[pre] += 1;
+                            nid = pre + String(existingByPrefix[pre]).padStart(2,'0');
+                        }
+                        const payload = { empID:nid };
+                        if(v.isUpdate){
+                            fieldMap.forEach(([src,dst])=>{ if(hasValue(v[src])) payload[dst] = v[src]; });
+                            if(v.educations.length) payload.educations = v.educations;
+                            if(v.careers.length) payload.careers = v.careers;
+                            if(v.languages.length) payload.languages = v.languages;
+                            if(v.licenses.length) payload.licenses = v.licenses;
+                            if(v.families.length) payload.families = v.families;
+                        } else {
+                            fieldMap.forEach(([src,dst])=>{ if(hasValue(v[src])) payload[dst] = v[src]; });
+                            if(hasValue(v.addr) || hasValue(v.addrDetail)) payload.zip='';
+                            if(v.educations.length) payload.educations = v.educations;
+                            if(v.careers.length) payload.careers = v.careers;
+                            if(v.languages.length) payload.languages = v.languages;
+                            if(v.licenses.length) payload.licenses = v.licenses;
+                            if(v.families.length) payload.families = v.families;
+                            if(!('quitDate' in payload)) payload.quitDate='';
+                        }
+                        return { id:nid, data:payload, merge:true };
+                    });
+                    await runBatched(writeItems, (batch,item)=>batch.set(doc(empRef, item.id), item.data, {merge:item.merge}), 400, '사원 업로드 중...');
+                    await window.createBackup('AUTO', '사원 일괄 업로드 후 자동 백업');
+                    window.setLoadingProgress(100, '사원 일괄 업로드가 완료되었습니다.');
+                    window.showMessageBox('업로드 완료'); $('bulkValidationModal').style.display='none'; window.renderGrid();
+                } finally { setTimeout(()=>window.hideLoading(), 250); }
             };
-        } $('bulkValidationModal').style.display='flex'; $('empBulkInput').value='';
+            $('bulkValidationModal').style.display='flex'; $('empBulkInput').value='';
+        };
+        if(errs.length) {
+            $('bulkValidationErrors').innerHTML = errs.join('<br>'); $('bulkValidationErrors').style.display='block'; $('bulkValidationSuccess').style.display='none'; $('bulkConfirmBtn').style.display='none';
+            $('bulkValidationModal').style.display='flex'; $('empBulkInput').value='';
+        } else if(ssnWarningTargets.length) {
+            const msg = `동일 주민번호를 가진 사원이 이미 존재합니다.<br>재직/퇴사 여부를 확인해주세요.<br><br>계속 진행하시겠습니까?<br><br>${ssnWarningTargets.map(v=>`${v.name||'(이름없음)'} / ${v.ssn}`).join('<br>')}`;
+            window.showConfirmBox(msg, proceedUpload, ()=>{ $('empBulkInput').value=''; });
+        } else {
+            proceedUpload();
+        }
     }; r.readAsArrayBuffer(f);
 };
 
@@ -1991,9 +2314,17 @@ window.handleAppointBulkUpload = (e) => {
         if(errs.length) { $('bulkValidationErrors').innerHTML = errs.join('<br>'); $('bulkValidationErrors').style.display='block'; $('bulkValidationSuccess').style.display='none'; $('bulkConfirmBtn').style.display='none'; } 
         else { $('bulkValidationErrors').style.display='none'; $('bulkValidationSuccess').style.display='block'; $('bulkConfirmBtn').style.display='block';
             $('bulkConfirmBtn').onclick = async () => {
+                try {
                 const g={}; vd.forEach(v=>{ if(!g[v.empID]) g[v.empID]={emp:v.tEmp, apps:[]}; g[v.empID].apps.push(v.appObj); });
-                for(const id in g){ const d=g[id], oApps=d.emp.appointments||[], mApps=[...oApps, ...d.apps], uO={appointments:mApps}; d.apps.sort((a,b)=>b.date.localeCompare(a.date)); const lat=d.apps[0]; if(lat.type==='직책부여') uO.duty=lat.after; else if(lat.type==='직위승진') uO.rank=lat.after; else if(lat.type.includes('부서')) uO.dept=lat.after; await updateDoc(doc(empRef, id), uO); }
+                window.showLoading('업로드 준비 중...', 5, '인사 발령 일괄 업로드를 준비하고 있습니다.');
+                await window.createBackup('AUTO', '인사 발령 일괄 업로드 전 자동 백업');
+                const batchItems=[];
+                for(const id in g){ const d=g[id], oApps=d.emp.appointments||[], mApps=[...oApps, ...d.apps], uO={appointments:mApps}; d.apps.sort((a,b)=>b.date.localeCompare(a.date)); const lat=d.apps[0]; if(lat.type==='직책부여') uO.duty=lat.after; else if(lat.type==='직위승진') uO.rank=lat.after; else if(lat.type.includes('부서')) uO.dept=lat.after; batchItems.push({id, payload:uO}); }
+                await runBatched(batchItems, (batch,item)=>batch.update(doc(empRef, item.id), item.payload), 400, '인사발령 업로드 중...');
+                await window.createBackup('AUTO', '인사 발령 일괄 업로드 후 자동 백업');
+                window.setLoadingProgress(100, '인사 발령 일괄 업로드가 완료되었습니다.');
                 window.showMessageBox("업로드 완료"); $('bulkValidationModal').style.display='none';
+                } finally { setTimeout(()=>window.hideLoading(), 250); }
             };
         } $('bulkValidationModal').style.display='flex'; $('appointBulkInput').value='';
     }; r.readAsBinaryString(f);
@@ -2037,9 +2368,9 @@ window.confirmAuditAction = async () => {
             if(document.querySelector('#appointEmpList tr.selected')) window.selectEmpForAppoint(emp.empID, document.querySelector('#appointEmpList tr.selected'));
         }, null);
     } else if (auditActionContext.type === 'SAL_DEL') {
-        $('auditModal').style.display = 'none'; const emp = selectedEmpForSalary; if(!emp) return; const sorted = [...(emp.salaryHistory||[])].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))); const target = sorted[auditActionContext.index]; if(!target) return; const realIdx = (emp.salaryHistory||[]).findIndex(x => x.date===target.date && x.reason===target.reason && x.monthly===target.monthly && x.annual===target.annual && (x.linkId||'')===(target.linkId||'')); if(realIdx < 0) return; window.showConfirmBox('정말 삭제하시겠습니까?', async () => { const newHistory=[...(emp.salaryHistory||[])]; newHistory.splice(realIdx,1); let newAppointments=[...(emp.appointments||[])]; let revertField={}; if(target.linkId){ const linkedApp=newAppointments.find(x => (x.linkId||'')===target.linkId); if(linkedApp){ newAppointments = newAppointments.filter(x => (x.linkId||'')!==target.linkId); revertField = resolveEmployeeFieldAfterAppointmentDelete(newAppointments, linkedApp); } } const latestSnap=resolveLatestSalarySnapshot(newHistory, emp); const logEntry={ date:new Date().toISOString().slice(0,10), modifier:mod, reason:rsn, itemDate:target.date, itemType:target.reason }; const updatedLogs=emp.salaryAuditLogs ? [...emp.salaryAuditLogs, logEntry] : [logEntry]; await window.createBackup('AUTO', '연봉 갱신 삭제 전 자동 백업'); const updatePayload={ salaryHistory:newHistory, salaryAuditLogs:updatedLogs, appointments:newAppointments, ...revertField }; if(latestSnap) Object.assign(updatePayload, latestSnap); await updateDoc(doc(empRef, emp.empID), updatePayload); await window.createBackup('AUTO', '연봉 갱신 삭제 후 자동 백업'); emp.salaryHistory=newHistory; emp.salaryAuditLogs=updatedLogs; emp.appointments=newAppointments; Object.assign(emp, revertField); if(latestSnap) applySalarySnapshotToEmp(emp, latestSnap); selectedEmpForSalary=emp; if(selectedEmpForAppoint && selectedEmpForAppoint.empID===emp.empID) selectedEmpForAppoint=emp; window.logSystemAction('정보 삭제', '연봉 갱신', `${emp.name} 연봉 갱신 내역 삭제`); window.showMessageBox("삭제 완료"); if(document.querySelector('#salStatusEmpList tr.selected')) window.selectEmpForSalary(emp.empID, document.querySelector('#salStatusEmpList tr.selected')); }, null);
+        $('auditModal').style.display = 'none'; const emp = selectedEmpForSalary; if(!emp) return; const sorted = [...(emp.salaryHistory||[])].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))); const target = sorted[auditActionContext.index]; if(!target) return; const realIdx = (emp.salaryHistory||[]).findIndex(x => x.date===target.date && x.reason===target.reason && x.monthly===target.monthly && x.annual===target.annual && (x.linkId||'')===(target.linkId||'')); if(realIdx < 0) return; window.showConfirmBox('정말 삭제하시겠습니까?', async () => { try { window.showLoading('삭제 중...', 10, '연봉 갱신 내역을 삭제하고 있습니다.'); const newHistory=[...(emp.salaryHistory||[])]; newHistory.splice(realIdx,1); let newAppointments=[...(emp.appointments||[])]; let revertField={}; if(target.linkId){ const linkedApp=newAppointments.find(x => (x.linkId||'')===target.linkId); if(linkedApp){ newAppointments = newAppointments.filter(x => (x.linkId||'')!==target.linkId); revertField = resolveEmployeeFieldAfterAppointmentDelete(newAppointments, linkedApp); } } const latestSnap=resolveLatestSalarySnapshot(newHistory, emp); const logEntry={ date:new Date().toISOString().slice(0,10), modifier:mod, reason:rsn, itemDate:target.date, itemType:target.reason }; const updatedLogs=emp.salaryAuditLogs ? [...emp.salaryAuditLogs, logEntry] : [logEntry]; await window.createBackup('AUTO', '연봉 갱신 삭제 전 자동 백업'); const updatePayload={ salaryHistory:newHistory, salaryAuditLogs:updatedLogs, appointments:newAppointments, ...revertField }; if(latestSnap) Object.assign(updatePayload, latestSnap); await updateDoc(doc(empRef, emp.empID), updatePayload); await window.createBackup('AUTO', '연봉 갱신 삭제 후 자동 백업'); emp.salaryHistory=newHistory; emp.salaryAuditLogs=updatedLogs; emp.appointments=newAppointments; Object.assign(emp, revertField); if(latestSnap) applySalarySnapshotToEmp(emp, latestSnap); selectedEmpForSalary=emp; if(selectedEmpForAppoint && selectedEmpForAppoint.empID===emp.empID) selectedEmpForAppoint=emp; window.logSystemAction('정보 삭제', '연봉 갱신', `${emp.name} 연봉 갱신 내역 삭제`); window.setLoadingProgress(100, '연봉 갱신 내역 삭제가 완료되었습니다.'); window.showMessageBox("삭제 완료"); if(document.querySelector('#salStatusEmpList tr.selected')) window.selectEmpForSalary(emp.empID, document.querySelector('#salStatusEmpList tr.selected')); } finally { setTimeout(()=>window.hideLoading(), 250); } }, null);
     } else if (auditActionContext.type === 'EMP_DEL') {
-        $('auditModal').style.display = 'none'; const emp = emps.find(e=>e.empID===auditActionContext.empId); if(!emp) return; window.showConfirmBox('정말 삭제하시겠습니까?', async () => { await window.createBackup('AUTO', '사원 삭제 전 자동 백업'); await setDoc(doc(logsRef, Date.now().toString()), { date:new Date().toISOString().slice(0,10), time:new Date().toTimeString().slice(0,8), ip:currentIp, user:currentLoggedInUserName, action:'사원 삭제', target:'사원 정보', details:`${emp.name}(${emp.empID}) 삭제 / 삭제자:${mod} / 삭제사유:${rsn}` }); await deleteDoc(doc(empRef, emp.empID)); await window.createBackup('AUTO', '사원 삭제 후 자동 백업'); window.showMessageBox("삭제 완료"); window.closeModal(); }, null);
+        $('auditModal').style.display = 'none'; const emp = emps.find(e=>e.empID===auditActionContext.empId); if(!emp) return; window.showConfirmBox('정말 삭제하시겠습니까?', async () => { try { window.showLoading('삭제 중...', 10, '사원 정보를 삭제하고 있습니다.'); await window.createBackup('AUTO', '사원 삭제 전 자동 백업'); await setDoc(doc(logsRef, Date.now().toString()), { date:new Date().toISOString().slice(0,10), time:new Date().toTimeString().slice(0,8), ip:currentIp, user:currentLoggedInUserName, action:'사원 삭제', target:'사원 정보', details:`${emp.name}(${emp.empID}) 삭제 / 삭제자:${mod} / 삭제사유:${rsn}` }); await deleteDoc(doc(empRef, emp.empID)); await window.createBackup('AUTO', '사원 삭제 후 자동 백업'); window.setLoadingProgress(100, '사원 삭제가 완료되었습니다.'); window.showMessageBox("삭제 완료"); window.closeModal(); } finally { setTimeout(()=>window.hideLoading(), 250); } }, null);
     } else if (auditActionContext.type === 'ORG_DEL') {
         $('auditModal').style.display = 'none'; await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', auditActionContext.id)); window.logSystemAction('설정 삭제', '조직도 관리', `[${$('auditOrgType').value}] ${$('auditOrgNewName').value} 삭제 (사유: ${rsn})`); window.showMessageBox("삭제 완료");
     } else if (auditActionContext.type === 'ORG_EDIT') {
@@ -2186,14 +2517,17 @@ async function start() {
             const initSnap = await getDoc(doc(settingsRef, 'init_org_v3_1'));
             if(!initSnap.exists()) {
                 await setDoc(doc(settingsRef, 'init_org_v3_1'), { init: true });
-                const rList = ['대표이사','이사','수석부장','부장','책임','전임','선임','주임','사원','팀원']; for(let i=0;i<rList.length;i++) await setDoc(doc(settingsRef, 'rank_init_'+i), {type:'RANK', name:rList[i], order:i});
+                const rList = ['대표이사','이사','수석부장','부장','책임','전임','선임','주임','사원','팀원','애널리스트','웰시연구원','훈련생','프리랜서','PM','아르바이트']; for(let i=0;i<rList.length;i++) await setDoc(doc(settingsRef, 'rank_init_'+i), {type:'RANK', name:rList[i], order:i});
                 const dList = ['대표이사','본부장','팀장','파트장']; for(let i=0;i<dList.length;i++) await setDoc(doc(settingsRef, 'duty_init_'+i), {type:'DUTY', name:dList[i], order:i});
                 const depts = [{i:'d1',n:'히포케이메논',p:''},{i:'d2',n:'기획본부',p:'d1'},{i:'d3',n:'경영관리팀',p:'d2'},{i:'d4',n:'회계파트',p:'d3'},{i:'d5',n:'인사파트',p:'d3'},{i:'d6',n:'비서총무파트',p:'d3'},{i:'d7',n:'사업운영팀',p:'d2'},{i:'d8',n:'신사업T/F파트',p:'d7'},{i:'d9',n:'영업지원파트',p:'d7'},{i:'d10',n:'C&C파트',p:'d2'},{i:'d11',n:'영상기획파트',p:'d2'},{i:'d12',n:'세일즈파트',p:'d2'},{i:'d13',n:'웰시투자그룹본부',p:'d1'},{i:'d14',n:'영업팀',p:'d13'},{i:'d15',n:'투자정보파트',p:'d13'},{i:'d16',n:'웰시연구원',p:'d13'}];
                 for(let i=0;i<depts.length;i++) await setDoc(doc(settingsRef, depts[i].i), {type:'DEPT', name:depts[i].n, parentId:depts[i].p, order:i});
             }
 
             onSnapshot(empRef, s=>{ emps=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-mgmt-reg').classList.contains('active')) window.renderGrid(); if($('page-home').classList.contains('active')) window.renderHomeData(); });
-            onSnapshot(settingsRef, s=>{ const d=s.docs.map(x=>({...x.data(), id:x.id})); siteLinks=d.filter(x=>x.type==='SITE'); sysDepts=d.filter(x=>x.type==='DEPT'); sysRanks=d.filter(x=>x.type==='RANK'); sysDuties=d.filter(x=>x.type==='DUTY'); allowedIps=d.filter(x=>x.type==='IP'); window.syncOrgSettings(); if($('page-sys-ip').classList.contains('active')) window.renderIpSettings(); if(allowedIps.length>0 && !allowedIps.some(i=>i.ip===currentIp)) { $('displayBlockedIp').innerText=currentIp; $('ipBlockOverlay').style.display='flex'; } else $('ipBlockOverlay').style.display='none'; });
+            onSnapshot(settingsRef, async s=>{ const d=s.docs.map(x=>({...x.data(), id:x.id})); siteLinks=d.filter(x=>x.type==='SITE'); sysDepts=d.filter(x=>x.type==='DEPT'); sysRanks=d.filter(x=>x.type==='RANK'); sysDuties=d.filter(x=>x.type==='DUTY'); sysWorkplaces=d.filter(x=>x.type==='WORKPLACE'); headquartersSetting=d.find(x=>x.type==='HQ')||null; allowedIps=d.filter(x=>x.type==='IP'); 
+                const wantedRankNames = ['대표이사','이사','수석부장','부장','책임','전임','선임','주임','사원','팀원','애널리스트','웰시연구원','훈련생','프리랜서','PM','아르바이트'];
+                if(wantedRankNames.some(n => !sysRanks.some(r => r.name===n))) { try { await window.ensureDefaultRanks(); } catch(e){ console.warn('ensureDefaultRanks failed', e); } }
+                window.syncOrgSettings(); if($('page-sys-ip').classList.contains('active')) window.renderIpSettings(); if(allowedIps.length>0 && !allowedIps.some(i=>i.ip===currentIp)) { $('displayBlockedIp').innerText=currentIp; $('ipBlockOverlay').style.display='flex'; } else $('ipBlockOverlay').style.display='none'; });
             onSnapshot(accountRef, s=>{ accounts=s.docs.map(d=>({...d.data(), id:d.id})); if(currentLoginAcc?.accountId){ currentLoginAcc = accounts.find(a=>a.accountId===currentLoginAcc.accountId) || currentLoginAcc; } window.applyMenuVisibility(); if($('page-account').classList.contains('active')) window.renderAccountGrid(); });
             onSnapshot(logsRef, s=>{ syslogs=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-sys-log').classList.contains('active')) window.renderLogs(); });
             onSnapshot(backupRef, s=>{ backups=s.docs.map(d=>({...d.data(), id:d.id})); if(($('page-backup-data') && $('page-backup-data').classList.contains('active')) || ($('page-restore-data') && $('page-restore-data').classList.contains('active'))) window.renderBackupPages(); });
