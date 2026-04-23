@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.3.5.6 - 통합 관리</title>
+<title>히포케이메논 ERP V.3.5.7 - 통합 관리</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -48,11 +48,10 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
 .report-temp-banner{background:#fff8e1;border:1px solid #f0d98c;color:#8a6d1d;padding:8px 12px;border-radius:4px;font-size:11px;margin-bottom:10px}
 .report-page-wrap{display:flex;flex-direction:column;gap:12px;height:100%}
-.report-box{background:white;border:1px solid var(--icube-border);padding:18px 20px;border-radius:2px}
-.report-header-center{text-align:center;margin-bottom:14px}.report-header-center .corp{font-size:14px;font-weight:bold}.report-header-center .title{font-size:30px;font-weight:900;letter-spacing:10px;margin-top:6px}
+.report-box{background:white;border:1px solid var(--icube-border);padding:14px;border-radius:2px}
+.report-header-center{text-align:center;margin-bottom:10px}.report-header-center .corp{font-size:16px;font-weight:bold}.report-header-center .title{font-size:24px;font-weight:900;letter-spacing:8px;margin-top:8px}
 .report-date-row{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin:8px 0 16px 0}.report-date-row input{height:28px;border:1px solid var(--icube-border);padding:0 8px}
-.report-table{width:100%;border-collapse:collapse;table-layout:fixed;background:white}.report-table th,.report-table td{border:1px solid #333;padding:5px 4px;font-size:11px;text-align:center;vertical-align:middle}.report-table th{background:#f2f2f2;font-weight:bold}.report-section-title{font-size:13px;font-weight:bold;margin:16px 0 6px 0}
-.report-table td.left{text-align:left;padding-left:8px}
+.report-table{width:100%;border-collapse:collapse;table-layout:fixed;background:white}.report-table th,.report-table td{border:1px solid #333;padding:6px 4px;font-size:11px;text-align:center;vertical-align:middle}.report-table th{background:#f6f6f6;font-weight:bold}.report-table.report-dept-status thead th:nth-child(n+4),.report-table.report-dept-status tbody td:nth-child(n+4),.report-table.report-dept-status tbody th:nth-child(n+4){border-left-style:dotted;border-right-style:dotted}.report-table.report-dept-status thead th:nth-child(3),.report-table.report-dept-status tbody td:nth-child(3),.report-table.report-dept-status tbody th:nth-child(3){background:#e9e9e9}.report-section-title{font-size:13px;font-weight:bold;margin:14px 0 6px 0}
 .report-write-layout{display:flex;gap:12px;min-height:0;flex:1}.report-write-left{width:320px;flex-shrink:0;background:white;border:1px solid var(--icube-border);display:flex;flex-direction:column}.report-write-right{flex:1;background:white;border:1px solid var(--icube-border);display:flex;flex-direction:column;min-width:0}.report-write-toolbar{padding:12px;border-bottom:1px solid var(--icube-border);display:flex;gap:8px;align-items:center;background:#fbfbfb}.report-write-toolbar input,.report-write-toolbar select{height:28px;border:1px solid var(--icube-border);padding:0 8px}.report-write-list{flex:1;overflow:auto}.report-write-empty{display:flex;align-items:center;justify-content:center;flex:1;color:#999}
 .report-write-form{padding:16px;overflow:auto}.report-write-grid{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center}.report-write-grid input,.report-write-grid select,.report-write-grid textarea{width:100%;border:1px solid var(--icube-border);padding:6px 8px;font-size:12px}.report-write-grid textarea{min-height:70px;resize:vertical}
 .small-note{font-size:11px;color:#777}
@@ -69,7 +68,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 </style>
 </head>
 <body data-role="관리자">
-<!-- V.3.5.6 반영: 근무지 관리/근무지 일괄업로드/인원현황보고 서식 보정 -->
+<!-- V.3.1.5 전반 점검 보정: 메뉴 진입/렌더 null-safe 보강, 버튼 줄바꿈 방지, 기본 날짜 자동세팅, 목록 비어있을 때 기본 문구 정리 -->
 
 <div id="login-screen">
     <div class="login-box">
@@ -97,7 +96,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
     </div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.5.6</span></div>
+        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.5.8</span></div>
         <div style="margin-left:auto;font-size:12px;color:#555;display:flex;align-items:center;gap:15px">
             <span><span id="displayLoggedInUser" style="font-weight:bold;color:var(--icube-blue)"></span> 님 로그인 중</span>
             <button id="notifyBellBtn" class="tool-btn" onclick="window.openNotificationCenter()" style="position:relative;width:34px;height:28px;padding:0;min-width:34px"><i class="fa-regular fa-bell"></i><span id="notifyUnreadDot" style="display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#2f80ff"></span></button>
@@ -1408,15 +1407,15 @@ window.renderTodayReport = () => {
         sortByDeptOrder(all).forEach(e => {
             const en = entries[e.empID] || {};
             if((en.status||'출근')===st){
-                detailRows.push(`<tr><td>${st}</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td class="left">${en.reason||en.startTime||''}</td></tr>`);
+                detailRows.push(`<tr><td>${st}</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td style="text-align:left;padding-left:8px;">${en.reason||en.startTime||''}</td></tr>`);
             }
         });
     });
-    const quitRows = sortByDeptOrder(all.filter(e => (entries[e.empID]?.status||'')==='퇴사')).map(e=>`<tr><td>퇴사</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td class="left">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="6">-</td></tr>';
-    const probationRows = sortByDeptOrder(all.filter(e => e.probationEndDate && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))>=0 && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))<=7)).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td>${e.probationEndDate||''}</td><td></td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>';
-    const joinRows = sortByDeptOrder(all.filter(e => (entries[e.empID]?.status||'')==='입사')).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td></td><td class="left">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>';
+    const quitRows = sortByDeptOrder(all.filter(e => (entries[e.empID]?.status||'')==='퇴사')).map(e=>`<tr><td>퇴사</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td style="text-align:left;padding-left:8px;">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="6">특이사항 없음</td></tr>';
+    const probationRows = sortByDeptOrder(all.filter(e => e.probationEndDate && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))>=0 && Math.ceil((new Date(e.probationEndDate)-new Date(targetDate))/(1000*60*60*24))<=7)).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td>${e.probationEndDate||''}</td><td></td></tr>`).join('') || '<tr><td colspan="7">특이사항 없음</td></tr>';
+    const joinRows = sortByDeptOrder(all.filter(e => (entries[e.empID]?.status||'')==='입사')).map(e=>`<tr><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${e.rank||''}</td><td>${e.joinDate||''}</td><td></td><td style="text-align:left;padding-left:8px;">${entries[e.empID]?.reason||''}</td></tr>`).join('') || '<tr><td colspan="7">특이사항 없음</td></tr>';
     const month = targetDate.substring(5,7);
-    const birthRows = [...all].filter(e => (e.ssn||'').substring(2,4)===month).sort((a,b)=>getBirthSortKey(a).localeCompare(getBirthSortKey(b)) || getDeptOrderValue(a.dept||'')-getDeptOrderValue(b.dept||'')).map(e=>`<tr><td>생일</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${(e.ssn||'').substring(2,4)}월 ${(e.ssn||'').substring(4,6)}일</td></tr>`).join('') || '<tr><td colspan="5">-</td></tr>';
+    const birthRows = [...all].filter(e => (e.ssn||'').substring(2,4)===month).sort((a,b)=>getBirthSortKey(a).localeCompare(getBirthSortKey(b)) || getDeptOrderValue(a.dept||'')-getDeptOrderValue(b.dept||'')).map(e=>`<tr><td>생일</td><td>${e.dept||''}</td><td>${window.getWorkerGroupLabel(e)}</td><td>${e.name||''}</td><td>${(e.ssn||'').substring(2,4)}월 ${(e.ssn||'').substring(4,6)}일</td></tr>`).join('') || '<tr><td colspan="5">특이사항 없음</td></tr>';
     const deptRows = orderedDeptNames.map(dept => {
         const arr = byDept[dept];
         const total = arr.length;
@@ -1438,16 +1437,16 @@ window.renderTodayReport = () => {
     }).join('') || '<tr><td colspan="16">-</td></tr>';
     const html = `
         <div class="report-section-title">1. 재적 인원 현황</div>
-        <table class="report-table"><thead><tr><th>사업자</th><th>근로자</th><th>임원</th><th>총계</th></tr></thead><tbody><tr><td>${사업자.length}</td><td>${근로자.length}</td><td>${임원.length}</td><td>${all.length}</td></tr></tbody></table>
+        <table class="report-table"><thead><tr><th>임원</th><th>근로자</th><th>사업자</th><th>총계</th></tr></thead><tbody><tr><td>${임원.length}</td><td>${근로자.length}</td><td>${사업자.length}</td><td>${all.length}</td></tr></tbody></table>
         <div class="report-section-title">2. 부서별 현황</div>
-        <table class="report-table"><thead><tr><th style="width:180px;">소속</th><th style="width:60px;">근로구분</th><th>재적</th><th>출근</th><th>지각</th><th>연차</th><th>반차</th><th>반반차</th><th>휴가</th><th>결근</th><th>조퇴</th><th>재택근무</th><th>입사</th><th>퇴사</th><th>기타</th><th>휴직</th></tr></thead><tbody>${deptRows}<tr><th colspan="2">총계</th><th>${all.length}</th><th>${countByStatus('출근')}</th><th>${countByStatus('지각')}</th><th>${countByStatus('연차')}</th><th>${countByStatus('반차')}</th><th>${countByStatus('반반차')}</th><th>${countByStatus('휴가')}</th><th>${countByStatus('결근')}</th><th>${countByStatus('조퇴')}</th><th>${countByStatus('재택근무')}</th><th>${countByStatus('입사')}</th><th>${countByStatus('퇴사')}</th><th>${countByStatus('기타')}</th><th>${countByStatus('휴직')}</th></tr></tbody></table>
+        <table class="report-table report-dept-status"><thead><tr><th style="width:180px;">소속</th><th style="width:60px;">근로구분</th><th>재적</th><th>출근</th><th>지각</th><th>연차</th><th>반차</th><th>반반차</th><th>휴가</th><th>결근</th><th>조퇴</th><th>재택근무</th><th>입사</th><th>퇴사</th><th>기타</th><th>휴직</th></tr></thead><tbody>${deptRows}<tr><th colspan="2">총계</th><th>${all.length}</th><th>${countByStatus('출근')}</th><th>${countByStatus('지각')}</th><th>${countByStatus('연차')}</th><th>${countByStatus('반차')}</th><th>${countByStatus('반반차')}</th><th>${countByStatus('휴가')}</th><th>${countByStatus('결근')}</th><th>${countByStatus('조퇴')}</th><th>${countByStatus('재택근무')}</th><th>${countByStatus('입사')}</th><th>${countByStatus('퇴사')}</th><th>${countByStatus('기타')}</th><th>${countByStatus('휴직')}</th></tr></tbody></table>
         <div class="report-section-title">3. 근태 상세내용</div>
-        <table class="report-table"><thead><tr><th style="width:100px;">구분</th><th style="width:160px;">소속</th><th style="width:90px;">근로구분</th><th style="width:110px;">성명</th><th>사유</th></tr></thead><tbody>${detailRows.join('') || '<tr><td colspan="5">-</td></tr>'}</tbody></table>
+        <table class="report-table"><thead><tr><th style="width:100px;">구분</th><th style="width:160px;">소속</th><th style="width:90px;">근로구분</th><th style="width:110px;">성명</th><th>사유</th></tr></thead><tbody>${detailRows.join('') || '<tr><td colspan="5">특이사항 없음</td></tr>'}</tbody></table>
         <div class="report-section-title">4. 입·퇴사자</div>
         <table class="report-table"><thead><tr><th style="width:90px;">구분</th><th style="width:160px;">소속</th><th style="width:90px;">근로구분</th><th style="width:110px;">성명</th><th style="width:90px;">직급</th><th>비고</th></tr></thead><tbody>${quitRows}</tbody></table>
         <div class="report-section-title">5. 수습기간 만료 도래(7일전)</div>
         <table class="report-table"><thead><tr><th style="width:160px;">소속</th><th style="width:90px;">근로구분</th><th style="width:110px;">성명</th><th style="width:90px;">직급</th><th style="width:120px;">입사일</th><th style="width:120px;">수습종료일</th><th>비고</th></tr></thead><tbody>${probationRows}</tbody></table>
-        <div class="report-section-title">6. 인사예정자</div>
+        <div class="report-section-title">6. 입사예정자</div>
         <table class="report-table"><thead><tr><th style="width:160px;">소속</th><th style="width:90px;">근로구분</th><th style="width:110px;">성명</th><th style="width:90px;">직급</th><th style="width:120px;">입사일</th><th style="width:120px;">오퍼레터 회신</th><th>비고</th></tr></thead><tbody>${joinRows}</tbody></table>
         <div class="report-section-title">7. ${targetDate.substring(5,7)}월 생일자</div>
         <table class="report-table"><thead><tr><th style="width:90px;">구분</th><th style="width:160px;">소속</th><th style="width:90px;">근로구분</th><th style="width:110px;">성명</th><th>일자</th></tr></thead><tbody>${birthRows}</tbody></table>
@@ -2102,31 +2101,16 @@ window.deleteAllEmployees = async () => {
 };
 
 window.downloadEmpTemplate = () => { 
-    const basicCols = 16;
-    const eduCols = 12;
-    const careerCols = 35;
-    const langCols = 20;
-    const licenseCols = 20;
-    const familyCols = 30;
-    const militaryCols = 7;
-
-    const r1 = ["기본사항"]; for(let i=0;i<basicCols-1;i++) r1.push("");
-    r1.push("학력사항"); for(let i=0;i<eduCols-1;i++) r1.push("");
-    r1.push("경력사항"); for(let i=0;i<careerCols-1;i++) r1.push("");
-    r1.push("어학사항"); for(let i=0;i<langCols-1;i++) r1.push("");
-    r1.push("자격사항"); for(let i=0;i<licenseCols-1;i++) r1.push("");
-    r1.push("가족사항"); for(let i=0;i<familyCols-1;i++) r1.push("");
-    r1.push("병역사항"); for(let i=0;i<militaryCols-1;i++) r1.push("");
-
-    const r2 = ["사번(수정시기입)","성명","주민번호","연락처","이메일","주소(상세포함)","은행명","계좌번호","고용형태","입사일","퇴사일","근무지","수습종료일","부서명","직위","직책"];
+    const r1 = ["기본사항"]; for(let i=0;i<14;i++) r1.push(""); r1.push("학력사항"); for(let i=0;i<11;i++) r1.push(""); r1.push("경력사항"); for(let i=0;i<34;i++) r1.push(""); r1.push("어학사항"); for(let i=0;i<19;i++) r1.push(""); r1.push("자격사항"); for(let i=0;i<19;i++) r1.push(""); r1.push("가족사항"); for(let i=0;i<29;i++) r1.push(""); r1.push("병역사항"); for(let i=0;i<6;i++) r1.push("");
+    const r2 = ["사번(수정시기입)","성명","주민번호","연락처","이메일","주소(상세포함)","은행명","계좌번호","고용형태","입사일","퇴사일","수습종료일","부서명","직위","직책"];
     for(let i=1; i<=2; i++) r2.push(`학력구분${i}`,`시작월${i}`,`종료월${i}`,`학교${i}`,`전공${i}`,`상태${i}`);
     for(let i=1; i<=5; i++) r2.push(`시작월${i}`,`종료월${i}`,`회사명${i}`,`부서${i}`,`직급/직책${i}`,`담당업무${i}`,`퇴사사유${i}`);
     for(let i=1; i<=5; i++) r2.push(`시험명${i}`,`점수${i}`,`취득일${i}`,`기관${i}`);
     for(let i=1; i<=5; i++) r2.push(`자격명${i}`,`발행처${i}`,`취득일${i}`,`사유${i}`);
     for(let i=1; i<=5; i++) r2.push(`관계${i}`,`성명${i}`,`생년월일${i}`,`동거${i}`,`직업${i}`,`비고${i}`);
     r2.push("병역구분","군별","전역사유","사유(미필/면제)","계급","복무시작일","복무종료일");
-
-    const r3 = ["비워두면 자동생성","텍스트","텍스트","텍스트","텍스트","기본주소, 상세주소 형태 권장","가이드 시트 참조","텍스트(숫자만 입력 가능)","가이드 참조","YYYYMMDD","YYYYMMDD","가이드 참조","YYYYMMDD","가이드 참조","가이드 참조","가이드 참조"];
+    
+    const r3 = ["비워두면 자동생성","텍스트","텍스트","텍스트","텍스트","기본주소, 상세주소 형태 권장","가이드 시트 참조","텍스트(숫자만 입력 가능)","가이드 참조","YYYYMMDD","YYYYMMDD","YYYYMMDD","가이드 참조","가이드 참조","가이드 참조"];
     for(let i=1; i<=2; i++) r3.push("가이드 참조","YYYYMM","YYYYMM","텍스트","텍스트","가이드 참조");
     for(let i=1; i<=5; i++) r3.push("YYYYMMDD","YYYYMMDD","텍스트","텍스트","텍스트","텍스트","텍스트");
     for(let i=1; i<=5; i++) r3.push("텍스트","텍스트","YYYYMM","텍스트");
@@ -2135,17 +2119,8 @@ window.downloadEmpTemplate = () => {
     r3.push("가이드 참조","가이드 참조","텍스트","텍스트","텍스트","YYYYMMDD","YYYYMMDD");
 
     const ws = XLSX.utils.aoa_to_sheet([r1, r2, r3]); 
-    ws['!merges'] = [
-        {s:{r:0,c:0},e:{r:0,c:basicCols-1}},
-        {s:{r:0,c:basicCols},e:{r:0,c:basicCols+eduCols-1}},
-        {s:{r:0,c:basicCols+eduCols},e:{r:0,c:basicCols+eduCols+careerCols-1}},
-        {s:{r:0,c:basicCols+eduCols+careerCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols-1}},
-        {s:{r:0,c:basicCols+eduCols+careerCols+langCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols-1}},
-        {s:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols+familyCols-1}},
-        {s:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols+familyCols},e:{r:0,c:basicCols+eduCols+careerCols+langCols+licenseCols+familyCols+militaryCols-1}}
-    ];
-    const totalCols = basicCols + eduCols + careerCols + langCols + licenseCols + familyCols + militaryCols;
-    ws['!cols'] = Array.from({length: totalCols}, () => ({wch: 16}));
+    ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:14}}, {s:{r:0,c:15},e:{r:0,c:26}}, {s:{r:0,c:27},e:{r:0,c:61}}, {s:{r:0,c:62},e:{r:0,c:81}}, {s:{r:0,c:82},e:{r:0,c:101}}, {s:{r:0,c:102},e:{r:0,c:131}}, {s:{r:0,c:132},e:{r:0,c:138}}];
+    ws['!cols'] = Array.from({length:139}, () => ({wch: 16}));
     const range = XLSX.utils.decode_range(ws['!ref']);
     for(let rowIdx=0; rowIdx<=300; rowIdx++){
         for(let colIdx=0; colIdx<=range.e.c; colIdx++){
@@ -2155,11 +2130,11 @@ window.downloadEmpTemplate = () => {
             if(ws[ref].t === 'n') { ws[ref].t = 's'; ws[ref].v = String(ws[ref].v ?? ''); }
         }
     }
-    ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:300,c:totalCols-1}});
-
+    ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:300,c:138}});
+    
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "사원일괄업로드"); 
-
-    const guideAOA = [ ["항목", "입력 가능 값 (정확히 일치해야 함)"], ["고용형태", "임원, 정규직, 계약직, 단시간근로, 일용직, 위탁직, 프리랜서"], ["근무지", sysWorkplaces.map(w=>w.name).join(", ") || "시스템 설정 > 근무지 관리에 등록된 값"], ["부서명", sysDepts.map(d=>d.name).join(", ")], ["직위", sysRanks.map(r=>r.name).join(", ")], ["직책", sysDuties.map(d=>d.name).join(", ")], ["은행명", "KB국민은행, 신한은행, 우리은행, 하나은행, NH농협은행, IBK기업은행, 카카오뱅크, 토스뱅크, 케이뱅크, SC제일은행, 한국씨티은행, 새마을금고, 신협, 우체국, 수협, 대구은행, 부산은행, 광주은행, 제주은행, 전북은행, 경남은행, NH투자증권, 미래에셋증권, 삼성증권, 한국투자증권, 키움증권, 대신증권, KB증권, 신한투자증권, 하나증권"], ["학력구분", "고등학교, 전문대학, 대학교, 대학원(석사), 대학원(박사)"], ["학력상태", "졸업, 재학, 휴학, 자퇴, 수료"], ["가족관계", "부, 모, 배우자, 자녀, 형제/자매, 기타(직접입력)"], ["병역구분", "해당없음, 필, 미필, 면제"], ["군별", "육군, 해군, 공군, 해병대, 사회복무요원, 산업기능요원, 전문연구요원, 의무경찰, 해양경찰, 의무소방"], ["주소 입력 방식", "주소, 상세주소 형태로 입력 시 쉼표(,) 뒤 문자열을 상세주소로 자동 분리"], ["부분 업데이트", "기존 사번을 입력하고 일부 항목만 작성하면 입력한 항목만 수정되고 빈칸 항목은 기존값 유지"], ["퇴사일", "YYYYMMDD 형식 입력 시 퇴사일로 반영"], ["근무지", "입력값이 있으면 사원 기본정보의 근무지 항목으로 반영" ] ];
+    
+    const guideAOA = [ ["항목", "입력 가능 값 (정확히 일치해야 함)"], ["고용형태", "임원, 정규직, 계약직, 단시간근로, 일용직, 위탁직, 프리랜서"], ["부서명", sysDepts.map(d=>d.name).join(", ")], ["직위", sysRanks.map(r=>r.name).join(", ")], ["직책", sysDuties.map(d=>d.name).join(", ")], ["은행명", "KB국민은행, 신한은행, 우리은행, 하나은행, NH농협은행, IBK기업은행, 카카오뱅크, 토스뱅크, 케이뱅크, SC제일은행, 한국씨티은행, 새마을금고, 신협, 우체국, 수협, 대구은행, 부산은행, 광주은행, 제주은행, 전북은행, 경남은행, NH투자증권, 미래에셋증권, 삼성증권, 한국투자증권, 키움증권, 대신증권, KB증권, 신한투자증권, 하나증권"], ["학력구분", "고등학교, 전문대학, 대학교, 대학원(석사), 대학원(박사)"], ["학력상태", "졸업, 재학, 휴학, 자퇴, 수료"], ["가족관계", "부, 모, 배우자, 자녀, 형제/자매, 기타(직접입력)"], ["병역구분", "해당없음, 필, 미필, 면제"], ["군별", "육군, 해군, 공군, 해병대, 사회복무요원, 산업기능요원, 전문연구요원, 의무경찰, 해양경찰, 의무소방"], ["주소 입력 방식", "주소, 상세주소 형태로 입력 시 쉼표(,) 뒤 문자열을 상세주소로 자동 분리"], ["부분 업데이트", "기존 사번을 입력하고 일부 항목만 작성하면 입력한 항목만 수정되고 빈칸 항목은 기존값 유지"], ["퇴사일", "YYYYMMDD 형식 입력 시 퇴사일로 반영"] ];
     const wsGuide = XLSX.utils.aoa_to_sheet(guideAOA); wsGuide['!cols'] = [{wch: 18}, {wch: 120}];
     XLSX.utils.book_append_sheet(wb, wsGuide, "코드 입력 안내");
     XLSX.writeFile(wb, "사원_일괄업로드_양식.xlsx", { cellStyles:true });
@@ -2234,14 +2209,14 @@ window.handleEmpBulkUpload = (e) => {
             if(re.length) { errs.push(`[${i+1}행] ${name||id||'이름없음'}: ${re.join(', ')}`); continue; }
 
             let eds=[], cars=[], langs=[], lics=[], fams=[];
-            for(let j=0; j<2; j++) { const bs=16+j*6; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5])) eds.push({type:normalizeText(rd[bs]), period:(fmtM(rd[bs+1])+(hasValue(rd[bs+2])?' ~ '+fmtM(rd[bs+2]):'')).trim(), school:normalizeText(rd[bs+3]), major:normalizeText(rd[bs+4]), status:normalizeText(rd[bs+5])}); }
-            for(let j=0; j<5; j++) { const bs=28+j*7; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5]) || hasValue(rd[bs+6])) cars.push({period:(fmtD(rd[bs])+(hasValue(rd[bs+1])?' ~ '+fmtD(rd[bs+1]):'')).trim(), company:normalizeText(rd[bs+2]), dept:normalizeText(rd[bs+3]), rank:normalizeText(rd[bs+4]), duty:normalizeText(rd[bs+5]), reason:normalizeText(rd[bs+6]), months:'0'}); }
-            for(let j=0; j<5; j++) { const bs=63+j*4; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3])) langs.push({name:normalizeText(rd[bs]), score:normalizeText(rd[bs+1]), date:fmtM(rd[bs+2]), issuer:normalizeText(rd[bs+3])}); }
-            for(let j=0; j<5; j++) { const bs=83+j*4; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3])) lics.push({name:normalizeText(rd[bs]), issuer:normalizeText(rd[bs+1]), date:fmtM(rd[bs+2]), reason:normalizeText(rd[bs+3])}); }
-            for(let j=0; j<5; j++) { const bs=103+j*6; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5])) fams.push({relation:normalizeText(rd[bs]), name:normalizeText(rd[bs+1]), birth:fmtD(rd[bs+2]), living:normalizeText(rd[bs+3]), job:normalizeText(rd[bs+4]), memo:normalizeText(rd[bs+5])}); }
+            for(let j=0; j<2; j++) { const bs=14+j*6; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5])) eds.push({type:normalizeText(rd[bs]), period:(fmtM(rd[bs+1])+(hasValue(rd[bs+2])?' ~ '+fmtM(rd[bs+2]):'')).trim(), school:normalizeText(rd[bs+3]), major:normalizeText(rd[bs+4]), status:normalizeText(rd[bs+5])}); }
+            for(let j=0; j<5; j++) { const bs=26+j*7; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5]) || hasValue(rd[bs+6])) cars.push({period:(fmtD(rd[bs])+(hasValue(rd[bs+1])?' ~ '+fmtD(rd[bs+1]):'')).trim(), company:normalizeText(rd[bs+2]), dept:normalizeText(rd[bs+3]), rank:normalizeText(rd[bs+4]), duty:normalizeText(rd[bs+5]), reason:normalizeText(rd[bs+6]), months:'0'}); }
+            for(let j=0; j<5; j++) { const bs=61+j*4; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3])) langs.push({name:normalizeText(rd[bs]), score:normalizeText(rd[bs+1]), date:fmtM(rd[bs+2]), issuer:normalizeText(rd[bs+3])}); }
+            for(let j=0; j<5; j++) { const bs=81+j*4; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3])) lics.push({name:normalizeText(rd[bs]), issuer:normalizeText(rd[bs+1]), date:fmtM(rd[bs+2]), reason:normalizeText(rd[bs+3])}); }
+            for(let j=0; j<5; j++) { const bs=101+j*6; if(hasValue(rd[bs]) || hasValue(rd[bs+1]) || hasValue(rd[bs+2]) || hasValue(rd[bs+3]) || hasValue(rd[bs+4]) || hasValue(rd[bs+5])) fams.push({relation:normalizeText(rd[bs]), name:normalizeText(rd[bs+1]), birth:fmtD(rd[bs+2]), living:normalizeText(rd[bs+3]), job:normalizeText(rd[bs+4]), memo:normalizeText(rd[bs+5])}); }
             const addrFields = splitAddress(rd[5]);
             const bank = normalizeBankName(rd[6]);
-            vd.push({ _id:id, isUpdate, name, ssn, phone:fmtPhone(rd[3]), email:normalizeText(rd[4]), addr:addrFields.addr, addrDetail:addrFields.addrDetail, bank, account:fmtAccount(rd[7], bank), contractType:normalizeText(rd[8])||'정규직', joinDate, quitDate:fmtD(rd[10])||'', workplace:normalizeText(rd[11])||'', probationEndDate:fmtD(rd[12])||'', dept:normalizeText(rd[13]), rank:normalizeText(rd[14])||'사원', duty:normalizeText(rd[15])||'직책없음', educations:cleanList(eds), careers:cleanList(cars), languages:cleanList(langs), licenses:cleanList(lics), families:cleanList(fams), milType:normalizeText(rd[133])||'해당없음', milGroup:normalizeText(rd[134])||'', milExit:normalizeText(rd[135])||'', milReason:normalizeText(rd[136])||'', milRank:normalizeText(rd[137])||'', milS:fmtD(rd[138])||'', milE:fmtD(rd[139])||'' });
+            vd.push({ _id:id, isUpdate, name, ssn, phone:fmtPhone(rd[3]), email:normalizeText(rd[4]), addr:addrFields.addr, addrDetail:addrFields.addrDetail, bank, account:fmtAccount(rd[7], bank), contractType:normalizeText(rd[8])||'정규직', joinDate, quitDate:fmtD(rd[10])||'', probationEndDate:fmtD(rd[11])||'', dept:normalizeText(rd[12]), rank:normalizeText(rd[13])||'사원', duty:normalizeText(rd[14])||'직책없음', educations:cleanList(eds), careers:cleanList(cars), languages:cleanList(langs), licenses:cleanList(lics), families:cleanList(fams), milType:normalizeText(rd[132])||'해당없음', milGroup:normalizeText(rd[133])||'', milExit:normalizeText(rd[134])||'', milReason:normalizeText(rd[135])||'', milRank:normalizeText(rd[136])||'', milS:fmtD(rd[137])||'', milE:fmtD(rd[138])||'' });
         }
         const ssnWarningTargets = vd.filter(v=>!v.isUpdate && hasValue(v.ssn) && emps.some(x=>x.ssn===v.ssn));
         const proceedUpload = async () => {
@@ -2251,7 +2226,7 @@ window.handleEmpBulkUpload = (e) => {
                     window.showLoading('업로드 준비 중...', 5, '사원 일괄 업로드를 준비하고 있습니다.');
                     await window.createBackup('AUTO', '사원 일괄 업로드 전 자동 백업');
                     const existingByPrefix = {};
-                    const fieldMap = [['name','name'],['ssn','ssn'],['phone','phone'],['email','email'],['addr','addr'],['addrDetail','addrDetail'],['bank','bank'],['account','account'],['contractType','contractType'],['joinDate','joinDate'],['quitDate','quitDate'],['workplace','workplace'],['probationEndDate','probationEndDate'],['dept','dept'],['rank','rank'],['duty','duty'],['milType','milType'],['milGroup','milGroup'],['milExit','milExit'],['milReason','milReason'],['milRank','milRank'],['milS','milS'],['milE','milE']];
+                    const fieldMap = [['name','name'],['ssn','ssn'],['phone','phone'],['email','email'],['addr','addr'],['addrDetail','addrDetail'],['bank','bank'],['account','account'],['contractType','contractType'],['joinDate','joinDate'],['quitDate','quitDate'],['probationEndDate','probationEndDate'],['dept','dept'],['rank','rank'],['duty','duty'],['milType','milType'],['milGroup','milGroup'],['milExit','milExit'],['milReason','milReason'],['milRank','milRank'],['milS','milS'],['milE','milE']];
                     const writeItems = vd.map(v => {
                         let nid=v._id;
                         if(!nid){
@@ -2425,6 +2400,7 @@ const MENU_PERMISSION_DEFS = [
   {id:'sys-site', label:'사이트 관리'},
   {id:'org-dept', label:'부서명 관리'},
   {id:'org-rank', label:'직위/직책 관리'},
+  {id:'sys-workplace', label:'근무지 관리'},
   {id:'sys-ip', label:'접속 IP 설정'},
   {id:'sys-log', label:'Log 기록'},
   {id:'account', label:'계정 관리'},
