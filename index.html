@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.3.5.7 - 통합 관리</title>
+<title>히포케이메논 ERP V.3.6.2 - 통합 관리</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -55,7 +55,9 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 .report-write-layout{display:flex;gap:12px;min-height:0;flex:1}.report-write-left{width:320px;flex-shrink:0;background:white;border:1px solid var(--icube-border);display:flex;flex-direction:column}.report-write-right{flex:1;background:white;border:1px solid var(--icube-border);display:flex;flex-direction:column;min-width:0}.report-write-toolbar{padding:12px;border-bottom:1px solid var(--icube-border);display:flex;gap:8px;align-items:center;background:#fbfbfb}.report-write-toolbar input,.report-write-toolbar select{height:28px;border:1px solid var(--icube-border);padding:0 8px}.report-write-list{flex:1;overflow:auto}.report-write-empty{display:flex;align-items:center;justify-content:center;flex:1;color:#999}
 .report-write-form{padding:16px;overflow:auto}.report-write-grid{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center}.report-write-grid input,.report-write-grid select,.report-write-grid textarea{width:100%;border:1px solid var(--icube-border);padding:6px 8px;font-size:12px}.report-write-grid textarea{min-height:70px;resize:vertical}
 .small-note{font-size:11px;color:#777}
-.stats-report-wrap{display:flex;flex-direction:column;gap:12px;height:100%}.stats-header{background:white;border:1px solid var(--icube-border);padding:16px 18px;border-radius:2px}.stats-title{font-size:28px;font-weight:300;text-align:center;letter-spacing:-0.5px;margin:4px 0 10px 0}.stats-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.stats-month-boxes{display:flex;gap:24px;flex-wrap:wrap}.stats-mini-table{border-collapse:collapse;background:#fff}.stats-mini-table th,.stats-mini-table td{border:1px solid #333;padding:4px 10px;font-size:12px;text-align:center}.stats-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,0.8fr);gap:18px}.stats-card{background:white;border:1px solid var(--icube-border);padding:16px;border-radius:2px}.stats-card h3{margin:0 0 12px 0;font-size:14px;color:var(--icube-blue)}.stats-graph-box{height:180px;border:1px solid #333;display:flex;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:13px;line-height:1.6}.stats-note{font-size:12px;line-height:1.7;white-space:pre-line}.stats-rate-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.stats-rate-box{background:#fff;border:1px solid var(--icube-border);padding:12px;text-align:center}.stats-rate-box .label{font-weight:bold;margin-bottom:8px}.stats-rate-box .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #ddd}.stats-rate-box .row:last-child{border-bottom:none}.stats-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.stats-square-box{height:180px;border:1px solid #333;display:flex;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:13px;line-height:1.6;padding:10px}
+.stats-report-wrap{display:flex;flex-direction:column;gap:12px;height:100%}.stats-header{background:white;border:1px solid var(--icube-border);padding:16px 18px;border-radius:2px}.stats-title{font-size:28px;font-weight:300;text-align:center;letter-spacing:-0.5px;margin:4px 0 10px 0}.stats-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.stats-month-boxes{display:flex;gap:18px;flex-wrap:wrap}.stats-mini-table{border-collapse:separate;border-spacing:0;background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:14px;overflow:hidden;box-shadow:0 10px 20px rgba(49,98,199,.08), inset 0 1px 0 rgba(255,255,255,.85);min-width:420px}.stats-mini-table th,.stats-mini-table td{border:none;border-right:1px solid #e3e9f3;border-bottom:1px solid #e3e9f3;padding:8px 12px;font-size:12px;text-align:center}.stats-mini-table th{background:linear-gradient(180deg,#edf4ff 0%,#dfeafd 100%);color:#1f3763;font-weight:bold}.stats-mini-table td{font-weight:bold;color:#2f4058}.stats-mini-table th:last-child,.stats-mini-table td:last-child{border-right:none}.stats-mini-table tr:last-child td{border-bottom:none}.stats-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,0.8fr);gap:18px}.stats-card{background:white;border:1px solid var(--icube-border);padding:16px;border-radius:2px}.stats-card h3{margin:0 0 12px 0;font-size:14px;color:var(--icube-blue)}.stats-graph-box{height:180px;border:1px solid #333;display:flex;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:13px;line-height:1.6}.stats-note{font-size:12px;line-height:1.7;white-space:pre-line}.stats-rate-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.stats-rate-box{background:#fff;border:1px solid var(--icube-border);padding:12px;text-align:center}.stats-rate-box .label{font-weight:bold;margin-bottom:8px}.stats-rate-box .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #ddd}.stats-rate-box .row:last-child{border-bottom:none}.stats-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.stats-square-box{height:180px;border:1px solid #333;display:flex;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:13px;line-height:1.6;padding:10px}.hc-chart-card{background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:14px;padding:16px;box-shadow:0 12px 24px rgba(49,98,199,.10), inset 0 1px 0 rgba(255,255,255,.85)}.hc-chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.hc-chart-title{font-size:14px;font-weight:bold;color:#1f3763}.hc-chart-sub{font-size:11px;color:#778399}.hc-chart-wrap{position:relative;height:240px}.hc-chart-card.compact .hc-chart-wrap{height:220px}.hc-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.hc-chart-empty{height:220px;display:flex;align-items:center;justify-content:center;color:#999;border:1px dashed #d6deea;border-radius:10px;background:rgba(255,255,255,.65)}
+.pay-page-wrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:0}.pay-period-bar{background:white;border:1px solid var(--icube-border);border-radius:6px;padding:12px 14px;display:flex;align-items:center;gap:10px}.pay-period-bar input{height:28px;border:1px solid var(--icube-border);padding:0 8px}.pay-left-count{padding:10px 12px;border-bottom:1px solid var(--icube-border);background:#f7faff;font-weight:bold;color:#1f3763;display:flex;justify-content:space-between;align-items:center}.pay-input-shell{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}.pay-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pay-summary-box{background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:12px;padding:12px;box-shadow:0 8px 18px rgba(49,98,199,.08)}.pay-summary-box .label{font-size:11px;color:#66758d;margin-bottom:6px}.pay-summary-box .value{font-size:16px;font-weight:bold;color:#1f3763}.pay-input-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 10px}.pay-field{display:flex;flex-direction:column;gap:4px}.pay-field label{font-size:11px;color:#516070}.pay-field input{height:28px;border:1px solid var(--icube-border);padding:0 8px;text-align:right}.pay-field input.pay-text{text-align:left}.pay-section-title{font-weight:bold;color:var(--icube-blue);border-left:3px solid var(--icube-blue);padding-left:8px;margin-top:4px}.pay-right-scroll{overflow:auto;min-height:0;flex:1;padding-right:4px}.pay-history-filter{display:flex;gap:8px;align-items:center;margin-left:auto}.pay-history-filter input{height:28px;border:1px solid var(--icube-border);padding:0 8px}
+
 
 @media print{
     @page{size:A4 portrait;margin:0.5mm} body,html{background:white;height:auto;overflow:visible !important}
@@ -96,7 +98,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
     </div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.5.8</span></div>
+        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.6.2</span></div>
         <div style="margin-left:auto;font-size:12px;color:#555;display:flex;align-items:center;gap:15px">
             <span><span id="displayLoggedInUser" style="font-weight:bold;color:var(--icube-blue)"></span> 님 로그인 중</span>
             <button id="notifyBellBtn" class="tool-btn" onclick="window.openNotificationCenter()" style="position:relative;width:34px;height:28px;padding:0;min-width:34px"><i class="fa-regular fa-bell"></i><span id="notifyUnreadDot" style="display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#2f80ff"></span></button>
@@ -133,6 +135,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                 <div class="menu-category">임금</div>
                 <ul class="menu-list">
                     <li class="menu-item" onclick="window.switchMenu('pay-status',this)"><i class="fa-solid fa-chart-line"></i> 연봉 산정/갱신 현황</li>
+                    <li class="menu-item" onclick="window.switchMenu('pay-current',this)"><i class="fa-solid fa-money-check-dollar"></i> 당월 급여지급</li>
                     <li class="menu-item" onclick="window.switchMenu('pay-history',this)"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</li>
                 </ul>
             </div>
@@ -305,6 +308,11 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                         <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-file-signature"></i> 인사 발령 일괄 업로드</h3>
                         <p style="color:#666; margin-bottom:15px;">다수의 사원에 대한 부서 이동, 직급 승진 등의 발령 내역을 일괄 등록할 수 있습니다.</p>
                         <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="tool-btn" onclick="window.downloadAppointTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 받기</button><button class="tool-btn primary" onclick="document.getElementById('appointBulkInput').click()"><i class="fa-solid fa-upload"></i> 파일 업로드</button><input type="file" id="appointBulkInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleAppointBulkUpload(event)"></div>
+                    </div>
+                    <div class="list-panel" style="padding:20px; flex:1;">
+                        <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-won-sign"></i> 임금정보 일괄 업로드</h3>
+                        <p style="color:#666; margin-bottom:15px;">다수 사원의 임금정보를 사번 기준으로 일괄 등록하고 연봉 이력에 반영합니다.</p>
+                        <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="tool-btn" onclick="window.downloadSalaryTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 받기</button><button class="tool-btn primary" onclick="document.getElementById('salaryBulkInput').click()"><i class="fa-solid fa-upload"></i> 파일 업로드</button><input type="file" id="salaryBulkInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleSalaryBulkUpload(event)"></div>
                     </div>
                 </div>
             </div>
@@ -483,9 +491,9 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                             <div class="stats-card">
                                 <div class="stats-month-boxes" id="headcountMonthBoxes"></div>
                             </div>
-                            <div class="stats-card"><div class="stats-graph-box">월별 인원변동 추이 그래프<br>제목 : 총 인원 변동</div></div>
-                            <div class="stats-card"><div class="stats-graph-box">월별 인원변동 추이 그래프<br>제목 : 정규직/계약직/일용직 인원 변동</div></div>
-                            <div class="stats-card"><div class="stats-graph-box">월별 인원변동 추이 그래프<br>제목 : 위탁직/프리랜서 인원 변동</div></div>
+                            <div class="hc-chart-card"><div class="hc-chart-head"><div class="hc-chart-title">총 인원 변동</div><div class="hc-chart-sub">월말 재적 기준</div></div><div class="hc-chart-wrap"><canvas id="hcMonthTotalChart"></canvas></div></div>
+                            <div class="hc-chart-card"><div class="hc-chart-head"><div class="hc-chart-title">정규직/계약직/일용직 인원 변동</div><div class="hc-chart-sub">근로자 그룹</div></div><div class="hc-chart-wrap"><canvas id="hcMonthWorkerChart"></canvas></div></div>
+                            <div class="hc-chart-card"><div class="hc-chart-head"><div class="hc-chart-title">위탁직/프리랜서 인원 변동</div><div class="hc-chart-sub">외부 인력 그룹</div></div><div class="hc-chart-wrap"><canvas id="hcMonthPartnerChart"></canvas></div></div>
                         </div>
                     </div>
                 </div>
@@ -505,19 +513,13 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                                 <div class="stats-month-boxes" id="headcountYearBoxes"></div>
                             </div>
                             <div class="stats-rate-grid" id="headcountYearRateGrid"></div>
-                            <div class="stats-chart-grid">
-                                <div class="stats-square-box">인원 연령대별 그래프 (원형 그래프 비율/명수)
-제목 : 총 인원 연령대</div>
-                                <div class="stats-square-box">인원 연령대별 그래프 (원형 그래프 비율/명수)
-제목 : 정규직/계약직/일용직 연령대</div>
-                                <div class="stats-square-box">인원 연령대별 그래프 (원형 그래프 비율/명수)
-제목 : 사업자/프리랜서 연령대</div>
-                                <div class="stats-square-box">인원 직위별 그래프 (원형 그래프 비율/명수)
-제목 : 총 인원 직위</div>
-                                <div class="stats-square-box">인원 직위별 그래프 (원형 그래프 비율/명수)
-제목 : 정규직/계약직/일용직 직위</div>
-                                <div class="stats-square-box">인원 직위별 그래프 (원형 그래프 비율/명수)
-제목 : 사업자/프리랜서 직위</div>
+                            <div class="hc-chart-grid">
+                                <div class="hc-chart-card compact"><div class="hc-chart-head"><div class="hc-chart-title">총 인원 연령대</div><div class="hc-chart-sub">비율/명수</div></div><div class="hc-chart-wrap"><canvas id="hcAgeTotalChart"></canvas></div></div>
+                                <div class="hc-chart-card compact"><div class="hc-chart-head"><div class="hc-chart-title">근로자 연령대</div><div class="hc-chart-sub">정규직/계약직/일용직</div></div><div class="hc-chart-wrap"><canvas id="hcAgeWorkerChart"></canvas></div></div>
+                                <div class="hc-chart-card compact"><div class="hc-chart-head"><div class="hc-chart-title">사업자/프리랜서 연령대</div><div class="hc-chart-sub">위탁직/프리랜서</div></div><div class="hc-chart-wrap"><canvas id="hcAgePartnerChart"></canvas></div></div>
+                                <div class="hc-chart-card compact"><div class="hc-chart-head"><div class="hc-chart-title">총 인원 직위</div><div class="hc-chart-sub">비율/명수</div></div><div class="hc-chart-wrap"><canvas id="hcRankTotalChart"></canvas></div></div>
+                                <div class="hc-chart-card compact"><div class="hc-chart-head"><div class="hc-chart-title">근로자 직위</div><div class="hc-chart-sub">정규직/계약직/일용직</div></div><div class="hc-chart-wrap"><canvas id="hcRankWorkerChart"></canvas></div></div>
+                                <div class="hc-chart-card compact"><div class="hc-chart-head"><div class="hc-chart-title">사업자/프리랜서 직위</div><div class="hc-chart-sub">위탁직/프리랜서</div></div><div class="hc-chart-wrap"><canvas id="hcRankPartnerChart"></canvas></div></div>
                             </div>
                         </div>
                     </div>
@@ -527,7 +529,71 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
             <div id="page-eval-probation" class="page-content"><div class="empty-page"><i class="fa-solid fa-clipboard-user" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>페이지 작업 완료 후 OPEN 예정</p></div></div>
             <div id="page-eval-kpi" class="page-content"><div class="empty-page"><i class="fa-solid fa-bullseye" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>페이지 작업 완료 후 OPEN 예정</p></div></div>
-            <div id="page-pay-history" class="page-content"><div class="empty-page"><i class="fa-solid fa-coins" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>급여지급내역 메뉴 준비 중</p></div></div>
+            
+            <div id="page-pay-current" class="page-content">
+                <div class="pay-page-wrap">
+                    <div class="pay-period-bar">
+                        <div style="font-weight:bold;color:var(--icube-blue);"><i class="fa-solid fa-money-check-dollar"></i> 당월 급여지급</div>
+                        <span style="margin-left:10px;font-weight:bold;">귀속년월</span>
+                        <input type="month" id="payCurrentYm" onchange="window.renderPayCurrentPage()">
+                        <button class="tool-btn" onclick="window.renderPayCurrentPage()"><i class="fa-solid fa-rotate"></i> 조회</button>
+                        <button class="tool-btn primary" onclick="window.downloadCurrentPayrollExcel()"><i class="fa-solid fa-file-excel"></i> 엑셀 다운로드</button>
+                        <span id="payCurrentPayDate" style="margin-left:auto;color:#666;font-size:11px;"></span>
+                    </div>
+                    <div class="dual-panel-container">
+                        <div class="panel-left">
+                            <div class="pay-left-count"><span>급여 지급대상</span><span id="payCurrentTargetCount">0명</span></div>
+                            <div class="search-box"><input type="text" id="payCurrentSearch" placeholder="사번/이름/부서 검색" style="width:100%" onkeyup="window.renderPayCurrentList()"></div>
+                            <div style="overflow-y:auto;flex:1"><table class="icube-grid"><thead><tr><th width="76">사번</th><th>이름</th><th width="90">부서</th></tr></thead><tbody id="payCurrentEmpList"></tbody></table></div>
+                        </div>
+                        <div class="panel-right" style="background:#e9ecef;">
+                            <div id="payCurrentEmptyArea" class="empty-page"><i class="fa-solid fa-money-check-dollar" style="font-size:40px;color:#ccc;margin-bottom:10px;"></i><p>좌측 목록에서 사원을 선택하면 급여 입력 화면이 표시됩니다.</p></div>
+                            <div id="payCurrentFormArea" style="display:none;height:100%;background:white;border:1px solid var(--icube-border);padding:18px;overflow:hidden;">
+                                <div class="pay-input-shell">
+                                    <div class="status-header">급여 입력 <span id="payCurrentEmpTitle" style="font-size:12px;color:#666;font-weight:normal;"></span></div>
+                                    <div class="pay-summary-grid">
+                                        <div class="pay-summary-box"><div class="label">지급액 계</div><div class="value" id="paySumGross">0원</div></div>
+                                        <div class="pay-summary-box"><div class="label">공제액 계</div><div class="value" id="paySumDeduct">0원</div></div>
+                                        <div class="pay-summary-box"><div class="label">실지급액 계</div><div class="value" id="paySumNet">0원</div></div>
+                                        <div class="pay-summary-box"><div class="label">지급 예정일</div><div class="value" id="paySumPayDate">-</div></div>
+                                    </div>
+                                    <div class="pay-right-scroll">
+                                        <div class="pay-section-title">기본 정보</div>
+                                        <div class="pay-input-grid" id="payCurrentInfoGrid"></div>
+                                        <div class="pay-section-title">지급 항목</div>
+                                        <div class="pay-input-grid" id="payCurrentPayGrid"></div>
+                                        <div class="pay-section-title">공제 항목</div>
+                                        <div class="pay-input-grid" id="payCurrentDeductGrid"></div>
+                                        <div class="small-note" style="margin-top:10px;">※ 급여구분, 사업장명, 근무상태, 원가구분, 재입사일, 영문 이름, 영문 성, 기본단가 및 실지급액 계 이후 항목은 내려받기 양식에는 포함하되 기본값은 공란으로 처리합니다.</div>
+                                    </div>
+                                    <div style="display:flex;justify-content:flex-end;gap:8px;">
+                                        <button class="tool-btn" onclick="window.reloadCurrentPayroll()"><i class="fa-solid fa-rotate-left"></i> 되돌리기</button>
+                                        <button class="tool-btn success" onclick="window.saveCurrentPayroll()"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="page-pay-history" class="page-content">
+                <div class="pay-page-wrap">
+                    <div class="toolbar">
+                        <div style="font-weight:bold;"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</div>
+                        <div class="pay-history-filter">
+                            <span>귀속년월</span><input type="month" id="payHistoryYm" onchange="window.renderPayHistoryPage()">
+                            <input type="text" id="payHistorySearch" placeholder="사번/이름/부서 검색" onkeyup="window.renderPayHistoryPage()">
+                            <button class="tool-btn" onclick="window.renderPayHistoryPage()"><i class="fa-solid fa-rotate"></i> 조회</button>
+                        </div>
+                    </div>
+                    <div class="list-panel" style="overflow:auto;">
+                        <table class="icube-grid" style="min-width:1100px;">
+                            <thead><tr><th width="90">귀속년월</th><th width="90">사번</th><th width="90">이름</th><th width="120">부서</th><th width="90">고용형태</th><th width="110">지급액 계</th><th width="110">공제액 계</th><th width="110">실지급액 계</th><th width="130">저장일시</th><th>비고</th></tr></thead>
+                            <tbody id="payHistoryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -713,12 +779,12 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 
 const fbCfg = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : JSON.parse('{"apiKey":"AIzaSyBohhdlBOkvjEPpdxc2NS_qEDOTvR0hl18","authDomain":"hypo-erp-5b661.firebaseapp.com","projectId":"hypo-erp-5b661","storageBucket":"hypo-erp-5b661.firebasestorage.app"}');
 const app = initializeApp(fbCfg); const db = getFirestore(app); const auth = getAuth(app); const appId = typeof __app_id !== 'undefined' ? __app_id : 'hypo-erp-v1';
-const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees'), accountRef = collection(db, 'artifacts', appId, 'public', 'data', 'accounts'), logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'syslogs'), settingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'settings'), backupRef = collection(db, 'artifacts', appId, 'public', 'data', 'backups'), reportRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_reports'), downloadApprovalRef = collection(db, 'artifacts', appId, 'public', 'data', 'employee_download_requests');
+const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees'), accountRef = collection(db, 'artifacts', appId, 'public', 'data', 'accounts'), logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'syslogs'), settingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'settings'), backupRef = collection(db, 'artifacts', appId, 'public', 'data', 'backups'), reportRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_reports'), downloadApprovalRef = collection(db, 'artifacts', appId, 'public', 'data', 'employee_download_requests'), salaryPaymentRef = collection(db, 'artifacts', appId, 'public', 'data', 'salary_payments');
 
-let emps=[], accounts=[], syslogs=[], allowedIps=[], siteLinks=[], sysDepts=[], sysRanks=[], sysDuties=[], sysWorkplaces=[], headquartersSetting=null, backups=[], dailyReports=[], downloadRequests=[];
+let emps=[], accounts=[], syslogs=[], allowedIps=[], siteLinks=[], sysDepts=[], sysRanks=[], sysDuties=[], sysWorkplaces=[], headquartersSetting=null, backups=[], dailyReports=[], downloadRequests=[], salaryPayments=[];
 let currentIp='조회 불가', currentLoggedInUserName="관리자(테스트)", currentLoginAcc=null;
 let currentEditPhotoData='';
-let isEditMode=false, isSalaryLocked=true, qsTargetEmp=null, selectedEmpForSalary=null, selectedEmpForAppoint=null;
+let isEditMode=false, isSalaryLocked=true, qsTargetEmp=null, selectedEmpForSalary=null, selectedEmpForAppoint=null, selectedPayCurrentEmp=null;
 let auditActionContext=null, confirmCallback=null, cancelCallback=null;
 let currentLinkedFlowId=null;
 
@@ -1488,42 +1554,298 @@ window.saveReportWriteEntry = async () => {
     if($('page-report-today')?.classList.contains('active')) window.renderTodayReport();
 };
 
-window.renderHeadcountMonthReport = () => {
-    const input = $('reportHeadcountMonthDate');
+let headcountCharts = {};
+const destroyHeadcountChart = (id) => { if(headcountCharts[id]) { headcountCharts[id].destroy(); delete headcountCharts[id]; } };
+const syncHeadcountMonthLimit = () => {
     const today = new Date();
-    if(input && !input.value) input.value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
-    const target = (input && input.value) ? input.value : `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
-    const [year, month] = target.split('-').map(v=>parseInt(v,10));
-    if($('headcountMonthTitle')) $('headcountMonthTitle').innerText = `${year}년 ${month}월 인원변동 현황`;
-    const joined = emps.filter(e => (e.joinDate||'').startsWith(target));
-    const quit = emps.filter(e => (e.quitDate||'').startsWith(target));
-    const types = ['정규직','계약직','일용직','위탁직','프리랜서'];
-    const countBy = (list, type='') => type ? list.filter(e=>e.contractType===type).length : list.length;
-    const makeTable = (label, list) => `<table class="stats-mini-table"><thead><tr><th>${label}</th>${types.map(t=>`<th>${t.replace('정규직','정규직').replace('계약직','계약직').replace('일용직','일용직').replace('위탁직','위탁직').replace('프리랜서','프리랜서')}</th>`).join('')}</tr></thead><tbody><tr><td>${countBy(list)} 명</td>${types.map(t=>`<td>${countBy(list,t)} 명</td>`).join('')}</tr></tbody></table>`;
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    const yEl = $('reportHeadcountMonthYear'), mEl = $('reportHeadcountMonthMonth');
+    if(!yEl || !mEl) return {currentYear, currentMonth};
+    yEl.max = currentYear;
+    if(!yEl.value) yEl.value = currentYear;
+    let year = parseInt(yEl.value || currentYear, 10);
+    if(year > currentYear){ year = currentYear; yEl.value = currentYear; }
+    [...mEl.options].forEach(opt => {
+        const monthNo = parseInt(opt.value, 10);
+        opt.disabled = year === currentYear && monthNo > currentMonth;
+    });
+    if(!mEl.value) mEl.value = String(year === currentYear ? currentMonth : 12).padStart(2,'0');
+    if(year === currentYear && parseInt(mEl.value, 10) > currentMonth) mEl.value = String(currentMonth).padStart(2,'0');
+    return {currentYear, currentMonth};
+};
+const getHeadcountMonthTarget = () => {
+    const today = new Date();
+    const yEl = $('reportHeadcountMonthYear'), mEl = $('reportHeadcountMonthMonth');
+    syncHeadcountMonthLimit();
+    const year = parseInt(yEl?.value || today.getFullYear(), 10);
+    const month = String(mEl?.value || String(today.getMonth()+1).padStart(2,'0')).padStart(2,'0');
+    return {year, month, target:`${year}-${month}`};
+};
+const isActiveAtDate = (emp, dateStr) => {
+    if(!emp.joinDate || emp.joinDate > dateStr) return false;
+    if(emp.quitDate && emp.quitDate.trim() && emp.quitDate <= dateStr) return false;
+    return true;
+};
+const getAgeGroup = (emp, year) => {
+    const birth = getBirthFromSsn(emp.ssn||'');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(birth)) return '미상';
+    const age = year - parseInt(birth.substring(0,4),10);
+    if(age < 30) return '20대 이하'; if(age < 40) return '30대'; if(age < 50) return '40대'; if(age < 60) return '50대'; return '60대 이상';
+};
+const hcPalette = {
+    total:'rgba(49,98,199,.82)', regular:'rgba(49,98,199,.72)', contract:'rgba(39,174,96,.70)', daily:'rgba(155,89,182,.70)',
+    partner:'rgba(52,73,94,.72)', freelancer:'rgba(22,160,133,.68)', join:'#27ae60', quit:'#d32f2f'
+};
+const hcDoughnutLabelPlugin = {
+    id:'hcDoughnutLabelPlugin',
+    afterDatasetsDraw(chart){
+        if(chart.config.type !== 'doughnut') return;
+        const {ctx, data} = chart;
+        const meta = chart.getDatasetMeta(0);
+        if(!meta || !meta.data) return;
+        ctx.save();
+        ctx.font = '11px Malgun Gothic, sans-serif';
+        ctx.fillStyle = '#2f4058';
+        ctx.strokeStyle = '#9aa8bb';
+        ctx.lineWidth = 1;
+        meta.data.forEach((arc, i) => {
+            const value = data.datasets?.[0]?.data?.[i] || 0;
+            if(!value) return;
+            const p = arc.getProps(['x','y','startAngle','endAngle','outerRadius'], true);
+            const angle = (p.startAngle + p.endAngle) / 2;
+            const sx = p.x + Math.cos(angle) * (p.outerRadius - 2);
+            const sy = p.y + Math.sin(angle) * (p.outerRadius - 2);
+            const mx = p.x + Math.cos(angle) * (p.outerRadius + 14);
+            const my = p.y + Math.sin(angle) * (p.outerRadius + 14);
+            const isRight = Math.cos(angle) >= 0;
+            const ex = mx + (isRight ? 22 : -22);
+            const ey = my;
+            ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(mx, my); ctx.lineTo(ex, ey); ctx.stroke();
+            ctx.textAlign = isRight ? 'left' : 'right';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${data.labels[i]} ${value}명`, ex + (isRight ? 4 : -4), ey);
+        });
+        ctx.restore();
+    }
+};
+const renderHcChart = (canvasId, config) => {
+    const canvas = $(canvasId); if(!canvas || typeof Chart === 'undefined') return;
+    destroyHeadcountChart(canvasId);
+    const defaultPlugins = {legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}, tooltip:{callbacks:{label:(ctx)=>`${ctx.dataset?.label||ctx.label}: ${ctx.parsed?.y ?? ctx.parsed ?? 0}명`}}};
+    headcountCharts[canvasId] = new Chart(canvas, {...config, options:{responsive:true, maintainAspectRatio:false, animation:{duration:950,easing:'easeOutQuart'}, plugins:defaultPlugins, scales: config.type==='doughnut'?undefined:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:'rgba(196,201,204,.45)'}},x:{grid:{display:false}}}, ...(config.options||{})}, plugins: config.plugins || []});
+};
+const getMonthlyJoinQuit = (year, monthNo, types=null) => {
+    const ym = `${year}-${String(monthNo).padStart(2,'0')}`;
+    const inType = (e) => !types || types.includes(e.contractType||'');
+    return {
+        joined: emps.filter(e => inType(e) && (e.joinDate||'').startsWith(ym)).length,
+        quit: emps.filter(e => inType(e) && (e.quitDate||'').startsWith(ym)).length
+    };
+};
+const renderHeadcountMonthCharts = (year, targetMonth) => {
+    const selectedMonth = Math.max(1, Math.min(12, parseInt(targetMonth||12,10)));
+    const labels = Array.from({length:12}, (_,i)=>`${i+1}월`);
+    const endDates = Array.from({length:12}, (_,i)=>`${year}-${String(i+1).padStart(2,'0')}-${new Date(year, i+1, 0).getDate()}`);
+    const visibleValue = (i, value) => (i + 1) <= selectedMonth ? value : null;
+    const count = (date, types=null) => emps.filter(e => (!types || types.includes(e.contractType||'')) && isActiveAtDate(e, date)).length;
+    const typeLabels = ['정규직','계약직','일용직','위탁직','프리랜서'];
+    const monthDetails = endDates.map((date, i) => {
+        const detail = { total: visibleValue(i, count(date)), byType:{} };
+        typeLabels.forEach(type => {
+            const value = visibleValue(i, count(date, [type]));
+            if(value) detail.byType[type] = value;
+        });
+        return detail;
+    });
+    const workerTypes = ['정규직','계약직','일용직'];
+    const workerJoin = labels.map((_,i)=>visibleValue(i, getMonthlyJoinQuit(year, i+1, workerTypes).joined));
+    const workerQuit = labels.map((_,i)=>visibleValue(i, getMonthlyJoinQuit(year, i+1, workerTypes).quit));
+    renderHcChart('hcMonthTotalChart', {type:'bar', data:{labels, datasets:[{label:'총 인원', data:endDates.map((d,i)=>visibleValue(i, count(d))), backgroundColor:hcPalette.total, borderColor:'rgba(49,98,199,1)', borderWidth:1, borderRadius:8, borderSkipped:false}]}, options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}, tooltip:{callbacks:{label:(ctx)=>{ const info = monthDetails[ctx.dataIndex] || {total:0, byType:{}}; const lines = [`총 인원 : ${info.total||0}명`]; Object.entries(info.byType).forEach(([type, value]) => lines.push(`- ${type} : ${value}명`)); return lines; }}}}}});
+    renderHcChart('hcMonthWorkerChart', {type:'bar', data:{labels, datasets:[
+        {label:'정규직', data:endDates.map((d,i)=>visibleValue(i, count(d,['정규직']))), backgroundColor:hcPalette.regular, borderColor:'rgba(49,98,199,1)', borderWidth:1, borderRadius:8, borderSkipped:false, yAxisID:'y'},
+        {label:'계약직', data:endDates.map((d,i)=>visibleValue(i, count(d,['계약직']))), backgroundColor:hcPalette.contract, borderColor:'rgba(39,174,96,1)', borderWidth:1, borderRadius:8, borderSkipped:false, yAxisID:'y'},
+        {label:'일용직', data:endDates.map((d,i)=>visibleValue(i, count(d,['일용직']))), backgroundColor:hcPalette.daily, borderColor:'rgba(155,89,182,1)', borderWidth:1, borderRadius:8, borderSkipped:false, yAxisID:'y'},
+        {type:'line', label:'입사', data:workerJoin, borderColor:hcPalette.join, backgroundColor:hcPalette.join, pointRadius:4, pointHoverRadius:5, borderWidth:2, tension:.35, fill:false, yAxisID:'y1'},
+        {type:'line', label:'퇴사', data:workerQuit, borderColor:hcPalette.quit, backgroundColor:hcPalette.quit, pointRadius:4, pointHoverRadius:5, borderWidth:2, tension:.35, fill:false, yAxisID:'y1'}
+    ]}, options:{scales:{y:{beginAtZero:true,position:'left',ticks:{precision:0},title:{display:true,text:'재적 인원'}},y1:{beginAtZero:true,position:'right',ticks:{precision:0},title:{display:true,text:'입·퇴사'},grid:{drawOnChartArea:false}},x:{grid:{display:false}}}}});
+    renderHcChart('hcMonthPartnerChart', {type:'bar', data:{labels, datasets:[{label:'위탁직', data:endDates.map((d,i)=>visibleValue(i, count(d,['위탁직']))), backgroundColor:hcPalette.partner, borderColor:'rgba(52,73,94,1)', borderWidth:1, borderRadius:8, borderSkipped:false},{label:'프리랜서', data:endDates.map((d,i)=>visibleValue(i, count(d,['프리랜서']))), backgroundColor:hcPalette.freelancer, borderColor:'rgba(22,160,133,1)', borderWidth:1, borderRadius:8, borderSkipped:false}]}});
+};
+window.renderHeadcountMonthReport = () => {
+    const {year, month, target} = getHeadcountMonthTarget();
+    if($('headcountMonthTitle')) $('headcountMonthTitle').innerText = `${year}년 ${parseInt(month,10)}월 인원변동 현황`;
+    const joined = emps.filter(e => (e.joinDate||'').startsWith(target)); const quit = emps.filter(e => (e.quitDate||'').startsWith(target));
+    const types = ['정규직','계약직','일용직','위탁직','프리랜서']; const countBy = (list, type='') => type ? list.filter(e=>e.contractType===type).length : list.length;
+    const makeTable = (label, list) => `<table class="stats-mini-table"><thead><tr><th>${label}</th>${types.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody><tr><td>${countBy(list)} 명</td>${types.map(t=>`<td>${countBy(list,t)} 명</td>`).join('')}</tr></tbody></table>`;
     if($('headcountMonthBoxes')) $('headcountMonthBoxes').innerHTML = makeTable('입사자', joined) + makeTable('퇴사자', quit);
+    setTimeout(()=>renderHeadcountMonthCharts(year, parseInt(month,10)), 30);
+};
+const buildDoughnutData = (list, mapper) => { const map={}; list.forEach(e=>{const k=mapper(e)||'미상'; map[k]=(map[k]||0)+1;}); const labels=Object.keys(map); const colors=['rgba(49,98,199,.78)','rgba(39,174,96,.72)','rgba(241,196,15,.76)','rgba(231,76,60,.68)','rgba(155,89,182,.70)','rgba(22,160,133,.68)','rgba(52,73,94,.62)']; return {labels, datasets:[{data:labels.map(k=>map[k]), backgroundColor:labels.map((_,i)=>colors[i%colors.length]), borderColor:'#fff', borderWidth:2, hoverOffset:8}]}; };
+const renderHeadcountYearCharts = (year) => {
+    const active = emps.filter(e=>isActiveAtDate(e,`${year}-12-31`)); const workers = active.filter(e=>['정규직','계약직','일용직'].includes(e.contractType||'')); const partners = active.filter(e=>['위탁직','프리랜서'].includes(e.contractType||''));
+    const opt={layout:{padding:{left:42,right:42,top:8,bottom:8}},plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}, tooltip:{callbacks:{label:(ctx)=>`${ctx.label}: ${ctx.parsed}명`}}},cutout:'58%'};
+    renderHcChart('hcAgeTotalChart',{type:'doughnut',data:buildDoughnutData(active,e=>getAgeGroup(e,year)),options:opt,plugins:[hcDoughnutLabelPlugin]}); renderHcChart('hcAgeWorkerChart',{type:'doughnut',data:buildDoughnutData(workers,e=>getAgeGroup(e,year)),options:opt,plugins:[hcDoughnutLabelPlugin]}); renderHcChart('hcAgePartnerChart',{type:'doughnut',data:buildDoughnutData(partners,e=>getAgeGroup(e,year)),options:opt,plugins:[hcDoughnutLabelPlugin]});
+    renderHcChart('hcRankTotalChart',{type:'doughnut',data:buildDoughnutData(active,e=>getDisplayRole(e)),options:opt,plugins:[hcDoughnutLabelPlugin]}); renderHcChart('hcRankWorkerChart',{type:'doughnut',data:buildDoughnutData(workers,e=>getDisplayRole(e)),options:opt,plugins:[hcDoughnutLabelPlugin]}); renderHcChart('hcRankPartnerChart',{type:'doughnut',data:buildDoughnutData(partners,e=>getDisplayRole(e)),options:opt,plugins:[hcDoughnutLabelPlugin]});
 };
 window.renderHeadcountYearReport = () => {
-    const input = $('reportHeadcountYearDate');
-    const year = parseInt((input && input.value) ? input.value : new Date().getFullYear(), 10);
-    if(input && !input.value) input.value = year;
-    const joined = emps.filter(e => (e.joinDate||'').startsWith(String(year)));
-    const quit = emps.filter(e => (e.quitDate||'').startsWith(String(year)));
-    const types = ['정규직','계약직','일용직','위탁직','프리랜서'];
-    const countBy = (list, type='') => type ? list.filter(e=>e.contractType===type).length : list.length;
+    const input = $('reportHeadcountYearDate'); const year = parseInt((input && input.value) ? input.value : new Date().getFullYear(), 10); if(input && !input.value) input.value = year;
+    const joined = emps.filter(e => (e.joinDate||'').startsWith(String(year))); const quit = emps.filter(e => (e.quitDate||'').startsWith(String(year))); const types = ['정규직','계약직','일용직','위탁직','프리랜서']; const countBy = (list, type='') => type ? list.filter(e=>e.contractType===type).length : list.length;
     const makeTable = (label, list) => `<table class="stats-mini-table"><thead><tr><th>${label}</th>${types.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody><tr><td>${countBy(list)} 명</td>${types.map(t=>`<td>${countBy(list,t)} 명</td>`).join('')}</tr></tbody></table>`;
     if($('headcountYearBoxes')) $('headcountYearBoxes').innerHTML = makeTable('입사자', joined) + makeTable('퇴사자', quit);
-    const rate = (joinCnt, quitCnt, baseCnt) => { if(!baseCnt) return {join:'0.00%', quit:'0.00%'}; return {join:`${((joinCnt/baseCnt)*100).toFixed(2)}%`, quit:`${((quitCnt/baseCnt)*100).toFixed(2)}%`}; };
-    const regularBase = emps.filter(e=>['정규직','계약직'].includes(e.contractType||'')).length;
-    const outsourcedBase = emps.filter(e=>e.contractType==='위탁직').length;
-    const totalBase = regularBase + outsourcedBase;
-    const totalRate = rate(joined.filter(e=>['정규직','계약직','위탁직'].includes(e.contractType||'')).length, quit.filter(e=>['정규직','계약직','위탁직'].includes(e.contractType||'')).length, totalBase);
-    const regularRate = rate(joined.filter(e=>['정규직','계약직'].includes(e.contractType||'')).length, quit.filter(e=>['정규직','계약직'].includes(e.contractType||'')).length, regularBase);
-    const outsourcedRate = rate(joined.filter(e=>e.contractType==='위탁직').length, quit.filter(e=>e.contractType==='위탁직').length, outsourcedBase);
-    if($('headcountYearRateGrid')) $('headcountYearRateGrid').innerHTML = `
-      <div class="stats-rate-box"><div class="label">정규직,위탁직 입/퇴사율</div><div class="row"><span>입사율</span><strong>${totalRate.join}</strong></div><div class="row"><span>퇴사율</span><strong>${totalRate.quit}</strong></div></div>
-      <div class="stats-rate-box"><div class="label">정규직 입/퇴사율</div><div class="row"><span>입사율</span><strong>${regularRate.join}</strong></div><div class="row"><span>퇴사율</span><strong>${regularRate.quit}</strong></div></div>
-      <div class="stats-rate-box"><div class="label">위탁직 입/퇴사율</div><div class="row"><span>입사율</span><strong>${outsourcedRate.join}</strong></div><div class="row"><span>퇴사율</span><strong>${outsourcedRate.quit}</strong></div></div>`;
+    const rate = (joinCnt, quitCnt, baseCnt) => !baseCnt ? {join:'0.00%', quit:'0.00%'} : {join:`${((joinCnt/baseCnt)*100).toFixed(2)}%`, quit:`${((quitCnt/baseCnt)*100).toFixed(2)}%`};
+    const regularBase = emps.filter(e=>['정규직','계약직'].includes(e.contractType||'')).length; const outsourcedBase = emps.filter(e=>e.contractType==='위탁직').length; const totalBase = regularBase + outsourcedBase;
+    const totalRate = rate(joined.filter(e=>['정규직','계약직','위탁직'].includes(e.contractType||'')).length, quit.filter(e=>['정규직','계약직','위탁직'].includes(e.contractType||'')).length, totalBase); const regularRate = rate(joined.filter(e=>['정규직','계약직'].includes(e.contractType||'')).length, quit.filter(e=>['정규직','계약직'].includes(e.contractType||'')).length, regularBase); const outsourcedRate = rate(joined.filter(e=>e.contractType==='위탁직').length, quit.filter(e=>e.contractType==='위탁직').length, outsourcedBase);
+    if($('headcountYearRateGrid')) $('headcountYearRateGrid').innerHTML = `<div class="stats-rate-box"><div class="label">정규직,위탁직 입/퇴사율</div><div class="row"><span>입사율</span><strong>${totalRate.join}</strong></div><div class="row"><span>퇴사율</span><strong>${totalRate.quit}</strong></div></div><div class="stats-rate-box"><div class="label">정규직 입/퇴사율</div><div class="row"><span>입사율</span><strong>${regularRate.join}</strong></div><div class="row"><span>퇴사율</span><strong>${regularRate.quit}</strong></div></div><div class="stats-rate-box"><div class="label">위탁직 입/퇴사율</div><div class="row"><span>입사율</span><strong>${outsourcedRate.join}</strong></div><div class="row"><span>퇴사율</span><strong>${outsourcedRate.quit}</strong></div></div>`;
+    setTimeout(()=>renderHeadcountYearCharts(year), 30);
 };
+
+
+const payrollHeaders = ['그룹','지급년월','급여구분','사번','이름','사업장명','부서명','근무상태','직군','직위','직책','입사일','퇴사일','계약구분','원가구분','소정시간','재입사일','영문 이름','영문 성','기본단가','기본급','식대','기본상여','성과상여','장기성과','차량유지','자가운전','근속수당','직책수당','연차수당','기타수당','고정연장','초과근로','소급급여','인센티브','상여','교통비','지급액 계','소득세','지방소득세','국민연금','건강보험','고용보험','정산소득세','정산지소세','건강정산','고용정산','연말소득세','연말지소세','건강연말','건강이자','고용연말','기타공제','공제액 계','실지급액 계','생산비과세','국외근로','식대비과세','미신고비과세','연구보조비','출산보육수당','취재수당','학자금비과세','주식매수선택권','이주수당','수련보조수당','직무발명보상금','재해급여','벤처기업주식매수선택권','출산지원금','임원등할인금액','초과근로수당 산정 기준월급'];
+const payItemFields = [
+    ['base','기본급'],['meal','식대'],['basicBonus','기본상여'],['performanceBonus','성과상여'],['longTermBonus','장기성과'],['car','차량유지'],['drive','자가운전'],['service','근속수당'],['dutyAllowance','직책수당'],['annualLeave','연차수당'],['etcPay','기타수당'],['fixedOver','고정연장'],['overtime','초과근로'],['retroPay','소급급여'],['incentive','인센티브'],['bonus','상여'],['transport','교통비']
+];
+const deductItemFields = [
+    ['incomeTax','소득세'],['localTax','지방소득세'],['pension','국민연금'],['health','건강보험'],['employmentIns','고용보험'],['settleIncomeTax','정산소득세'],['settleLocalTax','정산지소세'],['settleHealth','건강정산'],['settleEmployment','고용정산'],['yearEndIncomeTax','연말소득세'],['yearEndLocalTax','연말지소세'],['yearEndHealth','건강연말'],['healthInterest','건강이자'],['yearEndEmployment','고용연말'],['etcDeduct','기타공제']
+];
+const getMonthLastDate = (ym) => { const [y,m]=String(ym||'').split('-').map(Number); if(!y||!m) return ''; return `${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`; };
+const getMonthFirstDate = (ym) => `${ym}-01`;
+const getDefaultPayYm = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
+const getPayDateForYm = (ym) => {
+    const [y,m]=String(ym||getDefaultPayYm()).split('-').map(Number);
+    let d = new Date(y, m, 10);
+    while([0,6].includes(d.getDay())) d.setDate(d.getDate()-1);
+    return d.toISOString().slice(0,10);
+};
+const getPayrollDocId = (ym, empId) => `${String(ym||'').replace('-','')}_${empId}`;
+const getPayrollRecord = (ym, empId) => salaryPayments.find(p => p.id===getPayrollDocId(ym, empId) || (p.payYm===ym && p.empID===empId));
+const isPayTargetEmp = (emp, ym) => {
+    if(!['정규직','계약직','일용직'].includes(emp.contractType||'')) return false;
+    const first = getMonthFirstDate(ym), last = getMonthLastDate(ym);
+    if(!emp.joinDate || emp.joinDate > last) return false;
+    if(emp.quitDate && emp.quitDate.trim() && emp.quitDate < first) return false;
+    return true;
+};
+const getPayTargets = (ym) => emps.filter(e=>isPayTargetEmp(e,ym)).sort((a,b)=>(a.dept||'').localeCompare(b.dept||'') || (a.empID||'').localeCompare(b.empID||''));
+const numField = (id) => `<input id="${id}" class="pay-num" oninput="window.updateCurrentPayrollCalc()" value="0">`;
+const textField = (id, val='', readonly=true) => `<input id="${id}" class="pay-text ${readonly?'read-only':''}" ${readonly?'readonly':''} value="${String(val||'').replace(/"/g,'&quot;')}">`;
+const buildPayField = (id, label, inputHtml) => `<div class="pay-field"><label>${label}</label>${inputHtml}</div>`;
+window.renderPayCurrentPage = () => {
+    const ymEl = $('payCurrentYm');
+    if(ymEl && !ymEl.value) ymEl.value = getDefaultPayYm();
+    if(!selectedPayCurrentEmp){
+        if($('payCurrentFormArea')) $('payCurrentFormArea').style.display='none';
+        if($('payCurrentEmptyArea')) $('payCurrentEmptyArea').style.display='flex';
+    }
+    if($('payCurrentPayDate')) $('payCurrentPayDate').innerText = `지급 예정일 : ${getPayDateForYm($v('payCurrentYm'))} / 귀속기간 : ${getMonthFirstDate($v('payCurrentYm'))} ~ ${getMonthLastDate($v('payCurrentYm'))}`;
+    window.renderPayCurrentList();
+};
+window.renderPayCurrentList = () => {
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const q = ($v('payCurrentSearch')||'').trim();
+    const list = getPayTargets(ym).filter(e => !q || [e.empID,e.name,e.dept].some(v=>String(v||'').includes(q)));
+    if($('payCurrentTargetCount')) $('payCurrentTargetCount').innerText = `${getPayTargets(ym).length}명`;
+    const body = $('payCurrentEmpList'); if(!body) return;
+    body.innerHTML = list.length ? list.map(e => {
+        const saved = getPayrollRecord(ym, e.empID);
+        return `<tr onclick="window.selectPayCurrentEmp('${e.empID}', this)"><td>${e.empID||''}</td><td style="font-weight:bold">${e.name||''}${saved?'<span style="color:#27ae60;font-size:10px;margin-left:4px;">저장</span>':''}</td><td>${e.dept||''}</td></tr>`;
+    }).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">대상자가 없습니다.</td></tr>';
+};
+window.selectPayCurrentEmp = (empId, tr) => {
+    document.querySelectorAll('#payCurrentEmpList tr').forEach(r=>r.classList.remove('selected'));
+    if(tr) tr.classList.add('selected');
+    window.loadPayCurrentEmployee(empId);
+};
+window.loadPayCurrentEmployee = (empId) => {
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const emp = emps.find(e=>e.empID===empId); if(!emp) return;
+    selectedPayCurrentEmp = emp;
+    const saved = getPayrollRecord(ym, empId);
+    if($('payCurrentEmptyArea')) $('payCurrentEmptyArea').style.display='none';
+    if($('payCurrentFormArea')) $('payCurrentFormArea').style.display='block';
+    if($('payCurrentEmpTitle')) $('payCurrentEmpTitle').innerText = `${emp.empID||''} / ${emp.name||''} / ${emp.dept||''}`;
+    const info = [
+        ['payInfoGroup','그룹', emp.contractType==='임원'?'임원':'직원'],
+        ['payInfoYm','지급년월', ym],
+        ['payInfoEmpID','사번', emp.empID||''],
+        ['payInfoName','이름', emp.name||''],
+        ['payInfoDept','부서명', emp.dept||''],
+        ['payInfoRank','직위', emp.rank||''],
+        ['payInfoDuty','직책', emp.duty||''],
+        ['payInfoJoin','입사일', emp.joinDate||''],
+        ['payInfoQuit','퇴사일', emp.quitDate||''],
+        ['payInfoContract','계약구분', emp.contractType||''],
+        ['payInfoHours','소정시간', emp.salWorkDay ? `${emp.salWorkDay}시간/일` : '']
+    ];
+    if($('payCurrentInfoGrid')) $('payCurrentInfoGrid').innerHTML = info.map(([id,label,val])=>buildPayField(id,label,textField(id,val,true))).join('');
+    const defaults = {
+        base: parseNum(emp.salBase), meal: parseNum(emp.salMeal), car: parseNum(emp.salCar), drive: parseNum(emp.salDrive), service: parseNum(emp.salService), dutyAllowance: parseNum(emp.salRank), fixedOver: parseNum(emp.salFixedOver)
+    };
+    const payValues = saved?.payments || defaults;
+    const deductValues = saved?.deductions || {};
+    if($('payCurrentPayGrid')) $('payCurrentPayGrid').innerHTML = payItemFields.map(([key,label])=>buildPayField('payItem_'+key,label,numField('payItem_'+key))).join('');
+    if($('payCurrentDeductGrid')) $('payCurrentDeductGrid').innerHTML = deductItemFields.map(([key,label])=>buildPayField('deductItem_'+key,label,numField('deductItem_'+key))).join('');
+    payItemFields.forEach(([key])=>$sv('payItem_'+key, (payValues[key]||0).toLocaleString ? Number(payValues[key]||0).toLocaleString() : payValues[key]||0));
+    deductItemFields.forEach(([key])=>$sv('deductItem_'+key, (deductValues[key]||0).toLocaleString ? Number(deductValues[key]||0).toLocaleString() : deductValues[key]||0));
+    window.updateCurrentPayrollCalc();
+};
+window.updateCurrentPayrollCalc = () => {
+    const gross = payItemFields.reduce((sum,[key])=>sum+parseNum($v('payItem_'+key)),0);
+    const deduct = deductItemFields.reduce((sum,[key])=>sum+parseNum($v('deductItem_'+key)),0);
+    if($('paySumGross')) $('paySumGross').innerText = gross.toLocaleString()+'원';
+    if($('paySumDeduct')) $('paySumDeduct').innerText = deduct.toLocaleString()+'원';
+    if($('paySumNet')) $('paySumNet').innerText = (gross-deduct).toLocaleString()+'원';
+    if($('paySumPayDate')) $('paySumPayDate').innerText = getPayDateForYm($v('payCurrentYm'));
+};
+window.reloadCurrentPayroll = () => { if(selectedPayCurrentEmp) window.loadPayCurrentEmployee(selectedPayCurrentEmp.empID); };
+window.saveCurrentPayroll = async () => {
+    if(!selectedPayCurrentEmp) return window.showMessageBox('좌측에서 급여 지급대상자를 선택해주세요.');
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const payments = {}; const deductions = {};
+    payItemFields.forEach(([key])=>payments[key]=parseNum($v('payItem_'+key)));
+    deductItemFields.forEach(([key])=>deductions[key]=parseNum($v('deductItem_'+key)));
+    const gross = Object.values(payments).reduce((a,b)=>a+b,0), deduct = Object.values(deductions).reduce((a,b)=>a+b,0);
+    const payload = {
+        id:getPayrollDocId(ym, selectedPayCurrentEmp.empID), payYm:ym, payDate:getPayDateForYm(ym), empID:selectedPayCurrentEmp.empID, name:selectedPayCurrentEmp.name||'', dept:selectedPayCurrentEmp.dept||'', rank:selectedPayCurrentEmp.rank||'', duty:selectedPayCurrentEmp.duty||'', contractType:selectedPayCurrentEmp.contractType||'', joinDate:selectedPayCurrentEmp.joinDate||'', quitDate:selectedPayCurrentEmp.quitDate||'', payments, deductions, grossPay:gross, deductionTotal:deduct, netPay:gross-deduct, savedAt:new Date().toISOString(), savedBy:currentLoggedInUserName
+    };
+    await setDoc(doc(salaryPaymentRef, payload.id), payload);
+    await window.logSystemAction('저장', '당월 급여지급', `${ym} / ${payload.empID} ${payload.name} / 실지급 ${payload.netPay.toLocaleString()}원`);
+    window.showMessageBox('급여자료 저장 완료');
+    window.renderPayCurrentList();
+};
+const buildPayrollExportRow = (record, seq=1) => {
+    const p = record.payments || {}, d = record.deductions || {};
+    const map = {
+        '그룹': record.contractType==='임원'?'임원':'직원', '지급년월': record.payYm||'', '급여구분':'', '사번':record.empID||'', '이름':record.name||'', '사업장명':'', '부서명':record.dept||'', '근무상태':'', '직군':'', '직위':record.rank||'', '직책':record.duty||'', '입사일':record.joinDate||'', '퇴사일':record.quitDate||'', '계약구분':record.contractType||'', '원가구분':'', '소정시간':'', '재입사일':'', '영문 이름':'', '영문 성':'', '기본단가':'',
+        '기본급':p.base||0, '식대':p.meal||0, '기본상여':p.basicBonus||0, '성과상여':p.performanceBonus||0, '장기성과':p.longTermBonus||0, '차량유지':p.car||0, '자가운전':p.drive||0, '근속수당':p.service||0, '직책수당':p.dutyAllowance||0, '연차수당':p.annualLeave||0, '기타수당':p.etcPay||0, '고정연장':p.fixedOver||0, '초과근로':p.overtime||0, '소급급여':p.retroPay||0, '인센티브':p.incentive||0, '상여':p.bonus||0, '교통비':p.transport||0, '지급액 계':record.grossPay||0,
+        '소득세':d.incomeTax||0, '지방소득세':d.localTax||0, '국민연금':d.pension||0, '건강보험':d.health||0, '고용보험':d.employmentIns||0, '정산소득세':d.settleIncomeTax||0, '정산지소세':d.settleLocalTax||0, '건강정산':d.settleHealth||0, '고용정산':d.settleEmployment||0, '연말소득세':d.yearEndIncomeTax||0, '연말지소세':d.yearEndLocalTax||0, '건강연말':d.yearEndHealth||0, '건강이자':d.healthInterest||0, '고용연말':d.yearEndEmployment||0, '기타공제':d.etcDeduct||0, '공제액 계':record.deductionTotal||0, '실지급액 계':record.netPay||0
+    };
+    return [seq, ...payrollHeaders.map(h => map[h] ?? '')];
+};
+window.downloadCurrentPayrollExcel = () => {
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const records = salaryPayments.filter(p=>p.payYm===ym).sort((a,b)=>(a.empID||'').localeCompare(b.empID||''));
+    if(!records.length) return window.showMessageBox('해당 귀속년월에 저장된 급여자료가 없습니다.');
+    const aoa = [
+        Array(payrollHeaders.length+1).fill(''),
+        ['', '', '', '', `◈ ${ym.replace('-','년 ')}월 급여 대장 ◈`],
+        ['', '', '', '', '회사명 : (주)히포케이메논'],
+        ['', ...payrollHeaders],
+        ...records.map((r,i)=>buildPayrollExportRow(r,i+1))
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [{wch:6}, ...payrollHeaders.map(h=>({wch: Math.max(10, Math.min(18, String(h).length+4))}))];
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, '급여대장');
+    XLSX.writeFile(wb, `급여대장_${ym.replace('-','')}.xlsx`);
+};
+window.renderPayHistoryPage = () => {
+    const ymEl = $('payHistoryYm'); if(ymEl && !ymEl.value) ymEl.value = getDefaultPayYm();
+    const ym = $v('payHistoryYm') || getDefaultPayYm();
+    const q = ($v('payHistorySearch')||'').trim();
+    const rows = salaryPayments.filter(p => (!ym || p.payYm===ym) && (!q || [p.empID,p.name,p.dept].some(v=>String(v||'').includes(q)))).sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
+    const body = $('payHistoryBody'); if(!body) return;
+    body.innerHTML = rows.length ? rows.map(p=>`<tr><td>${p.payYm||''}</td><td>${p.empID||''}</td><td style="font-weight:bold">${p.name||''}</td><td>${p.dept||''}</td><td>${p.contractType||''}</td><td>${(p.grossPay||0).toLocaleString()}원</td><td>${(p.deductionTotal||0).toLocaleString()}원</td><td style="font-weight:bold;color:var(--icube-blue)">${(p.netPay||0).toLocaleString()}원</td><td>${(p.savedAt||'').replace('T',' ').slice(0,16)}</td><td>${p.savedBy||''}</td></tr>`).join('') : '<tr><td colspan="10" style="padding:20px;color:#999">조회된 급여지급내역이 없습니다.</td></tr>';
+};
+
 
 // 2. NAV & SYNC
 window.safeRun = (fn, label='') => {
@@ -1545,7 +1867,7 @@ window.switchMenu = (id, el) => {
     if(id !== 'mgmt-appoint') {
         if(appointContent) appointContent.style.display='none';
         if(appointEmpty) appointEmpty.style.display='flex';
-        selectedEmpForAppoint=null;
+        selectedEmpForAppoint=null, selectedPayCurrentEmp=null;
         $sv('appointSearch','');
     }
     if(id !== 'pay-status') {
@@ -1582,6 +1904,8 @@ window.switchMenu = (id, el) => {
         'mgmt-search': ()=>window.renderSearchList(),
         'mgmt-appoint': ()=>window.renderAppointList(),
         'pay-status': ()=>window.renderSalaryStatusList(),
+        'pay-current': ()=>window.renderPayCurrentPage(),
+        'pay-history': ()=>window.renderPayHistoryPage(),
         'mgmt-download': ()=>window.renderEmployeeDownloadPage(),
         'report-today': ()=>window.renderTodayReport(),
         'report-today-write': ()=>window.renderReportWritePage(),
@@ -1821,7 +2145,7 @@ window.openModal = (edit=false) => {
     isEditMode=edit; isSalaryLocked=edit; $('empModal').style.display='flex'; $('modalTitle').innerText=edit?"사원 정보 수정":"사원 신규 등록";
     ['formName','formSSN','formContractType','formEmpID','formJoinDate'].forEach(id=>{const el=$(id); if(el){el.classList.toggle('disabled-field',edit); if(el.tagName==='INPUT')el.readOnly=edit;} });
     $('salaryInputMask').style.display=edit?'flex':'none'; $('salaryCalcMask').style.display=edit?'flex':'none'; if($('empDeleteBtn')) { $('empDeleteBtn').style.display=edit?'inline-flex':'none'; $('empDeleteBtn').disabled=!edit; }
-    if(!edit) { document.querySelectorAll('.modal-body input').forEach(i=>i.value=''); ['eduBody','careerBody','langBody','licenseBody','familyBody'].forEach(id=>{$(''+id).innerHTML='';window.addRow(id);}); currentEditPhotoData=''; window.renderProfilePhotoPreview(''); window.handleContractTypeChange(); window.updateSalaryCalc(); $sv('formMilType','해당없음'); window.toggleMil(); }
+    if(!edit) { document.querySelectorAll('.modal-body input').forEach(i=>i.value=''); ['eduBody','careerBody','langBody','licenseBody','familyBody'].forEach(id=>{$(''+id).innerHTML='';}); window.addRow('familyBody'); currentEditPhotoData=''; window.renderProfilePhotoPreview(''); window.handleContractTypeChange(); window.updateSalaryCalc(); $sv('formMilType','해당없음'); window.toggleMil(); }
     window.switchTab('basic');
 };
 window.closeModal = () => $('empModal').style.display='none';
@@ -1851,8 +2175,8 @@ window.viewDetail = (id) => {
     ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>{ const el=$(k); if(el) el.value=parseInt(e[k]||0).toLocaleString(); });
     sV('salWorkDay', e.salWorkDay||'8'); sV('salProbationRate', e.salProbationRate||'100'); window.updateSalaryCalc(); window.handleContractTypeChange();
     sV('formMilType',e.milType||'해당없음'); sV('formMilGroup',e.milGroup||''); window.toggleMil(); sV('formMilExit',e.milExit||''); sV('formMilRank',e.milRank||''); sV('formMilS',e.milS||''); sV('formMilE',e.milE||''); sV('formMilReason',e.milReason||'');
-    const rT = (tid, list) => { const b=$(tid); b.innerHTML=''; (list||[]).forEach(i=>window.addRow(tid,i)); if(!list||!list.length) window.addRow(tid); };
-    rT('eduBody',e.educations); rT('careerBody',e.careers); rT('familyBody',e.families); rT('langBody',e.languages); rT('licenseBody',e.licenses);
+    const rT = (tid, list, keepEmptyRow=false) => { const b=$(tid); b.innerHTML=''; (list||[]).forEach(i=>window.addRow(tid,i)); if(keepEmptyRow && (!list||!list.length)) window.addRow(tid); };
+    rT('eduBody',e.educations); rT('careerBody',e.careers); rT('familyBody',e.families,true); rT('langBody',e.languages); rT('licenseBody',e.licenses);
     let tm=0; document.querySelectorAll('.month-calc-output').forEach(el=>tm+=parseInt(el.value)||0); $('totalCareerMonths').innerText=tm+'개월';
 };
 
@@ -2140,6 +2464,7 @@ window.downloadEmpTemplate = () => {
     XLSX.writeFile(wb, "사원_일괄업로드_양식.xlsx", { cellStyles:true });
 };
 window.downloadAppointTemplate = () => { const ws=XLSX.utils.aoa_to_sheet([["사번(필수)","발령일(필수)","발령내용(필수)","발령 전","발령 후(필수)","임금변동"],["260101","YYYY-MM-DD","부서명변경/직위승진/직책부여","참고용","변경될값","변동/유지"]]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"발령양식"); XLSX.writeFile(wb,"인사발령_일괄업로드_양식.xlsx"); };
+window.downloadSalaryTemplate = () => { const ws=XLSX.utils.aoa_to_sheet([["사번(필수)","적용일(필수)","사유","수습적용률(%)","일근로시간","기본급","식대","자가운전보조","차량유지비","근속수당","직책수당","고정연장수당","비고"],["260101","YYYY-MM-DD","임금인상","100","8","3000000","200000","0","0","0","0","500000",""]]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"임금정보양식"); XLSX.writeFile(wb,"임금정보_일괄업로드_양식.xlsx"); };
 
 window.handleEmpBulkUpload = (e) => {
     const f=e.target?.files?.[0]; if(!f) return;
@@ -2274,6 +2599,18 @@ window.handleEmpBulkUpload = (e) => {
             proceedUpload();
         }
     }; r.readAsArrayBuffer(f);
+};
+
+window.handleSalaryBulkUpload = (e) => {
+    const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+    r.onload=async(ev)=>{
+        const wb=XLSX.read(ev.target.result,{type:'binary'}); const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+        let errs=[], vd=[]; const cleanNum=v=>String(v??'').replace(/[^0-9.-]/g,'');
+        rows.forEach((row,idx)=>{ const empID=String(row['사번(필수)']||'').trim(); if(!empID) return; const tEmp=emps.find(ex=>ex.empID===empID); const applyDate=String(row['적용일(필수)']||'').trim(); let re=[]; if(!tEmp) re.push('사번 없음'); if(!/^\d{4}-\d{2}-\d{2}$/.test(applyDate)) re.push('적용일 오류'); if(re.length) errs.push(`[${idx+2}행] 사번 ${empID}: ${re.join(', ')}`); else { const payload={salProbationRate:cleanNum(row['수습적용률(%)']||tEmp.salProbationRate||'100')||'100', salWorkDay:cleanNum(row['일근로시간']||tEmp.salWorkDay||'8')||'8', salBase:cleanNum(row['기본급']), salMeal:cleanNum(row['식대']), salDrive:cleanNum(row['자가운전보조']), salCar:cleanNum(row['차량유지비']), salService:cleanNum(row['근속수당']), salRank:cleanNum(row['직책수당']), salFixedOver:cleanNum(row['고정연장수당'])}; ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>{ if(payload[k]==='') payload[k]=String(parseNum(tEmp[k]||0)); }); const monthly=['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].reduce((sum,k)=>sum+parseNum(payload[k]),0); vd.push({empID,tEmp,applyDate,reason:String(row['사유']||'임금정보 일괄업로드').trim()||'임금정보 일괄업로드',payload,monthly,memo:String(row['비고']||'')}); }});
+        if(errs.length){ $('bulkValidationErrors').innerHTML=errs.join('<br>'); $('bulkValidationErrors').style.display='block'; $('bulkValidationSuccess').style.display='none'; $('bulkConfirmBtn').style.display='none'; }
+        else { $('bulkValidationErrors').style.display='none'; $('bulkValidationSuccess').style.display='block'; $('bulkValidationSuccess').innerText=`${vd.length}건의 임금정보를 업로드할 수 있습니다. 진행하시겠습니까?`; $('bulkConfirmBtn').style.display='block'; $('bulkConfirmBtn').onclick=async()=>{ try{ window.showLoading('업로드 준비 중...',5,'임금정보 일괄 업로드를 준비하고 있습니다.'); await window.createBackup('AUTO','임금정보 일괄 업로드 전 자동 백업'); const items=vd.map(v=>{ const salaryHistory=[...(v.tEmp.salaryHistory||[])]; const snapshot={...v.payload}; salaryHistory.push({date:v.applyDate, reason:v.reason, monthly:v.monthly.toLocaleString()+'원', annual:(v.monthly*12).toLocaleString()+'원', period:v.applyDate, memo:v.memo, snapshot}); return {id:v.empID,data:{...v.payload,salaryHistory}}; }); await runBatched(items,(batch,item)=>batch.set(doc(empRef,item.id),item.data,{merge:true}),400,'임금정보 업로드 중...'); await window.createBackup('AUTO','임금정보 일괄 업로드 후 자동 백업'); window.setLoadingProgress(100,'임금정보 일괄 업로드가 완료되었습니다.'); window.showMessageBox('업로드 완료'); $('bulkValidationModal').style.display='none'; } finally { setTimeout(()=>window.hideLoading(),250); } }; }
+        $('bulkValidationModal').style.display='flex'; $('salaryBulkInput').value='';
+    }; r.readAsBinaryString(f);
 };
 
 window.handleAppointBulkUpload = (e) => {
@@ -2509,6 +2846,7 @@ async function start() {
             onSnapshot(backupRef, s=>{ backups=s.docs.map(d=>({...d.data(), id:d.id})); if(($('page-backup-data') && $('page-backup-data').classList.contains('active')) || ($('page-restore-data') && $('page-restore-data').classList.contains('active'))) window.renderBackupPages(); });
             onSnapshot(reportRef, s=>{ dailyReports=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-report-today')?.classList.contains('active')) window.renderTodayReport(); if($('page-report-today-write')?.classList.contains('active')) window.renderReportWritePage(); });
             onSnapshot(downloadApprovalRef, s=>{ downloadRequests=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-mgmt-download')?.classList.contains('active')) window.renderEmployeeDownloadHistory(); if($('notificationCenterModal')?.style.display==='flex') window.renderNotificationCenter(); window.processEmployeeDownloadApprovalNotifications(); window.updateNotificationBell(); });
+            onSnapshot(salaryPaymentRef, s=>{ salaryPayments=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-pay-current')?.classList.contains('active')) window.renderPayCurrentPage(); if($('page-pay-history')?.classList.contains('active')) window.renderPayHistoryPage(); });
 
             // Bypass Login
             document.body.setAttribute('data-role', '관리자'); currentLoginAcc = { accountId:'hypo-hr', name:'최고관리자', permissions:null }; $('displayLoggedInUser').innerText = "최고관리자"; $('app-container').style.display='flex'; window.ensureStatusInputs(); window.applyMenuVisibility(); window.switchMenu('home');
