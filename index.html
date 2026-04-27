@@ -3,10 +3,559 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.3.6.2 - 통합 관리</title>
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<title>히포케이메논 ERP V.3.7.7 - 통합 관리</title>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js">
+/* ===== V.3.7.7 요청사항 반영: 상태필터/권한트리/추가기능 ===== */
+window.isActiveEmpByFilter = (emp, filterValue) => {
+    const f = filterValue || '재직';
+    const isRetired = !!String(emp?.quitDate || '').trim();
+    if(f === '전체') return true;
+    if(f === '퇴직') return isRetired;
+    return !isRetired;
+};
+
+(function(){
+    const oldRenderSearchList = window.renderSearchList;
+    window.renderSearchList = function(){
+        if(typeof oldRenderSearchList !== 'function') return;
+        oldRenderSearchList();
+        const filter = document.getElementById('recordStatusFilter')?.value || '재직';
+        const search = (document.getElementById('recordSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('recordEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => ['정규직','계약직','임원','단시간근로','일용직'].includes(e.contractType || ''))
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectRecordEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.dept||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderAppointList = window.renderAppointList;
+    window.renderAppointList = function(){
+        if(typeof oldRenderAppointList !== 'function') return;
+        oldRenderAppointList();
+        const filter = document.getElementById('appointStatusFilter')?.value || '재직';
+        const search = (document.getElementById('appointSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('appointEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectAppointEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderSalaryStatusList = window.renderSalaryStatusList;
+    window.renderSalaryStatusList = function(){
+        if(typeof oldRenderSalaryStatusList !== 'function') return;
+        oldRenderSalaryStatusList();
+        const filter = document.getElementById('salStatusFilter')?.value || '재직';
+        const search = (document.getElementById('salStatusSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('salStatusEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectSalaryEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+})();
+
+window.permissionMenuTree = [
+    {id:'report', name:'보고 및 통계', children:[
+        {id:'report-today', name:'인원현황보고'},
+        {id:'report-today-write', name:'인원현황보고 작성'},
+        {id:'report-headcount', name:'인원현황', children:[
+            {id:'report-headcount-month', name:'당월 인원 변동'},
+            {id:'report-headcount-year', name:'당해년도 인원 통계'}
+        ]},
+        {id:'report-pay', name:'임금지급현황'}
+    ]},
+    {id:'mgmt', name:'사원관리', children:[
+        {id:'mgmt-reg', name:'사원 등록/수정'},
+        {id:'mgmt-search', name:'사원 조회'},
+        {id:'org-chart', name:'조직도'},
+        {id:'mgmt-appoint', name:'인사 발령 등록'},
+        {id:'mgmt-bulk', name:'일괄업로드'},
+        {id:'mgmt-download', name:'사원정보 다운로드'}
+    ]},
+    {id:'pay', name:'임금', children:[
+        {id:'pay-status', name:'연봉 산정/갱신 현황'},
+        {id:'pay-sme-tax', name:'중소기업소득세감면 대상'},
+        {id:'pay-current', name:'당월 급여지급', children:[
+            {id:'pay-current-overtime', name:'초과근로'},
+            {id:'pay-current-incentive', name:'인센티브'},
+            {id:'pay-current-etc', name:'기타수당'},
+            {id:'pay-current-annual', name:'연차수당'}
+        ]},
+        {id:'pay-history', name:'급여지급내역'}
+    ]},
+    {id:'subsidy', name:'지원금', children:[
+        {id:'subsidy-youth-job', name:'청년일자리도약장려금'},
+        {id:'subsidy-parental-leave', name:'육아휴직 지원금'},
+        {id:'subsidy-short-time', name:'육아기/임신기 단축근로 지원금'},
+        {id:'subsidy-spouse-birth', name:'배우자출산휴가 지원금'}
+    ]},
+    {id:'eval', name:'평가', children:[
+        {id:'eval-probation', name:'수습평가'},
+        {id:'eval-kpi', name:'KPI평가'}
+    ]},
+    {id:'system', name:'시스템 설정', children:[
+        {id:'sys-site', name:'사이트 관리'},
+        {id:'org-dept', name:'부서명 관리'},
+        {id:'org-rank', name:'직위/직책 관리'},
+        {id:'sys-workplace', name:'근무지 관리'},
+        {id:'sys-ip', name:'접속 IP 설정'},
+        {id:'sys-log', name:'Log 기록'},
+        {id:'account', name:'계정 관리'},
+        {id:'backup-data', name:'데이터 백업/복원'}
+    ]}
+];
+
+window.flattenPermissionTree = (nodes=window.permissionMenuTree, depth=0, parentId='') => {
+    let rows = [];
+    nodes.forEach(n => {
+        rows.push({...n, depth, parentId});
+        if(n.children) rows = rows.concat(window.flattenPermissionTree(n.children, depth+1, n.id));
+    });
+    return rows;
+};
+
+window.getChildPermissionIds = (id, nodes=window.permissionMenuTree) => {
+    let found = null;
+    const walk = (list) => {
+        for(const n of list){
+            if(n.id === id){ found = n; return; }
+            if(n.children) walk(n.children);
+            if(found) return;
+        }
+    };
+    walk(nodes);
+    const ids = [];
+    const collect = (n) => { (n.children||[]).forEach(c => { ids.push(c.id); collect(c); }); };
+    if(found) collect(found);
+    return ids;
+};
+
+window.toggleChildPermissions = (id, checked) => {
+    window.getChildPermissionIds(id).forEach(cid => {
+        const cb = document.querySelector(`#permissionGrid input[data-menu-id="${cid}"]`);
+        if(cb) cb.checked = checked;
+    });
+    window.refreshPermSelectAllState();
+};
+
+window.toggleAllPermissions = (checked) => {
+    document.querySelectorAll('#permissionGrid input[type="checkbox"]').forEach(cb => cb.checked = checked);
+};
+
+window.refreshPermSelectAllState = () => {
+    const all = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]'));
+    const master = document.getElementById('permSelectAll');
+    if(master) master.checked = all.length > 0 && all.every(cb => cb.checked);
+};
+
+(function(){
+    const oldOpenPermissionModal = window.openPermissionModal;
+    window.openPermissionModal = function(accountId){
+        if(typeof oldOpenPermissionModal === 'function') oldOpenPermissionModal(accountId);
+        setTimeout(() => {
+            const acc = (accounts || []).find(a => a.id === accountId || a.accountId === accountId) || currentPermAccount || {};
+            const current = acc.permissions || acc.menuPermissions || acc.allowedMenus || [];
+            const currentSet = new Set(Array.isArray(current) ? current : Object.keys(current || {}).filter(k => current[k]));
+            const grid = document.getElementById('permissionGrid');
+            if(!grid) return;
+            const rows = window.flattenPermissionTree();
+            grid.innerHTML = '<div class="head">메뉴명</div><div class="head">접속 권한</div>' + rows.map((m, idx) => {
+                const cls = m.depth === 0 ? 'permission-menu-parent' : (m.depth === 1 ? 'permission-menu-child' : 'permission-menu-grandchild');
+                const prefix = m.depth === 0 ? '' : (m.depth === 1 ? 'ㄴ ' : 'ㄴ ㄴ ');
+                const checked = currentSet.has(m.id) ? 'checked' : '';
+                return `<div class="cell label ${cls}">${prefix}${m.name}</div><div class="cell"><input type="checkbox" data-menu-id="${m.id}" ${checked} onchange="window.toggleChildPermissions('${m.id}', this.checked)"></div>`;
+            }).join('');
+            window.refreshPermSelectAllState();
+        }, 50);
+    };
+
+    const oldSavePermissionSettings = window.savePermissionSettings;
+    window.savePermissionSettings = function(){
+        const checkedMenus = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]:checked')).map(cb => cb.dataset.menuId);
+        const hidden = document.getElementById('permSelectedMenus');
+        if(hidden) hidden.value = JSON.stringify(checkedMenus);
+        window.__latestPermissionMenus = checkedMenus;
+        if(typeof oldSavePermissionSettings === 'function') return oldSavePermissionSettings();
+    };
+})();
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">
+/* ===== V.3.7.7 요청사항 반영: 상태필터/권한트리/추가기능 ===== */
+window.isActiveEmpByFilter = (emp, filterValue) => {
+    const f = filterValue || '재직';
+    const isRetired = !!String(emp?.quitDate || '').trim();
+    if(f === '전체') return true;
+    if(f === '퇴직') return isRetired;
+    return !isRetired;
+};
+
+(function(){
+    const oldRenderSearchList = window.renderSearchList;
+    window.renderSearchList = function(){
+        if(typeof oldRenderSearchList !== 'function') return;
+        oldRenderSearchList();
+        const filter = document.getElementById('recordStatusFilter')?.value || '재직';
+        const search = (document.getElementById('recordSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('recordEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => ['정규직','계약직','임원','단시간근로','일용직'].includes(e.contractType || ''))
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectRecordEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.dept||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderAppointList = window.renderAppointList;
+    window.renderAppointList = function(){
+        if(typeof oldRenderAppointList !== 'function') return;
+        oldRenderAppointList();
+        const filter = document.getElementById('appointStatusFilter')?.value || '재직';
+        const search = (document.getElementById('appointSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('appointEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectAppointEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderSalaryStatusList = window.renderSalaryStatusList;
+    window.renderSalaryStatusList = function(){
+        if(typeof oldRenderSalaryStatusList !== 'function') return;
+        oldRenderSalaryStatusList();
+        const filter = document.getElementById('salStatusFilter')?.value || '재직';
+        const search = (document.getElementById('salStatusSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('salStatusEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectSalaryEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+})();
+
+window.permissionMenuTree = [
+    {id:'report', name:'보고 및 통계', children:[
+        {id:'report-today', name:'인원현황보고'},
+        {id:'report-today-write', name:'인원현황보고 작성'},
+        {id:'report-headcount', name:'인원현황', children:[
+            {id:'report-headcount-month', name:'당월 인원 변동'},
+            {id:'report-headcount-year', name:'당해년도 인원 통계'}
+        ]},
+        {id:'report-pay', name:'임금지급현황'}
+    ]},
+    {id:'mgmt', name:'사원관리', children:[
+        {id:'mgmt-reg', name:'사원 등록/수정'},
+        {id:'mgmt-search', name:'사원 조회'},
+        {id:'org-chart', name:'조직도'},
+        {id:'mgmt-appoint', name:'인사 발령 등록'},
+        {id:'mgmt-bulk', name:'일괄업로드'},
+        {id:'mgmt-download', name:'사원정보 다운로드'}
+    ]},
+    {id:'pay', name:'임금', children:[
+        {id:'pay-status', name:'연봉 산정/갱신 현황'},
+        {id:'pay-sme-tax', name:'중소기업소득세감면 대상'},
+        {id:'pay-current', name:'당월 급여지급', children:[
+            {id:'pay-current-overtime', name:'초과근로'},
+            {id:'pay-current-incentive', name:'인센티브'},
+            {id:'pay-current-etc', name:'기타수당'},
+            {id:'pay-current-annual', name:'연차수당'}
+        ]},
+        {id:'pay-history', name:'급여지급내역'}
+    ]},
+    {id:'subsidy', name:'지원금', children:[
+        {id:'subsidy-youth-job', name:'청년일자리도약장려금'},
+        {id:'subsidy-parental-leave', name:'육아휴직 지원금'},
+        {id:'subsidy-short-time', name:'육아기/임신기 단축근로 지원금'},
+        {id:'subsidy-spouse-birth', name:'배우자출산휴가 지원금'}
+    ]},
+    {id:'eval', name:'평가', children:[
+        {id:'eval-probation', name:'수습평가'},
+        {id:'eval-kpi', name:'KPI평가'}
+    ]},
+    {id:'system', name:'시스템 설정', children:[
+        {id:'sys-site', name:'사이트 관리'},
+        {id:'org-dept', name:'부서명 관리'},
+        {id:'org-rank', name:'직위/직책 관리'},
+        {id:'sys-workplace', name:'근무지 관리'},
+        {id:'sys-ip', name:'접속 IP 설정'},
+        {id:'sys-log', name:'Log 기록'},
+        {id:'account', name:'계정 관리'},
+        {id:'backup-data', name:'데이터 백업/복원'}
+    ]}
+];
+
+window.flattenPermissionTree = (nodes=window.permissionMenuTree, depth=0, parentId='') => {
+    let rows = [];
+    nodes.forEach(n => {
+        rows.push({...n, depth, parentId});
+        if(n.children) rows = rows.concat(window.flattenPermissionTree(n.children, depth+1, n.id));
+    });
+    return rows;
+};
+
+window.getChildPermissionIds = (id, nodes=window.permissionMenuTree) => {
+    let found = null;
+    const walk = (list) => {
+        for(const n of list){
+            if(n.id === id){ found = n; return; }
+            if(n.children) walk(n.children);
+            if(found) return;
+        }
+    };
+    walk(nodes);
+    const ids = [];
+    const collect = (n) => { (n.children||[]).forEach(c => { ids.push(c.id); collect(c); }); };
+    if(found) collect(found);
+    return ids;
+};
+
+window.toggleChildPermissions = (id, checked) => {
+    window.getChildPermissionIds(id).forEach(cid => {
+        const cb = document.querySelector(`#permissionGrid input[data-menu-id="${cid}"]`);
+        if(cb) cb.checked = checked;
+    });
+    window.refreshPermSelectAllState();
+};
+
+window.toggleAllPermissions = (checked) => {
+    document.querySelectorAll('#permissionGrid input[type="checkbox"]').forEach(cb => cb.checked = checked);
+};
+
+window.refreshPermSelectAllState = () => {
+    const all = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]'));
+    const master = document.getElementById('permSelectAll');
+    if(master) master.checked = all.length > 0 && all.every(cb => cb.checked);
+};
+
+(function(){
+    const oldOpenPermissionModal = window.openPermissionModal;
+    window.openPermissionModal = function(accountId){
+        if(typeof oldOpenPermissionModal === 'function') oldOpenPermissionModal(accountId);
+        setTimeout(() => {
+            const acc = (accounts || []).find(a => a.id === accountId || a.accountId === accountId) || currentPermAccount || {};
+            const current = acc.permissions || acc.menuPermissions || acc.allowedMenus || [];
+            const currentSet = new Set(Array.isArray(current) ? current : Object.keys(current || {}).filter(k => current[k]));
+            const grid = document.getElementById('permissionGrid');
+            if(!grid) return;
+            const rows = window.flattenPermissionTree();
+            grid.innerHTML = '<div class="head">메뉴명</div><div class="head">접속 권한</div>' + rows.map((m, idx) => {
+                const cls = m.depth === 0 ? 'permission-menu-parent' : (m.depth === 1 ? 'permission-menu-child' : 'permission-menu-grandchild');
+                const prefix = m.depth === 0 ? '' : (m.depth === 1 ? 'ㄴ ' : 'ㄴ ㄴ ');
+                const checked = currentSet.has(m.id) ? 'checked' : '';
+                return `<div class="cell label ${cls}">${prefix}${m.name}</div><div class="cell"><input type="checkbox" data-menu-id="${m.id}" ${checked} onchange="window.toggleChildPermissions('${m.id}', this.checked)"></div>`;
+            }).join('');
+            window.refreshPermSelectAllState();
+        }, 50);
+    };
+
+    const oldSavePermissionSettings = window.savePermissionSettings;
+    window.savePermissionSettings = function(){
+        const checkedMenus = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]:checked')).map(cb => cb.dataset.menuId);
+        const hidden = document.getElementById('permSelectedMenus');
+        if(hidden) hidden.value = JSON.stringify(checkedMenus);
+        window.__latestPermissionMenus = checkedMenus;
+        if(typeof oldSavePermissionSettings === 'function') return oldSavePermissionSettings();
+    };
+})();
+
+</script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
+/* ===== V.3.7.7 요청사항 반영: 상태필터/권한트리/추가기능 ===== */
+window.isActiveEmpByFilter = (emp, filterValue) => {
+    const f = filterValue || '재직';
+    const isRetired = !!String(emp?.quitDate || '').trim();
+    if(f === '전체') return true;
+    if(f === '퇴직') return isRetired;
+    return !isRetired;
+};
+
+(function(){
+    const oldRenderSearchList = window.renderSearchList;
+    window.renderSearchList = function(){
+        if(typeof oldRenderSearchList !== 'function') return;
+        oldRenderSearchList();
+        const filter = document.getElementById('recordStatusFilter')?.value || '재직';
+        const search = (document.getElementById('recordSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('recordEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => ['정규직','계약직','임원','단시간근로','일용직'].includes(e.contractType || ''))
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectRecordEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.dept||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderAppointList = window.renderAppointList;
+    window.renderAppointList = function(){
+        if(typeof oldRenderAppointList !== 'function') return;
+        oldRenderAppointList();
+        const filter = document.getElementById('appointStatusFilter')?.value || '재직';
+        const search = (document.getElementById('appointSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('appointEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectAppointEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderSalaryStatusList = window.renderSalaryStatusList;
+    window.renderSalaryStatusList = function(){
+        if(typeof oldRenderSalaryStatusList !== 'function') return;
+        oldRenderSalaryStatusList();
+        const filter = document.getElementById('salStatusFilter')?.value || '재직';
+        const search = (document.getElementById('salStatusSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('salStatusEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectSalaryEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+})();
+
+window.permissionMenuTree = [
+    {id:'report', name:'보고 및 통계', children:[
+        {id:'report-today', name:'인원현황보고'},
+        {id:'report-today-write', name:'인원현황보고 작성'},
+        {id:'report-headcount', name:'인원현황', children:[
+            {id:'report-headcount-month', name:'당월 인원 변동'},
+            {id:'report-headcount-year', name:'당해년도 인원 통계'}
+        ]},
+        {id:'report-pay', name:'임금지급현황'}
+    ]},
+    {id:'mgmt', name:'사원관리', children:[
+        {id:'mgmt-reg', name:'사원 등록/수정'},
+        {id:'mgmt-search', name:'사원 조회'},
+        {id:'org-chart', name:'조직도'},
+        {id:'mgmt-appoint', name:'인사 발령 등록'},
+        {id:'mgmt-bulk', name:'일괄업로드'},
+        {id:'mgmt-download', name:'사원정보 다운로드'}
+    ]},
+    {id:'pay', name:'임금', children:[
+        {id:'pay-status', name:'연봉 산정/갱신 현황'},
+        {id:'pay-sme-tax', name:'중소기업소득세감면 대상'},
+        {id:'pay-current', name:'당월 급여지급', children:[
+            {id:'pay-current-overtime', name:'초과근로'},
+            {id:'pay-current-incentive', name:'인센티브'},
+            {id:'pay-current-etc', name:'기타수당'},
+            {id:'pay-current-annual', name:'연차수당'}
+        ]},
+        {id:'pay-history', name:'급여지급내역'}
+    ]},
+    {id:'subsidy', name:'지원금', children:[
+        {id:'subsidy-youth-job', name:'청년일자리도약장려금'},
+        {id:'subsidy-parental-leave', name:'육아휴직 지원금'},
+        {id:'subsidy-short-time', name:'육아기/임신기 단축근로 지원금'},
+        {id:'subsidy-spouse-birth', name:'배우자출산휴가 지원금'}
+    ]},
+    {id:'eval', name:'평가', children:[
+        {id:'eval-probation', name:'수습평가'},
+        {id:'eval-kpi', name:'KPI평가'}
+    ]},
+    {id:'system', name:'시스템 설정', children:[
+        {id:'sys-site', name:'사이트 관리'},
+        {id:'org-dept', name:'부서명 관리'},
+        {id:'org-rank', name:'직위/직책 관리'},
+        {id:'sys-workplace', name:'근무지 관리'},
+        {id:'sys-ip', name:'접속 IP 설정'},
+        {id:'sys-log', name:'Log 기록'},
+        {id:'account', name:'계정 관리'},
+        {id:'backup-data', name:'데이터 백업/복원'}
+    ]}
+];
+
+window.flattenPermissionTree = (nodes=window.permissionMenuTree, depth=0, parentId='') => {
+    let rows = [];
+    nodes.forEach(n => {
+        rows.push({...n, depth, parentId});
+        if(n.children) rows = rows.concat(window.flattenPermissionTree(n.children, depth+1, n.id));
+    });
+    return rows;
+};
+
+window.getChildPermissionIds = (id, nodes=window.permissionMenuTree) => {
+    let found = null;
+    const walk = (list) => {
+        for(const n of list){
+            if(n.id === id){ found = n; return; }
+            if(n.children) walk(n.children);
+            if(found) return;
+        }
+    };
+    walk(nodes);
+    const ids = [];
+    const collect = (n) => { (n.children||[]).forEach(c => { ids.push(c.id); collect(c); }); };
+    if(found) collect(found);
+    return ids;
+};
+
+window.toggleChildPermissions = (id, checked) => {
+    window.getChildPermissionIds(id).forEach(cid => {
+        const cb = document.querySelector(`#permissionGrid input[data-menu-id="${cid}"]`);
+        if(cb) cb.checked = checked;
+    });
+    window.refreshPermSelectAllState();
+};
+
+window.toggleAllPermissions = (checked) => {
+    document.querySelectorAll('#permissionGrid input[type="checkbox"]').forEach(cb => cb.checked = checked);
+};
+
+window.refreshPermSelectAllState = () => {
+    const all = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]'));
+    const master = document.getElementById('permSelectAll');
+    if(master) master.checked = all.length > 0 && all.every(cb => cb.checked);
+};
+
+(function(){
+    const oldOpenPermissionModal = window.openPermissionModal;
+    window.openPermissionModal = function(accountId){
+        if(typeof oldOpenPermissionModal === 'function') oldOpenPermissionModal(accountId);
+        setTimeout(() => {
+            const acc = (accounts || []).find(a => a.id === accountId || a.accountId === accountId) || currentPermAccount || {};
+            const current = acc.permissions || acc.menuPermissions || acc.allowedMenus || [];
+            const currentSet = new Set(Array.isArray(current) ? current : Object.keys(current || {}).filter(k => current[k]));
+            const grid = document.getElementById('permissionGrid');
+            if(!grid) return;
+            const rows = window.flattenPermissionTree();
+            grid.innerHTML = '<div class="head">메뉴명</div><div class="head">접속 권한</div>' + rows.map((m, idx) => {
+                const cls = m.depth === 0 ? 'permission-menu-parent' : (m.depth === 1 ? 'permission-menu-child' : 'permission-menu-grandchild');
+                const prefix = m.depth === 0 ? '' : (m.depth === 1 ? 'ㄴ ' : 'ㄴ ㄴ ');
+                const checked = currentSet.has(m.id) ? 'checked' : '';
+                return `<div class="cell label ${cls}">${prefix}${m.name}</div><div class="cell"><input type="checkbox" data-menu-id="${m.id}" ${checked} onchange="window.toggleChildPermissions('${m.id}', this.checked)"></div>`;
+            }).join('');
+            window.refreshPermSelectAllState();
+        }, 50);
+    };
+
+    const oldSavePermissionSettings = window.savePermissionSettings;
+    window.savePermissionSettings = function(){
+        const checkedMenus = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]:checked')).map(cb => cb.dataset.menuId);
+        const hidden = document.getElementById('permSelectedMenus');
+        if(hidden) hidden.value = JSON.stringify(checkedMenus);
+        window.__latestPermissionMenus = checkedMenus;
+        if(typeof oldSavePermissionSettings === 'function') return oldSavePermissionSettings();
+    };
+})();
+
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{--icube-blue:#3162C7;--icube-bg:#EDF2F5;--icube-border:#C4C9CC;--icube-header:#F1F4F7;--icube-selected:#FFFFE1;--sidebar-width:240px;--sidebar-dark:#2C3E50;--sidebar-hover:#34495E}
@@ -37,13 +586,14 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 .record-card{background:white;border:1px solid #000;padding:20px;color:#000;font-family:'Malgun Gothic',serif;position:relative;max-width:800px;margin:0 auto} .record-title{text-align:center;font-size:24px;font-weight:bold;margin-bottom:20px;letter-spacing:5px} .record-top-grid{display:flex;gap:15px;margin-bottom:15px} .photo-box{width:130px;height:170px;border:1px solid #000;display:flex;justify-content:center;align-items:center;background:#f9f9f9;color:#999;flex-shrink:0} .record-table{width:100%;border-collapse:collapse;margin-bottom:15px;table-layout:fixed} .record-table th,.record-table td{border:1px solid #000;padding:6px;font-size:11px;text-align:center;vertical-align:middle;word-wrap:break-word} .record-table th{background:#f0f0f0;font-weight:bold} .record-section-title{font-size:13px;font-weight:bold;margin-bottom:5px;border-left:3px solid #000;padding-left:8px;margin-top:10px}
 .print-footer{display:none;text-align:center;font-size:16px;font-weight:bold;letter-spacing:3px;color:#000;margin-top:30px;page-break-inside:avoid;padding-bottom:10px}.basic-info-flex{display:flex;gap:15px;align-items:flex-start}.profile-upload-box{width:140px;min-width:140px;border:1px solid var(--icube-border);background:#fbfbfb;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px}.profile-upload-preview{width:118px;height:150px;border:1px solid #cfd6dc;background:#fff center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px}.profile-upload-actions{display:flex;flex-direction:column;gap:6px;width:100%}.profile-upload-actions .tool-btn{width:100%;padding:4px 8px;font-size:11px}
 .home-layout{display:flex;gap:20px;height:100%;overflow:hidden;min-height:0} .home-left{flex:1.5;display:flex;flex-direction:column;gap:15px;overflow:hidden;min-height:0} .home-right{flex:1;display:flex;flex-direction:column;gap:15px;overflow-y:auto;min-height:0} .home-card{background:white;border:1px solid var(--icube-border);border-radius:4px;padding:15px;display:flex;flex-direction:column;min-height:0} .home-card-title{font-size:14px;font-weight:bold;color:var(--icube-blue);border-bottom:2px solid var(--icube-blue);padding-bottom:5px;margin-bottom:10px;display:flex;justify-content:space-between} .stat-table{width:100%;border-collapse:collapse;text-align:center;font-size:12px} .stat-table th{background:#f8f8f8;border:1px solid var(--icube-border);padding:6px} .stat-table td{border:1px solid var(--icube-border);padding:8px;font-weight:bold;font-size:14px} .mini-list-table{width:100%;border-collapse:collapse;text-align:center;font-size:11px} .mini-list-table th{background:#f4f6f8;border:1px solid var(--icube-border);padding:4px} .mini-list-table td{border:1px solid var(--icube-border);padding:4px}
-.quick-links{display:flex;gap:15px;justify-content:center;padding:15px;background:white;border:1px solid var(--icube-border);margin-bottom:20px;border-radius:4px} .quick-link-btn{padding:10px 20px;background:#fff;border:1px solid var(--icube-blue);color:var(--icube-blue);font-weight:bold;border-radius:20px;text-decoration:none;transition:all 0.2s;display:flex;align-items:center;gap:8px} .quick-link-btn:hover{background:var(--icube-blue);color:white;box-shadow:0 4px 10px rgba(49,98,199,0.3)}
+.quick-links{display:flex;gap:10px;justify-content:center;padding:15px;background:white;border:1px solid var(--icube-border);margin-bottom:20px;border-radius:4px;flex-wrap:wrap;align-content:flex-start}.quick-link-btn{padding:10px 16px;background:#fff;border:1px solid var(--icube-blue);color:var(--icube-blue);font-weight:bold;border-radius:20px;text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;flex:0 0 auto} .quick-link-btn:hover{background:var(--icube-blue);color:white;box-shadow:0 4px 10px rgba(49,98,199,0.3)}
 .org-tree{display:flex;flex-direction:column;gap:10px;padding:15px;background:#fbfbfb;border:1px solid #eee;border-radius:4px;overflow-x:auto;margin-bottom:20px} .tree ul{padding-top:20px;position:relative;display:flex;justify-content:center;gap:10px;margin:0;padding-left:0} .tree li{float:left;text-align:center;list-style-type:none;position:relative;padding:20px 5px 0 5px} .tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;border-top:3px solid #8ea6d8;width:50%;height:22px} .tree li::after{right:auto;left:50%;border-left:3px solid #8ea6d8} .tree li:only-child::after,.tree li:only-child::before{display:none} .tree li:only-child{padding-top:0} .tree li:first-child::before,.tree li:last-child::after{border:0 none} .tree li:last-child::before{border-right:3px solid #8ea6d8;border-radius:0 5px 0 0} .tree li:first-child::after{border-radius:5px 0 0 0} .tree ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:3px solid #8ea6d8;width:0;height:22px;margin-left:-1px} .tree-node{border:2px solid var(--icube-blue);padding:10px 20px;color:#333;font-weight:bold;display:inline-block;border-radius:6px;background:white;box-shadow:0 2px 4px rgba(0,0,0,0.05);cursor:pointer;min-width:120px;transition:all 0.2s} .tree-node:hover,.tree-node.active{background:var(--icube-blue);color:white}
 .permission-grid{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:0;border:1px solid var(--icube-border);background:#fff}
 .permission-grid .head{background:var(--icube-header);font-weight:bold;text-align:center;padding:8px;border-bottom:1px solid var(--icube-border)}
 .permission-grid .cell{padding:8px 10px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:center;min-height:38px}
 .permission-grid .cell.label{justify-content:flex-start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .permission-grid .row-end{border-bottom:none}
+body:not([data-menu-ready="true"]) .sidebar .menu-item[onclick*="switchMenu"]{visibility:hidden}
  .tree li::before,.tree li::after,.tree ul ul::before{border-color:#6e8fdb !important;border-width:2px !important}
 
 .report-temp-banner{background:#fff8e1;border:1px solid #f0d98c;color:#8a6d1d;padding:8px 12px;border-radius:4px;font-size:11px;margin-bottom:10px}
@@ -56,7 +606,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 .report-write-form{padding:16px;overflow:auto}.report-write-grid{display:grid;grid-template-columns:140px 1fr;gap:10px;align-items:center}.report-write-grid input,.report-write-grid select,.report-write-grid textarea{width:100%;border:1px solid var(--icube-border);padding:6px 8px;font-size:12px}.report-write-grid textarea{min-height:70px;resize:vertical}
 .small-note{font-size:11px;color:#777}
 .stats-report-wrap{display:flex;flex-direction:column;gap:12px;height:100%}.stats-header{background:white;border:1px solid var(--icube-border);padding:16px 18px;border-radius:2px}.stats-title{font-size:28px;font-weight:300;text-align:center;letter-spacing:-0.5px;margin:4px 0 10px 0}.stats-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.stats-month-boxes{display:flex;gap:18px;flex-wrap:wrap}.stats-mini-table{border-collapse:separate;border-spacing:0;background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:14px;overflow:hidden;box-shadow:0 10px 20px rgba(49,98,199,.08), inset 0 1px 0 rgba(255,255,255,.85);min-width:420px}.stats-mini-table th,.stats-mini-table td{border:none;border-right:1px solid #e3e9f3;border-bottom:1px solid #e3e9f3;padding:8px 12px;font-size:12px;text-align:center}.stats-mini-table th{background:linear-gradient(180deg,#edf4ff 0%,#dfeafd 100%);color:#1f3763;font-weight:bold}.stats-mini-table td{font-weight:bold;color:#2f4058}.stats-mini-table th:last-child,.stats-mini-table td:last-child{border-right:none}.stats-mini-table tr:last-child td{border-bottom:none}.stats-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,0.8fr);gap:18px}.stats-card{background:white;border:1px solid var(--icube-border);padding:16px;border-radius:2px}.stats-card h3{margin:0 0 12px 0;font-size:14px;color:var(--icube-blue)}.stats-graph-box{height:180px;border:1px solid #333;display:flex;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:13px;line-height:1.6}.stats-note{font-size:12px;line-height:1.7;white-space:pre-line}.stats-rate-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.stats-rate-box{background:#fff;border:1px solid var(--icube-border);padding:12px;text-align:center}.stats-rate-box .label{font-weight:bold;margin-bottom:8px}.stats-rate-box .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #ddd}.stats-rate-box .row:last-child{border-bottom:none}.stats-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.stats-square-box{height:180px;border:1px solid #333;display:flex;align-items:center;justify-content:center;text-align:center;background:#fafafa;font-size:13px;line-height:1.6;padding:10px}.hc-chart-card{background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:14px;padding:16px;box-shadow:0 12px 24px rgba(49,98,199,.10), inset 0 1px 0 rgba(255,255,255,.85)}.hc-chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.hc-chart-title{font-size:14px;font-weight:bold;color:#1f3763}.hc-chart-sub{font-size:11px;color:#778399}.hc-chart-wrap{position:relative;height:240px}.hc-chart-card.compact .hc-chart-wrap{height:220px}.hc-chart-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.hc-chart-empty{height:220px;display:flex;align-items:center;justify-content:center;color:#999;border:1px dashed #d6deea;border-radius:10px;background:rgba(255,255,255,.65)}
-.pay-page-wrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:0}.pay-period-bar{background:white;border:1px solid var(--icube-border);border-radius:6px;padding:12px 14px;display:flex;align-items:center;gap:10px}.pay-period-bar input{height:28px;border:1px solid var(--icube-border);padding:0 8px}.pay-left-count{padding:10px 12px;border-bottom:1px solid var(--icube-border);background:#f7faff;font-weight:bold;color:#1f3763;display:flex;justify-content:space-between;align-items:center}.pay-input-shell{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}.pay-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pay-summary-box{background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:12px;padding:12px;box-shadow:0 8px 18px rgba(49,98,199,.08)}.pay-summary-box .label{font-size:11px;color:#66758d;margin-bottom:6px}.pay-summary-box .value{font-size:16px;font-weight:bold;color:#1f3763}.pay-input-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 10px}.pay-field{display:flex;flex-direction:column;gap:4px}.pay-field label{font-size:11px;color:#516070}.pay-field input{height:28px;border:1px solid var(--icube-border);padding:0 8px;text-align:right}.pay-field input.pay-text{text-align:left}.pay-section-title{font-weight:bold;color:var(--icube-blue);border-left:3px solid var(--icube-blue);padding-left:8px;margin-top:4px}.pay-right-scroll{overflow:auto;min-height:0;flex:1;padding-right:4px}.pay-history-filter{display:flex;gap:8px;align-items:center;margin-left:auto}.pay-history-filter input{height:28px;border:1px solid var(--icube-border);padding:0 8px}
+.pay-page-wrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:0}.pay-period-bar{background:white;border:1px solid var(--icube-border);border-radius:6px;padding:12px 14px;display:flex;align-items:center;gap:10px}.pay-period-bar input{height:28px;border:1px solid var(--icube-border);padding:0 8px}.pay-left-count{padding:10px 12px;border-bottom:1px solid var(--icube-border);background:#f7faff;font-weight:bold;color:#1f3763;display:flex;justify-content:space-between;align-items:center}.pay-input-shell{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}.pay-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pay-summary-box{background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);border:1px solid #d6deea;border-radius:12px;padding:12px;box-shadow:0 8px 18px rgba(49,98,199,.08)}.pay-summary-box .label{font-size:11px;color:#66758d;margin-bottom:6px}.pay-summary-box .value{font-size:16px;font-weight:bold;color:#1f3763}.pay-input-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 10px}.pay-field{display:flex;flex-direction:column;gap:4px}.pay-field label{font-size:11px;color:#516070}.pay-field input{height:28px;border:1px solid var(--icube-border);padding:0 8px;text-align:right}.pay-field input.pay-text{text-align:left}.pay-section-title{font-weight:bold;color:var(--icube-blue);border-left:3px solid var(--icube-blue);padding-left:8px;margin-top:4px}.pay-right-scroll{overflow:auto;min-height:0;flex:1;padding-right:4px}.pay-history-filter{display:flex;gap:8px;align-items:center;margin-left:auto}.pay-history-filter input{height:28px;border:1px solid var(--icube-border);padding:0 8px}.pay-tax-criteria{border:1px solid #d6deea;background:#fbfdff;border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:140px 110px 170px 1fr;gap:8px 10px;align-items:center}.pay-tax-criteria .tax-spacer{min-height:1px}.pay-tax-criteria .tax-title{grid-column:1/-1;font-weight:bold;color:var(--icube-blue);margin-bottom:2px}.pay-tax-criteria label{font-size:11px;color:#516070}.pay-tax-criteria input,.pay-tax-criteria select{height:28px;border:1px solid var(--icube-border);padding:0 8px}.pay-name-join{color:#3162C7;font-weight:bold}.pay-name-quit{color:#d32f2f;font-weight:bold}.pay-name-probation{color:#8e44ad;font-weight:bold}.pay-name-saved{color:#27ae60;font-size:10px;margin-left:4px}.annual-pay-wrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:0}.annual-pay-table-wrap{background:#fff;border:1px solid var(--icube-border);border-radius:6px;overflow:auto;flex:1}.report-pay-dashboard{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}.report-pay-filter{background:#fff;border:1px solid var(--icube-border);border-radius:6px;padding:12px;display:flex;gap:10px;align-items:center}.report-pay-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:12px;min-height:0;flex:1}.report-pay-card{background:#fff;border:1px solid var(--icube-border);border-radius:10px;padding:14px;box-shadow:0 8px 18px rgba(49,98,199,.06);min-height:0}.report-pay-card h3{margin:0 0 10px 0;color:var(--icube-blue);font-size:14px}.report-pay-chart{height:260px}.disability-extra-row{display:none}.disability-extra-row.show{display:table-row}.pay-upload-input{display:none}.pay-sub-empty{background:white;border:1px solid var(--icube-border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:420px;color:#999}.sme-status-ok{color:#3162C7;font-weight:bold}.sme-status-no{color:#d32f2f;font-weight:bold}.sme-check-table{width:100%;border-collapse:collapse;table-layout:fixed}.sme-check-table th{background:#f4f6f8;border:1px solid var(--icube-border);padding:7px;font-weight:bold;text-align:center}.sme-check-table td{border:1px solid var(--icube-border);padding:7px;vertical-align:middle}.sme-check-table td:nth-child(4){text-align:center}.sme-info-box{background:#f8fbff;border:1px solid #d6deea;border-radius:6px;padding:10px 12px;line-height:1.6;color:#444;margin:10px 0}.sme-badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:bold;margin-left:5px}.sme-badge.ok{background:#eef4ff;color:#3162C7;border:1px solid #9db5ee}.sme-badge.no{background:#fff1f1;color:#d32f2f;border:1px solid #efb0b0}.tax-upload-guide{line-height:1.7;text-align:left;color:#444}.tax-upload-guide .guide-title{font-weight:bold;color:var(--icube-blue);margin:8px 0 4px}.tax-upload-guide ul{margin:4px 0 8px 18px;padding:0}
 
 
 @media print{
@@ -67,10 +617,19 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
     .record-card{padding:10px;border:none;margin:0;max-width:100%} .record-table{page-break-inside:auto} .record-table tr{page-break-inside:avoid;page-break-after:auto} .record-section-title{page-break-after:avoid}
     .print-footer{display:block} *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important} .record-table th{background:#e0e0e0 !important}
 }
+
+.permission-section-title{font-weight:bold;color:#1f3763;background:#edf4ff;border-top:1px solid #d6deea;border-bottom:1px solid #d6deea;padding:8px 10px;display:flex;align-items:center;gap:6px}
+.permission-menu-parent{font-weight:bold;background:#f8fbff}
+.permission-menu-child{padding-left:26px !important}
+.permission-menu-grandchild{padding-left:46px !important;color:#555}
+.permission-select-all{display:flex;align-items:center;justify-content:space-between;background:#fff8e1;border:1px solid #f0d98c;padding:8px 10px;margin-bottom:10px;border-radius:4px}
+
 </style>
 </head>
 <body data-role="관리자">
-<!-- V.3.1.5 전반 점검 보정: 메뉴 진입/렌더 null-safe 보강, 버튼 줄바꿈 방지, 기본 날짜 자동세팅, 목록 비어있을 때 기본 문구 정리 -->
+<!-- V.3.7.7: 통합업로드 비연동 연봉이력 사유 기본값 임금인상, 연봉 산정/갱신 현황 사유 '연봉갱신/조정' 추가 -->
+
+<!-- V.3.7.7 인사발령·연봉갱신 통합 업로드 사번 검증 보정 / V.3.1.5 전반 점검 보정: 메뉴 진입/렌더 null-safe 보강, 버튼 줄바꿈 방지, 기본 날짜 자동세팅, 목록 비어있을 때 기본 문구 정리 -->
 
 <div id="login-screen">
     <div class="login-box">
@@ -98,7 +657,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
     </div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.6.2</span></div>
+        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.3.7.7</span></div>
         <div style="margin-left:auto;font-size:12px;color:#555;display:flex;align-items:center;gap:15px">
             <span><span id="displayLoggedInUser" style="font-weight:bold;color:var(--icube-blue)"></span> 님 로그인 중</span>
             <button id="notifyBellBtn" class="tool-btn" onclick="window.openNotificationCenter()" style="position:relative;width:34px;height:28px;padding:0;min-width:34px"><i class="fa-regular fa-bell"></i><span id="notifyUnreadDot" style="display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#2f80ff"></span></button>
@@ -135,8 +694,23 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                 <div class="menu-category">임금</div>
                 <ul class="menu-list">
                     <li class="menu-item" onclick="window.switchMenu('pay-status',this)"><i class="fa-solid fa-chart-line"></i> 연봉 산정/갱신 현황</li>
+                    <li class="menu-item" onclick="window.switchMenu('pay-sme-tax',this)"><i class="fa-solid fa-receipt"></i> 중소기업소득세감면 대상</li>
                     <li class="menu-item" onclick="window.switchMenu('pay-current',this)"><i class="fa-solid fa-money-check-dollar"></i> 당월 급여지급</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('pay-current-overtime',this)"><i class="fa-solid fa-clock"></i> 초과근로</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('pay-current-incentive',this)"><i class="fa-solid fa-sack-dollar"></i> 인센티브</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('pay-current-etc',this)"><i class="fa-solid fa-plus-minus"></i> 기타수당</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('pay-current-annual',this)"><i class="fa-solid fa-calendar-check"></i> 연차수당</li>
                     <li class="menu-item" onclick="window.switchMenu('pay-history',this)"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역</li>
+                </ul>
+            </div>
+
+            <div class="menu-group auth-payroll-up">
+                <div class="menu-category">지원금</div>
+                <ul class="menu-list">
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('subsidy-youth-job',this)"><i class="fa-solid fa-seedling"></i> 청년일자리도약장려금</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('subsidy-parental-leave',this)"><i class="fa-solid fa-baby"></i> 육아휴직 지원금</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('subsidy-short-time',this)"><i class="fa-solid fa-clock"></i> 육아기/임신기 단축근로 지원금</li>
+                    <li class="menu-item submenu-child" onclick="window.switchMenu('subsidy-spouse-birth',this)"><i class="fa-solid fa-person-breastfeeding"></i> 배우자출산휴가 지원금</li>
                 </ul>
             </div>
             <div class="menu-group auth-basic-up"><div class="menu-category">평가</div><ul class="menu-list"><li class="menu-item" onclick="window.switchMenu('eval-probation',this)"><i class="fa-solid fa-clipboard-user"></i> 수습평가</li><li class="menu-item" onclick="window.switchMenu('eval-kpi',this)"><i class="fa-solid fa-bullseye"></i> KPI평가</li></ul></div>
@@ -184,7 +758,12 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
             <div id="page-mgmt-search" class="page-content">
                 <div class="dual-panel-container">
-                    <div class="panel-left"><div class="search-box"><input type="text" id="recordSearch" placeholder="정규직/계약직 사번,이름 검색" style="width:100%" onkeyup="if(event.key==='Enter') window.renderSearchList()"></div><div style="overflow-y:auto;flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="80">부서</th></tr></thead><tbody id="recordEmpList"></tbody></table></div></div>
+                    <div class="panel-left"><div class="search-box" style="flex-direction:column;align-items:stretch;gap:6px;">
+                        <select id="recordStatusFilter" onchange="window.renderSearchList()" style="width:100%;height:26px;border:1px solid var(--icube-border);padding:0 8px;">
+                            <option value="재직">재직</option><option value="퇴직">퇴직</option><option value="전체">전체</option>
+                        </select>
+                        <input type="text" id="recordSearch" placeholder="사번/이름 검색" style="width:100%" onkeyup="if(event.key==='Enter') window.renderSearchList()">
+                    </div><div style="overflow-y:auto;flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="80">부서</th></tr></thead><tbody id="recordEmpList"></tbody></table></div></div>
                     <div class="panel-right" style="background:#e9ecef; padding: 20px;">
                         <div id="recordCardArea" style="display:none; margin: 0 auto; width:100%; max-width:800px;">
                             <div class="status-header print-hide">인사기록카드 <button class="tool-btn primary" onclick="window.printRecordCard()"><i class="fa-solid fa-print"></i> 인쇄하기 (A4 세로)</button></div>
@@ -240,7 +819,12 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
             <div id="page-mgmt-appoint" class="page-content">
                 <div class="dual-panel-container">
-                    <div class="panel-left"><div class="search-box"><input type="text" id="appointSearch" placeholder="사번/이름 검색" style="width:100%" onkeyup="if(event.key==='Enter') window.renderAppointList()"></div><div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="appointEmpList"></tbody></table></div></div>
+                    <div class="panel-left"><div class="search-box" style="flex-direction:column;align-items:stretch;gap:6px;">
+                        <select id="appointStatusFilter" onchange="window.renderAppointList()" style="width:100%;height:26px;border:1px solid var(--icube-border);padding:0 8px;">
+                            <option value="재직">재직</option><option value="퇴직">퇴직</option><option value="전체">전체</option>
+                        </select>
+                        <input type="text" id="appointSearch" placeholder="사번/이름 검색" style="width:100%" onkeyup="if(event.key==='Enter') window.renderAppointList()">
+                    </div><div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="appointEmpList"></tbody></table></div></div>
                     <div class="panel-right" style="background:#e9ecef;">
                         <div id="appointContentArea" style="display:none; flex-direction:column; height:100%; background:white; padding:20px; border:1px solid var(--icube-border);">
                             <div class="status-header">인사발령 등록</div>
@@ -263,7 +847,12 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
             <div id="page-pay-status" class="page-content">
                 <div class="salary-status-container dual-panel-container">
                     <div class="panel-left">
-                        <div class="search-box"><input type="text" id="salStatusSearch" placeholder="사번/이름 검색" onkeyup="if(event.key==='Enter') window.renderSalaryStatusList()" style="width:100%"></div>
+                        <div class="search-box" style="flex-direction:column;align-items:stretch;gap:6px;">
+                            <select id="salStatusFilter" onchange="window.renderSalaryStatusList()" style="width:100%;height:26px;border:1px solid var(--icube-border);padding:0 8px;">
+                                <option value="재직">재직</option><option value="퇴직">퇴직</option><option value="전체">전체</option>
+                            </select>
+                            <input type="text" id="salStatusSearch" placeholder="사번/이름 검색" onkeyup="if(event.key==='Enter') window.renderSalaryStatusList()" style="width:100%">
+                        </div>
                         <div style="overflow-y:auto; flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="100">입사일</th></tr></thead><tbody id="salStatusEmpList"></tbody></table></div>
                     </div>
                     <div class="panel-right" style="background:#e9ecef;">
@@ -272,7 +861,7 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                                 <div class="status-header">연봉 산정/갱신</div>
                                 <table class="salary-input-table">
                                     <thead><tr><th>산정/갱신일</th><th>사유</th></tr></thead>
-                                    <tbody><tr><td><input id="salDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td><td><select id="salReason"><option>임금인상</option><option>인사발령</option></select></td></tr></tbody>
+                                    <tbody><tr><td><input id="salDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td><td><select id="salReason"><option>임금인상</option><option>연봉갱신/조정</option><option>인사발령</option></select></td></tr></tbody>
                                 </table>
                                 <table class="salary-input-table">
                                     <thead><tr><th colspan="2">임금구성</th></tr></thead>
@@ -313,6 +902,16 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                         <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-won-sign"></i> 임금정보 일괄 업로드</h3>
                         <p style="color:#666; margin-bottom:15px;">다수 사원의 임금정보를 사번 기준으로 일괄 등록하고 연봉 이력에 반영합니다.</p>
                         <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="tool-btn" onclick="window.downloadSalaryTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 받기</button><button class="tool-btn primary" onclick="document.getElementById('salaryBulkInput').click()"><i class="fa-solid fa-upload"></i> 파일 업로드</button><input type="file" id="salaryBulkInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleSalaryBulkUpload(event)"></div>
+                    </div>
+                    <div class="list-panel auth-payroll-up" style="padding:20px; flex:1;">
+                        <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-link"></i> 인사발령·연봉갱신 통합 업로드</h3>
+                        <p style="color:#666; margin-bottom:15px;">인사발령내역과 연봉갱신현황 시트가 포함된 엑셀 파일을 한 번에 업로드하여 두 메뉴의 이력을 동시에 반영합니다.</p>
+                        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;"><button class="tool-btn" onclick="window.downloadAppointSalaryLinkedTemplate()"><i class="fa-solid fa-download"></i> 업로드 양식 받기</button><button class="tool-btn primary" onclick="document.getElementById('appointSalaryLinkedInput').click()"><i class="fa-solid fa-upload"></i> 통합 파일 업로드</button><input type="file" id="appointSalaryLinkedInput" style="display:none" accept=".xlsx, .xls" onchange="window.handleAppointSalaryLinkedUpload(event)"></div>
+                    </div>
+                    <div class="list-panel" style="padding:20px; flex:1;">
+                        <h3 style="margin-top:0; color:var(--icube-blue);"><i class="fa-solid fa-file-invoice-dollar"></i> 급여지급내역 일괄 업로드</h3>
+                        <p style="color:#666; margin-bottom:15px;">급여대장 엑셀 파일을 귀속연월별로 일괄 업로드합니다. 여러 귀속연월을 한 번에 추가할 수 있습니다.</p>
+                        <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="tool-btn primary" onclick="window.openPayrollPaymentBulkModal()"><i class="fa-solid fa-upload"></i> 급여지급내역 업로드</button></div>
                     </div>
                 </div>
             </div>
@@ -525,7 +1124,23 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                     </div>
                 </div>
             </div>
-            <div id="page-report-pay" class="page-content"><div class="empty-page"><i class="fa-solid fa-won-sign" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>페이지 작업 완료 후 OPEN 예정</p></div></div>
+            <div id="page-report-pay" class="page-content">
+                <div class="report-pay-dashboard">
+                    <div class="report-pay-filter"><div style="font-weight:bold;color:var(--icube-blue);"><i class="fa-solid fa-won-sign"></i> 임금지급현황</div><span style="margin-left:auto;font-weight:bold;">기준년월</span><input type="month" id="reportPayYm" onchange="window.renderReportPayPage()"><button class="tool-btn" onclick="window.renderReportPayPage()"><i class="fa-solid fa-rotate"></i> 조회</button></div>
+                    <div class="report-pay-grid">
+                        <div class="report-pay-card"><h3>지급인원수 / 총 지급액 추이</h3><div class="report-pay-chart"><canvas id="reportPayTrendChart"></canvas></div></div>
+                        <div class="report-pay-card"><h3>기준월 요약</h3><div id="reportPaySummaryBox" class="stats-rate-grid"></div></div>
+                        <div class="report-pay-card"><h3>직위별 평균임금</h3><div style="overflow:auto;max-height:260px;"><table class="icube-grid"><thead><tr><th>직위</th><th>임금정보 기준 평균</th><th>기준월 지급액 평균</th></tr></thead><tbody id="reportPayRankAvgBody"></tbody></table></div></div>
+                        <div class="report-pay-card"><h3>임금구간 분포</h3><div style="overflow:auto;max-height:260px;"><table class="icube-grid"><thead><tr><th>구간</th><th>임금정보 기준</th><th>기준월 지급액 기준</th></tr></thead><tbody id="reportPayBandBody"></tbody></table></div></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="page-subsidy-youth-job" class="page-content"><div class="empty-page"><i class="fa-solid fa-seedling" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>청년일자리도약장려금 메뉴 준비 중<br><span style="font-size:11px;color:#777">세부 구성은 추후 반영 예정</span></p></div></div>
+            <div id="page-subsidy-parental-leave" class="page-content"><div class="empty-page"><i class="fa-solid fa-baby" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>육아휴직 지원금 메뉴 준비 중<br><span style="font-size:11px;color:#777">세부 구성은 추후 반영 예정</span></p></div></div>
+            <div id="page-subsidy-short-time" class="page-content"><div class="empty-page"><i class="fa-solid fa-clock" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>육아기/임신기 단축근로 지원금 메뉴 준비 중<br><span style="font-size:11px;color:#777">세부 구성은 추후 반영 예정</span></p></div></div>
+            <div id="page-subsidy-spouse-birth" class="page-content"><div class="empty-page"><i class="fa-solid fa-person-breastfeeding" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>배우자출산휴가 지원금 메뉴 준비 중<br><span style="font-size:11px;color:#777">세부 구성은 추후 반영 예정</span></p></div></div>
 
             <div id="page-eval-probation" class="page-content"><div class="empty-page"><i class="fa-solid fa-clipboard-user" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>페이지 작업 완료 후 OPEN 예정</p></div></div>
             <div id="page-eval-kpi" class="page-content"><div class="empty-page"><i class="fa-solid fa-bullseye" style="font-size:40px; color:#ccc; margin-bottom:10px;"></i><p>페이지 작업 완료 후 OPEN 예정</p></div></div>
@@ -537,7 +1152,13 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                         <span style="margin-left:10px;font-weight:bold;">귀속년월</span>
                         <input type="month" id="payCurrentYm" onchange="window.renderPayCurrentPage()">
                         <button class="tool-btn" onclick="window.renderPayCurrentPage()"><i class="fa-solid fa-rotate"></i> 조회</button>
-                        <button class="tool-btn primary" onclick="window.downloadCurrentPayrollExcel()"><i class="fa-solid fa-file-excel"></i> 엑셀 다운로드</button>
+                        <button class="tool-btn primary" onclick="window.downloadCurrentPayrollExcel()"><i class="fa-solid fa-file-excel"></i> 엑셀 다운로드</button><button id="payAdditionalFeatureBtn" class="tool-btn" onclick="window.openPayAdditionalFeatureMenu()"><i class="fa-solid fa-plus"></i> 추가 기능</button>
+                        <button class="tool-btn" onclick="document.getElementById('payPensionUploadInput').click()"><i class="fa-solid fa-upload"></i> 국민연금 업로드</button>
+                        <button class="tool-btn" onclick="document.getElementById('payHealthUploadInput').click()"><i class="fa-solid fa-upload"></i> 건강보험 업로드</button>
+                        <button class="tool-btn" onclick="document.getElementById('payTaxTableUploadInput').click()"><i class="fa-solid fa-table"></i> 간이세액표 업로드</button>
+                        <input type="file" id="payPensionUploadInput" class="pay-upload-input" accept=".xlsx,.xls" onchange="window.handlePayrollInsuranceUpload(event,'pension')">
+                        <input type="file" id="payHealthUploadInput" class="pay-upload-input" accept=".xlsx,.xls" onchange="window.handlePayrollInsuranceUpload(event,'health')">
+                        <input type="file" id="payTaxTableUploadInput" class="pay-upload-input" accept=".xlsx,.xls" onchange="window.handleTaxTableUpload(event)">
                         <span id="payCurrentPayDate" style="margin-left:auto;color:#666;font-size:11px;"></span>
                     </div>
                     <div class="dual-panel-container">
@@ -557,6 +1178,12 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                                         <div class="pay-summary-box"><div class="label">실지급액 계</div><div class="value" id="paySumNet">0원</div></div>
                                         <div class="pay-summary-box"><div class="label">지급 예정일</div><div class="value" id="paySumPayDate">-</div></div>
                                     </div>
+                                    <div class="pay-tax-criteria" id="payTaxCriteriaBox">
+                                        <div class="tax-title">소득세 계산 기준</div>
+                                        <label>부양가족 수</label><input id="payTaxDependents" class="pay-num" value="1" inputmode="numeric" oninput="window.handlePayNumInput(this);window.updateCurrentPayrollCalc()"><span class="tax-spacer"></span><span class="tax-spacer"></span>
+                                        <label>중소기업소득세감면</label><input id="payTaxSmeStatus" class="pay-text read-only" readonly value="미대상">
+                                        <label>감면기간</label><input id="payTaxSmePeriod" class="pay-text read-only" readonly value="-">
+                                    </div>
                                     <div class="pay-right-scroll">
                                         <div class="pay-section-title">기본 정보</div>
                                         <div class="pay-input-grid" id="payCurrentInfoGrid"></div>
@@ -574,6 +1201,43 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div id="page-pay-sme-tax" class="page-content">
+                <div class="dual-panel-container">
+                    <div class="panel-left">
+                        <div class="search-box"><input type="text" id="smeTaxSearch" placeholder="사번/이름/부서 검색" style="width:100%" onkeyup="window.renderSmeTaxList()"></div>
+                        <div style="overflow-y:auto;flex:1"><table class="icube-grid"><thead><tr><th width="80">사번</th><th>이름</th><th width="90">부서</th></tr></thead><tbody id="smeTaxEmpList"></tbody></table></div>
+                    </div>
+                    <div class="panel-right" style="background:#e9ecef;">
+                        <div id="smeTaxEmptyArea" class="empty-page"><i class="fa-solid fa-receipt" style="font-size:40px;color:#ccc;margin-bottom:10px;"></i><p>좌측 목록에서 사원을 선택하면 감면대상 정보를 입력할 수 있습니다.</p></div>
+                        <div id="smeTaxFormArea" style="display:none;background:white;border:1px solid var(--icube-border);padding:20px;height:100%;overflow:auto;">
+                            <div class="status-header">중소기업소득세감면 대상 관리 <span id="smeTaxEmpTitle" style="font-size:12px;color:#666;font-weight:normal;"></span></div>
+                            <table class="detail-table">
+                                <tr><th>대상조건 충족여부</th><td><div style="display:flex;gap:6px;align-items:center;"><input id="smeTaxYnText" class="read-only" readonly value="미대상"><input type="hidden" id="smeTaxYn" value="false"><button class="tool-btn primary" type="button" onclick="window.openSmeTaxCheckModal()">점검</button></div></td><th>기신청 여부</th><td><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="smeTaxPreviouslyApplied" onchange="window.handleSmeTaxPreviouslyAppliedChange()"> 기존 신청내역 있음</label></td></tr>
+                                <tr><th>신청일</th><td><input id="smeTaxApplyDate" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" onchange="window.updateSmeTaxStartByApplyDate()"></td><th>감면 시작일</th><td><input id="smeTaxStart" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD" onchange="window.applySmeTaxPeriodByStart()"></td></tr>
+                                <tr><th>감면 종료일</th><td><input id="smeTaxEnd" class="auto-hyphen" data-type="date" placeholder="YYYY-MM-DD"></td><td colspan="2" class="small-note">기신청자는 기존 신청내역 기준으로 감면 시작일/종료일을 직접 입력합니다.</td></tr>
+                                <tr><th>감면유형</th><td><select id="smeTaxType" onchange="window.applySmeTaxTypeRules()"><option value="청년">청년</option><option value="고령자">고령자</option><option value="장애인">장애인</option><option value="경력단절근로자">경력단절근로자</option><option value="기타">기타</option></select></td><th>감면율</th><td><input id="smeTaxRate" class="pay-num" inputmode="numeric" value="70" oninput="window.handlePayNumInput(this)"></td></tr>
+                                <tr><th>장애인 해당</th><td><select id="smeTaxDisabled" onchange="window.refreshSmeTaxAutoDisplay()"><option value="false">해당없음</option><option value="true">해당</option></select></td><th>경력단절근로자 해당</th><td><select id="smeTaxCareerBreak" onchange="window.refreshSmeTaxAutoDisplay()"><option value="false">해당없음</option><option value="true">해당</option></select></td></tr>
+                                <tr><th>증빙수령 여부</th><td><select id="smeTaxDoc"><option value="미수령">미수령</option><option value="수령">수령</option></select></td><th>증빙/신청서류 저장 경로</th><td><input id="smeTaxMemo" placeholder="예: 사내드라이브 경로 또는 문서번호"></td></tr>
+                            </table>
+                            <div class="sme-info-box">
+                                <b>장애인:</b> 장애인복지법상 장애인, 국가유공자법상 상이자, 5·18민주화운동 부상자, 고엽제후유증 환자로서 장애등급 판정자 등 해당 여부를 별도 확인합니다.<br>
+                                <b>경력단절근로자:</b> 같은 기업에서 1년 이상 근무 후 결혼·임신·출산·육아·자녀교육·가족돌봄 사유로 퇴직하고, 퇴직 후 2~15년 미만 기간 내 중소기업에 재취업한 경우를 별도 확인합니다.
+                            </div>
+                            <div style="text-align:right"><button class="tool-btn success" onclick="window.saveSmeTaxInfo()"><i class="fa-solid fa-floppy-disk"></i> 저장</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="page-pay-current-overtime" class="page-content"><div class="pay-sub-empty"><i class="fa-solid fa-clock" style="font-size:38px;margin-bottom:10px;color:#ccc"></i><p>초과근로 메뉴 준비 중<br><span style="font-size:11px;color:#777">추후 당월 급여지급과 자동 연동 예정</span></p></div></div>
+            <div id="page-pay-current-incentive" class="page-content"><div class="pay-sub-empty"><i class="fa-solid fa-sack-dollar" style="font-size:38px;margin-bottom:10px;color:#ccc"></i><p>인센티브 메뉴 준비 중<br><span style="font-size:11px;color:#777">추후 당월 급여지급과 자동 연동 예정</span></p></div></div>
+            <div id="page-pay-current-etc" class="page-content"><div class="pay-sub-empty"><i class="fa-solid fa-plus-minus" style="font-size:38px;margin-bottom:10px;color:#ccc"></i><p>기타수당 메뉴 준비 중<br><span style="font-size:11px;color:#777">추후 당월 급여지급과 자동 연동 예정</span></p></div></div>
+            <div id="page-pay-current-annual" class="page-content">
+                <div class="annual-pay-wrap">
+                    <div class="pay-period-bar"><div style="font-weight:bold;color:var(--icube-blue);"><i class="fa-solid fa-calendar-check"></i> 연차수당</div><span style="margin-left:10px;font-weight:bold;">귀속년월</span><input type="month" id="annualPayYm" readonly class="read-only"><button class="tool-btn" onclick="window.renderAnnualLeavePayPage()"><i class="fa-solid fa-rotate"></i> 조회</button><button class="tool-btn success" onclick="window.saveAnnualLeavePayAll()"><i class="fa-solid fa-floppy-disk"></i> 저장</button><span class="small-note" style="margin-left:auto;">해당월 퇴사자 기준 자동 조회 / 저장 시 당월 급여지급 연차수당에 반영</span></div>
+                    <div class="annual-pay-table-wrap"><table class="icube-grid" style="min-width:980px;"><thead><tr><th width="160">대상자</th><th width="120">입사일</th><th width="120">퇴사일</th><th width="120">통상시급</th><th width="140">잔여연차일수</th><th width="140">연차수당</th></tr></thead><tbody id="annualLeavePayBody"></tbody></table></div>
                 </div>
             </div>
             <div id="page-pay-history" class="page-content">
@@ -628,6 +1292,8 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
                         <table class="detail-table" style="flex:1; margin-bottom:0;">
                             <tr><th class="required">이름</th><td><input id="formName"></td><th class="required">주민등록번호</th><td><div style="display:flex; gap:4px;"><input id="formSSN" class="auto-hyphen" data-type="ssn" placeholder="000000-0000000" onblur="window.checkSSNValid(this)"><button id="btnSsnEdit" class="tool-btn" style="display:none;" onclick="window.requestSsnEdit()">수정</button><button id="btnSsnHistory" class="tool-btn" style="display:none;" onclick="window.viewSsnHistory()">이력</button></div></td></tr>
                             <tr><th>연락처</th><td><input id="formPhone" class="auto-hyphen" data-type="phone" placeholder="010-0000-0000"></td><th>이메일</th><td><input id="formEmail" type="email" placeholder="example@email.com"></td></tr>
+                            <tr><th>장애인 여부</th><td><select id="formDisabledYn" onchange="window.toggleDisabilityDetail()"><option value="N">해당없음</option><option value="Y">해당</option></select></td><th>보훈대상 여부</th><td><select id="formVeteranYn"><option value="N">해당없음</option><option value="Y">해당</option></select></td></tr>
+                            <tr id="disabilityDetailRow" class="disability-extra-row"><th>장애 내용</th><td><input id="formDisabilityType" placeholder="예: 지체장애, 청각장애 등"></td><th>장애 등급/정도</th><td><input id="formDisabilityGrade" placeholder="예: 심한 장애 / 3급 등"></td></tr>
                             <tr><th>주소</th><td colspan="3"><div style="display:flex; gap:4px; margin-bottom:4px"><button class="tool-btn" onclick="window.searchAddr()" type="button" style="height:26px">주소 검색</button></div><input id="formAddr" class="read-only" readonly style="margin-bottom:4px" placeholder="기본주소"><input id="formAddrDetail" placeholder="상세주소"></td></tr>
                             <tr><th>급여계좌</th><td colspan="3">
                                 <div style="display:flex; gap:8px">
@@ -748,7 +1414,11 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
         <input id="permAccountId" readonly class="read-only" style="width:160px;height:28px;border:1px solid #ccc;padding:0 8px">
         <span style="color:#666">메뉴별 접속 권한을 체크하여 저장합니다. 접속 권한이 있으면 해당 메뉴 작업이 가능합니다.</span>
       </div>
-      <div id="permissionGrid" class="permission-grid"></div>
+      <div class="permission-select-all">
+            <label style="font-weight:bold;"><input type="checkbox" id="permSelectAll" onchange="window.toggleAllPermissions(this.checked)"> 전체 선택</label>
+            <span style="font-size:11px;color:#666;">상위 메뉴 선택 시 하위 메뉴가 자동 선택됩니다.</span>
+        </div>
+      <input type="hidden" id="permSelectedMenus"><div id="permissionGrid" class="permission-grid"></div>
     </div>
     <div class="modal-footer"><button class="tool-btn" onclick="window.closePermissionModal()">취소</button><button class="tool-btn primary" onclick="window.savePermissionSettings()">저장</button></div>
   </div>
@@ -758,6 +1428,17 @@ body[data-role="기본담당자"] .auth-admin-only, body[data-role="기본담당
 
 <div id="empDownloadHistoryModal" class="modal-overlay" style="z-index:1260"><div class="modal-content" style="width:900px;max-height:85vh"><div class="modal-header"><h2 style="font-weight:bold">사원정보 다운로드 승인/이력</h2><button class="close-btn" onclick="window.closeEmpDownloadHistoryModal()">&times;</button></div><div class="modal-body" style="padding:20px;overflow:auto;"><table class="icube-grid"><thead><tr><th width="140">요청일시</th><th width="90">담당자</th><th>다운로드 사유</th><th width="90">상태</th><th width="140">승인/만료</th><th width="70">횟수</th><th width="120">관리</th></tr></thead><tbody id="empDownloadHistoryModalBody"></tbody></table></div></div></div>
 
+
+<div id="smeTaxCheckModal" class="modal-overlay" style="z-index:1270"><div class="modal-content" style="width:960px;max-height:88vh"><div class="modal-header"><h2 style="font-weight:bold">중소기업소득세감면 대상요건 점검</h2><button class="close-btn" onclick="window.closeSmeTaxCheckModal()">&times;</button></div><div class="modal-body" style="padding:20px;overflow:auto;">
+    <div class="sme-info-box" id="smeTaxCheckSummary">사원정보를 기준으로 자동 점검한 뒤 필요한 항목은 직접 체크할 수 있습니다.</div>
+    <table class="sme-check-table"><thead><tr><th width="180">요건</th><th>기준</th><th width="230">사원정보</th><th width="80">체크</th></tr></thead><tbody id="smeTaxCheckBody"></tbody></table>
+    <div class="sme-info-box">
+        청년은 근로계약 체결일 현재 15~34세 이하 여부를 확인하며, 병역 이행기간은 최대 6년까지 나이에서 차감합니다. 고령자는 근로계약 체결일 현재 60세 이상 여부를 확인합니다. 장애인 및 경력단절근로자 여부는 증빙 확인이 필요하므로 별도 선택 항목으로 둡니다.
+    </div>
+</div><div class="modal-footer"><button class="tool-btn" onclick="window.closeSmeTaxCheckModal()">취소</button><button class="tool-btn primary" onclick="window.applySmeTaxCheckResult()">저장</button></div></div></div>
+
+
+<div id="payrollPaymentBulkModal" class="modal-overlay" style="z-index:1310"><div class="modal-content" style="width:820px;max-height:85vh"><div class="modal-header"><h2 style="font-weight:bold">급여지급내역 일괄 업로드</h2><button class="close-btn" onclick="window.closePayrollPaymentBulkModal()">&times;</button></div><div class="modal-body" style="padding:20px;overflow:auto"><div style="font-size:11px;color:#666;line-height:1.6;margin-bottom:12px;">귀속연월을 선택한 뒤 급여대장 엑셀 파일(.xls, .xlsx)을 업로드합니다. 같은 귀속연월에 여러 파일을 선택하면 파일의 급여자료가 해당 귀속연월에 합산 등록됩니다.</div><div id="payrollPaymentBulkRows" style="display:flex;flex-direction:column;gap:8px"></div><div style="margin-top:12px"><button class="tool-btn" onclick="window.addPayrollPaymentBulkRow()"><i class="fa-solid fa-plus"></i> 귀속연월 추가</button></div></div><div class="modal-footer"><button class="tool-btn" onclick="window.closePayrollPaymentBulkModal()">취소</button><button class="tool-btn success" onclick="window.handlePayrollPaymentBulkUpload()">업로드</button></div></div></div>
 <div id="auditModal" class="modal-overlay" style="z-index:1200"><div class="modal-content" style="width:350px;"><div class="modal-header"><h2 id="auditTitle" style="font-weight:bold">권한 요청</h2><button class="close-btn" onclick="document.getElementById('auditModal').style.display='none'">&times;</button></div><div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:10px;"><input type="hidden" id="auditOrgId"><input type="hidden" id="auditOrgType"><input type="hidden" id="auditOrgNewName"><input id="auditModifier" readonly style="margin-bottom:10px; height:30px; background:#f9f9f9; border:1px solid #ccc; padding:0 8px;"><input id="auditReason" placeholder="사유 기입 필수" style="margin-bottom:15px; height:30px; border:1px solid #ccc; padding:0 8px;" onkeyup="if(event.key==='Enter') window.confirmAuditAction()"><input id="auditNewSsn" class="auto-hyphen" data-type="ssn" style="height:30px; display:none; margin-bottom:15px; border:1px solid #ccc; padding:0 8px;" placeholder="새 주민번호"><div style="text-align:right"><button class="tool-btn primary" style="display:inline-flex" onclick="window.confirmAuditAction()">확인</button></div></div></div></div>
 <div id="historyModal" class="modal-overlay" style="z-index:1200"><div class="modal-content" style="width:650px; max-height:80vh; display:flex; flex-direction:column;"><div class="modal-header"><h2 id="historyTitle" style="font-weight:bold">이력 조회</h2><button class="close-btn" onclick="document.getElementById('historyModal').style.display='none'">&times;</button></div><div class="modal-body" style="padding:20px; flex:1; overflow-y:auto; border:1px solid var(--icube-border)"><table class="icube-grid"><thead id="historyThead"></thead><tbody id="historyTbody"></tbody></table></div></div></div>
 <div id="notificationCenterModal" class="modal-overlay" style="z-index:1265"><div class="modal-content" style="width:900px;max-height:85vh"><div class="modal-header"><h2 style="font-weight:bold">알림함</h2><button class="close-btn" onclick="window.closeNotificationCenter()">&times;</button></div><div class="modal-body" style="padding:20px;overflow:auto;"><div style="font-size:11px;color:#666;margin-bottom:10px;">다운로드 승인 요청 메시지를 확인하고 승인 또는 반려할 수 있습니다.</div><table class="icube-grid"><thead><tr><th width="140">요청일시</th><th width="90">담당자</th><th>다운로드 사유</th><th width="90">상태</th><th width="130">읽음</th><th width="140">관리</th></tr></thead><tbody id="notificationCenterBody"></tbody></table></div></div></div>
@@ -781,7 +1462,7 @@ const fbCfg = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_c
 const app = initializeApp(fbCfg); const db = getFirestore(app); const auth = getAuth(app); const appId = typeof __app_id !== 'undefined' ? __app_id : 'hypo-erp-v1';
 const empRef = collection(db, 'artifacts', appId, 'public', 'data', 'employees'), accountRef = collection(db, 'artifacts', appId, 'public', 'data', 'accounts'), logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'syslogs'), settingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'settings'), backupRef = collection(db, 'artifacts', appId, 'public', 'data', 'backups'), reportRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_reports'), downloadApprovalRef = collection(db, 'artifacts', appId, 'public', 'data', 'employee_download_requests'), salaryPaymentRef = collection(db, 'artifacts', appId, 'public', 'data', 'salary_payments');
 
-let emps=[], accounts=[], syslogs=[], allowedIps=[], siteLinks=[], sysDepts=[], sysRanks=[], sysDuties=[], sysWorkplaces=[], headquartersSetting=null, backups=[], dailyReports=[], downloadRequests=[], salaryPayments=[];
+let emps=[], accounts=[], syslogs=[], allowedIps=[], siteLinks=[], sysDepts=[], sysRanks=[], sysDuties=[], sysWorkplaces=[], headquartersSetting=null, backups=[], dailyReports=[], downloadRequests=[], salaryPayments=[], salaryTaxTables=[];
 let currentIp='조회 불가', currentLoggedInUserName="관리자(테스트)", currentLoginAcc=null;
 let currentEditPhotoData='';
 let isEditMode=false, isSalaryLocked=true, qsTargetEmp=null, selectedEmpForSalary=null, selectedEmpForAppoint=null, selectedPayCurrentEmp=null;
@@ -794,6 +1475,18 @@ const $ = id => document.getElementById(id);
 const $v = id => $(id) ? $(id).value : '';
 const $sv = (id, val) => { if($(id)) $(id).value = val||''; };
 const trackedSalaryKeys = ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver','salWorkDay','salProbationRate'];
+
+const normalizeSalaryReasonForUpload = (rawReason='', linkedToAppointment=false) => {
+    if(linkedToAppointment) return '인사발령';
+    const r = String(rawReason || '').trim();
+    if(r === '인사발령') return '인사발령';
+    if(r === '연봉갱신/조정') return '연봉갱신/조정';
+    if(r === '임금인상') return '임금인상';
+    // 기존 통합업로드 파일에 '연봉갱신'으로 입력되어 있거나 사유가 공란인 경우 기본값은 임금인상
+    if(!r || r === '연봉갱신') return '임금인상';
+    return r;
+};
+
 const makeLinkedFlowId = (empId, date, prefix='LNK') => `${prefix}_${empId||'EMP'}_${(date||'').replace(/[^0-9]/g,'')}_${Date.now()}`;
 const buildSalarySnapshotFromPrefix = (prefix='st_') => {
     const snap = {};
@@ -1719,24 +2412,181 @@ const getPayDateForYm = (ym) => {
 const getPayrollDocId = (ym, empId) => `${String(ym||'').replace('-','')}_${empId}`;
 const getPayrollRecord = (ym, empId) => salaryPayments.find(p => p.id===getPayrollDocId(ym, empId) || (p.payYm===ym && p.empID===empId));
 const isPayTargetEmp = (emp, ym) => {
-    if(!['정규직','계약직','일용직'].includes(emp.contractType||'')) return false;
+    if(!['임원','정규직','계약직','일용직'].includes(emp.contractType||'')) return false;
     const first = getMonthFirstDate(ym), last = getMonthLastDate(ym);
     if(!emp.joinDate || emp.joinDate > last) return false;
     if(emp.quitDate && emp.quitDate.trim() && emp.quitDate < first) return false;
     return true;
 };
-const getPayTargets = (ym) => emps.filter(e=>isPayTargetEmp(e,ym)).sort((a,b)=>(a.dept||'').localeCompare(b.dept||'') || (a.empID||'').localeCompare(b.empID||''));
-const numField = (id) => `<input id="${id}" class="pay-num" oninput="window.updateCurrentPayrollCalc()" value="0">`;
+const sortEmployeesLikeHome = (list=[]) => [...list].sort((a,b) => {
+    let dwA=sysDepts.find(d=>d.name===a.dept)?.order||999, dwB=sysDepts.find(d=>d.name===b.dept)?.order||999; if(dwA!==dwB) return dwA-dwB;
+    let duA=stdDutyOrder.indexOf(a.duty); if(duA===-1)duA=99; let duB=stdDutyOrder.indexOf(b.duty); if(duB===-1)duB=99; if(duA!==duB) return duA-duB;
+    let rA=stdRankOrder.indexOf(a.rank); if(rA===-1)rA=99; let rB=stdRankOrder.indexOf(b.rank); if(rB===-1)rB=99; if(rA!==rB) return rA-rB;
+    return new Date(a.joinDate||0).getTime() - new Date(b.joinDate||0).getTime();
+});
+const getPayTargets = (ym) => sortEmployeesLikeHome(emps.filter(e=>isPayTargetEmp(e,ym)));
+const getPayMonthStatus = (emp, ym) => {
+    const tags = [];
+    const joinedThisMonth = (emp.joinDate||'').startsWith(ym);
+    const quitThisMonth = (emp.quitDate||'').startsWith(ym);
+    if(joinedThisMonth && quitThisMonth) tags.push({text:'입/퇴사자', cls:'pay-name-quit'});
+    else {
+        if(joinedThisMonth) tags.push({text:'입사자', cls:'pay-name-join'});
+        if(quitThisMonth) tags.push({text:'퇴사자', cls:'pay-name-quit'});
+    }
+    if(isProbationInPayMonth(emp, ym)) tags.push({text:'수습', cls:'pay-name-probation'});
+    return tags;
+};
+window.handlePayNumInput = (el) => {
+    if(!el) return;
+    const raw = String(el.value||'').replace(/[^0-9]/g,'');
+    el.value = raw ? Number(raw).toLocaleString() : '0';
+};
+window.handlePayInputKeydown = (event) => {
+    if(event.key !== 'Enter') return;
+    event.preventDefault();
+    const inputs = Array.from(document.querySelectorAll('#payCurrentFormArea input.pay-num'));
+    const idx = inputs.indexOf(event.target);
+    if(event.target?.id === 'deductItem_etcDeduct') {
+        window.saveCurrentPayroll();
+        return;
+    }
+    if(idx >= 0 && inputs[idx+1]) inputs[idx+1].focus();
+};
+const numField = (id) => `<input id="${id}" class="pay-num" inputmode="numeric" oninput="window.handlePayNumInput(this);window.updateCurrentPayrollCalc()" onkeydown="window.handlePayInputKeydown(event)" value="0">`;
 const textField = (id, val='', readonly=true) => `<input id="${id}" class="pay-text ${readonly?'read-only':''}" ${readonly?'readonly':''} value="${String(val||'').replace(/"/g,'&quot;')}">`;
 const buildPayField = (id, label, inputHtml) => `<div class="pay-field"><label>${label}</label>${inputHtml}</div>`;
+const getPayrollWorkInfo = (emp={}, ym='') => {
+    const firstStr = getMonthFirstDate(ym), lastStr = getMonthLastDate(ym);
+    const first = new Date(firstStr), last = new Date(lastStr);
+    let start = first, end = last;
+    if(emp.joinDate && emp.joinDate > firstStr) start = new Date(emp.joinDate);
+    if(emp.quitDate && emp.quitDate.trim() && emp.quitDate < lastStr) end = new Date(emp.quitDate); // 퇴사일은 마지막 근로일
+    const monthDays = new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
+    let workDays = Math.floor((end - start) / (1000*60*60*24)) + 1;
+    if(isNaN(workDays) || workDays < 0) workDays = 0;
+    if(workDays > monthDays) workDays = monthDays;
+    const isProrated = workDays > 0 && workDays < monthDays;
+    return {monthDays, workDays, ratio: monthDays ? workDays/monthDays : 1, isProrated, period:`${start.toISOString().slice(0,10)} ~ ${end.toISOString().slice(0,10)}`};
+};
+const proratePayAmount = (amount=0, workInfo={ratio:1,isProrated:false}) => {
+    const n = parseNum(amount);
+    return workInfo.isProrated ? Math.round(n * workInfo.ratio) : n;
+};
+const isProbationInPayMonth = (emp={}, ym='') => {
+    const end = emp.probationEndDate || '';
+    if(!end || !ym) return false;
+    const first = getMonthFirstDate(ym), last = getMonthLastDate(ym);
+    return end >= first && (!emp.joinDate || emp.joinDate <= last);
+};
+const getProbationAdjustedAmount = (amount=0, emp={}, ym='', applyRate=true) => {
+    const n = parseNum(amount);
+    const wi = getPayrollWorkInfo(emp, ym);
+    if(!wi.monthDays || wi.workDays <= 0) return 0;
+    const probationRate = applyRate ? ((parseFloat(emp.salProbationRate)||100)/100) : 1;
+    const endStr = emp.probationEndDate || '';
+    if(!endStr || endStr < getMonthFirstDate(ym)) return proratePayAmount(n, wi);
+    const startStr = wi.period.split(' ~ ')[0];
+    const workEndStr = wi.period.split(' ~ ')[1];
+    const start = new Date(startStr), workEnd = new Date(workEndStr), probEnd = new Date(endStr);
+    const probationEnd = probEnd < workEnd ? probEnd : workEnd;
+    let probDays = Math.floor((probationEnd - start)/(1000*60*60*24)) + 1;
+    if(isNaN(probDays) || probDays < 0) probDays = 0;
+    if(probDays > wi.workDays) probDays = wi.workDays;
+    const normalDays = wi.workDays - probDays;
+    return Math.round((n / wi.monthDays) * ((probDays * probationRate) + normalDays));
+};
+const getPayrollDefaults = (emp={}, ym='') => {
+    const targetYm = ym || $v('payCurrentYm') || getDefaultPayYm();
+    return {
+        base: getProbationAdjustedAmount(emp.salBase, emp, targetYm, true),
+        meal: proratePayAmount(emp.salMeal, getPayrollWorkInfo(emp, targetYm)),
+        car: getProbationAdjustedAmount(emp.salCar, emp, targetYm, true),
+        drive: getProbationAdjustedAmount(emp.salDrive, emp, targetYm, true),
+        service: getProbationAdjustedAmount(emp.salService, emp, targetYm, true),
+        dutyAllowance: getProbationAdjustedAmount(emp.salRank, emp, targetYm, true),
+        fixedOver: getProbationAdjustedAmount(emp.salFixedOver, emp, targetYm, true)
+    };
+};
+
+const getTaxablePayrollAmount = () => {
+    const gross = payItemFields.reduce((sum,[key])=>sum+parseNum($v('payItem_'+key)),0);
+    return Math.max(0, gross - parseNum($v('payItem_meal')) - parseNum($v('payItem_drive')));
+};
+const getApplicableTaxTable = (ym='') => {
+    const target = String(ym||getDefaultPayYm());
+    return [...salaryTaxTables].filter(t => (t.effectiveYm||'') <= target).sort((a,b)=>String(b.effectiveYm||'').localeCompare(String(a.effectiveYm||'')))[0] || null;
+};
+const lookupIncomeTaxFromUploadedTable = (taxablePay=0, dependents=1, ym='') => {
+    const table = getApplicableTaxTable(ym);
+    const rows = table?.rows || [];
+    if(!rows.length) return null;
+    const dep = Math.max(1, parseNum(dependents)||1);
+    const row = rows.find(r => taxablePay >= parseNum(r.from) && taxablePay < parseNum(r.to || 999999999));
+    if(!row) return null;
+    const val = row['fam'+dep] ?? row[dep] ?? row.tax ?? row.amount;
+    return val == null ? null : Math.floor(parseNum(val)/10)*10;
+};
+const getEmpTaxCriteria = (emp={}, saved=null) => {
+    const c = saved?.taxCriteria || {};
+    const smeYn = c.smeYn ?? emp.smeTaxReductionYn ?? emp.taxReductionYn ?? false;
+    const smeStart = c.smeStart || emp.smeTaxReductionStart || emp.taxReductionStart || '';
+    const smeEnd = c.smeEnd || emp.smeTaxReductionEnd || emp.taxReductionEnd || '';
+    return { dependents: parseNum(c.dependents || emp.taxDependents || 1) || 1, smeYn: !!smeYn, smeStart, smeEnd };
+};
+const isSmeReductionActive = (criteria={}, ym='') => !!criteria.smeYn && criteria.smeStart && criteria.smeEnd && `${ym}-01` >= criteria.smeStart && `${ym}-01` <= criteria.smeEnd;
+const estimateMonthlyIncomeTax = (gross=0, dependents=1, smeActive=false) => {
+    gross = Math.max(0, parseNum(gross)); dependents = Math.max(1, parseNum(dependents)||1);
+    if(gross <= 1060000) return 0;
+    const annualGross = gross * 12;
+    let earnedDeduct = 0;
+    if(annualGross <= 5000000) earnedDeduct = annualGross * 0.70;
+    else if(annualGross <= 15000000) earnedDeduct = 3500000 + (annualGross-5000000)*0.40;
+    else if(annualGross <= 45000000) earnedDeduct = 7500000 + (annualGross-15000000)*0.15;
+    else if(annualGross <= 100000000) earnedDeduct = 12000000 + (annualGross-45000000)*0.05;
+    else earnedDeduct = 14750000 + (annualGross-100000000)*0.02;
+    const taxable = Math.max(0, annualGross - earnedDeduct - (1500000 * dependents));
+    const brackets = [[14000000,0.06,0],[50000000,0.15,1260000],[88000000,0.24,5760000],[150000000,0.35,15440000],[300000000,0.38,19940000],[500000000,0.40,25940000],[1000000000,0.42,35940000],[Infinity,0.45,65940000]];
+    const b = brackets.find(x=>taxable<=x[0]);
+    let annualTax = Math.max(0, taxable*b[1]-b[2]);
+    const credit = Math.min(740000, annualTax <= 1300000 ? annualTax*0.55 : 715000 + (annualTax-1300000)*0.30);
+    annualTax = Math.max(0, annualTax - credit);
+    if(smeActive) annualTax = annualTax * 0.30;
+    return Math.floor((annualTax/12)/10)*10;
+};
+window.handlePayInputKeydown = (event) => {
+    if(event.key !== 'Enter') return;
+    event.preventDefault();
+    const inputs = Array.from(document.querySelectorAll('#payCurrentPayGrid input.pay-num, #payCurrentDeductGrid input.pay-num'));
+    const idx = inputs.indexOf(event.target);
+    if(event.target?.id === 'deductItem_etcDeduct') { window.saveCurrentPayroll(); return; }
+    if(idx >= 0 && inputs[idx+1]) inputs[idx+1].focus();
+};
+
+window.showTaxTableUploadGuide = () => {
+    const msg = `[근로소득 간이세액표 업로드 안내]\n\n근로소득 간이세액표를 업데이트하세요.\n\n■ 다운로드 경로\n1. 국세청 홈택스 접속\n2. 상단 메뉴에서 '조회/발급' 선택\n3. '기타조회' 영역의 '근로소득간이세액표' 선택\n4. 적용연도 또는 시행일을 확인한 뒤 엑셀 파일 다운로드\n\n■ 업로드 파일 형식\n- 국세청에서 내려받은 Excel 파일(.xls 또는 .xlsx)\n- 파일명 변경은 가능하나, 시트/열 구조는 변경하지 않는 것을 권장합니다.\n\n■ 적용 기준\n- 업로드한 간이세액표는 업로드 시점 이후 급여 계산에 계속 적용됩니다.\n- 간이세액표가 개정·공시된 경우에만 다시 업로드하면 됩니다.`;
+    window.showConfirmBox(msg, ()=>document.getElementById('payTaxTableUploadInput')?.click(), null);
+};
+
+window.syncPaySubMenuYm = () => {
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    if($('annualPayYm')) $('annualPayYm').value = ym;
+};
 window.renderPayCurrentPage = () => {
     const ymEl = $('payCurrentYm');
     if(ymEl && !ymEl.value) ymEl.value = getDefaultPayYm();
+    window.syncPaySubMenuYm();
+    if($('page-pay-current-annual')?.classList.contains('active')) window.renderAnnualLeavePayPage();
     if(!selectedPayCurrentEmp){
         if($('payCurrentFormArea')) $('payCurrentFormArea').style.display='none';
         if($('payCurrentEmptyArea')) $('payCurrentEmptyArea').style.display='flex';
     }
     if($('payCurrentPayDate')) $('payCurrentPayDate').innerText = `지급 예정일 : ${getPayDateForYm($v('payCurrentYm'))} / 귀속기간 : ${getMonthFirstDate($v('payCurrentYm'))} ~ ${getMonthLastDate($v('payCurrentYm'))}`;
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    if(!window.__taxTableNoticeShown && !getApplicableTaxTable(ym)){
+        window.__taxTableNoticeShown = true;
+        setTimeout(()=>window.showTaxTableUploadGuide(), 250);
+    }
     window.renderPayCurrentList();
 };
 window.renderPayCurrentList = () => {
@@ -1747,7 +2597,9 @@ window.renderPayCurrentList = () => {
     const body = $('payCurrentEmpList'); if(!body) return;
     body.innerHTML = list.length ? list.map(e => {
         const saved = getPayrollRecord(ym, e.empID);
-        return `<tr onclick="window.selectPayCurrentEmp('${e.empID}', this)"><td>${e.empID||''}</td><td style="font-weight:bold">${e.name||''}${saved?'<span style="color:#27ae60;font-size:10px;margin-left:4px;">저장</span>':''}</td><td>${e.dept||''}</td></tr>`;
+        const tags = getPayMonthStatus(e, ym);
+        const tagHtml = tags.map(t=>`<span class="${t.cls}">(${t.text})</span>`).join('');
+        return `<tr onclick="window.selectPayCurrentEmp('${e.empID}', this)"><td>${e.empID||''}</td><td style="font-weight:bold">${e.name||''}${tagHtml}${saved?'<span class="pay-name-saved">저장</span>':''}</td><td>${e.dept||''}</td></tr>`;
     }).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">대상자가 없습니다.</td></tr>';
 };
 window.selectPayCurrentEmp = (empId, tr) => {
@@ -1774,12 +2626,15 @@ window.loadPayCurrentEmployee = (empId) => {
         ['payInfoJoin','입사일', emp.joinDate||''],
         ['payInfoQuit','퇴사일', emp.quitDate||''],
         ['payInfoContract','계약구분', emp.contractType||''],
-        ['payInfoHours','소정시간', emp.salWorkDay ? `${emp.salWorkDay}시간/일` : '']
+        ['payInfoHours','소정시간', emp.salWorkDay ? `${emp.salWorkDay}시간/일` : ''],
+        ['payInfoWorkDays','근무일수', `${getPayrollWorkInfo(emp, ym).workDays}/${getPayrollWorkInfo(emp, ym).monthDays}일${getPayrollWorkInfo(emp, ym).isProrated?' (일할계산)':''}`]
     ];
     if($('payCurrentInfoGrid')) $('payCurrentInfoGrid').innerHTML = info.map(([id,label,val])=>buildPayField(id,label,textField(id,val,true))).join('');
-    const defaults = {
-        base: parseNum(emp.salBase), meal: parseNum(emp.salMeal), car: parseNum(emp.salCar), drive: parseNum(emp.salDrive), service: parseNum(emp.salService), dutyAllowance: parseNum(emp.salRank), fixedOver: parseNum(emp.salFixedOver)
-    };
+    const criteria = getEmpTaxCriteria(emp, saved);
+    if($('payTaxDependents')) $('payTaxDependents').value = criteria.dependents.toLocaleString();
+    if($('payTaxSmeStatus')) $('payTaxSmeStatus').value = criteria.smeYn ? '감면대상' : '미대상';
+    if($('payTaxSmePeriod')) $('payTaxSmePeriod').value = criteria.smeYn ? `${criteria.smeStart || '-'} ~ ${criteria.smeEnd || '-'}` : '-';
+    const defaults = getPayrollDefaults(emp, ym);
     const payValues = saved?.payments || defaults;
     const deductValues = saved?.deductions || {};
     if($('payCurrentPayGrid')) $('payCurrentPayGrid').innerHTML = payItemFields.map(([key,label])=>buildPayField('payItem_'+key,label,numField('payItem_'+key))).join('');
@@ -1790,6 +2645,17 @@ window.loadPayCurrentEmployee = (empId) => {
 };
 window.updateCurrentPayrollCalc = () => {
     const gross = payItemFields.reduce((sum,[key])=>sum+parseNum($v('payItem_'+key)),0);
+    const dependents = parseNum($v('payTaxDependents')) || 1;
+    const saved = selectedPayCurrentEmp ? getPayrollRecord($v('payCurrentYm') || getDefaultPayYm(), selectedPayCurrentEmp.empID) : null;
+    const criteria = selectedPayCurrentEmp ? getEmpTaxCriteria(selectedPayCurrentEmp, saved) : {dependents:1,smeYn:false};
+    criteria.dependents = dependents;
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const taxablePay = getTaxablePayrollAmount();
+    let incomeTax = lookupIncomeTaxFromUploadedTable(taxablePay, dependents, ym);
+    if(incomeTax == null) incomeTax = estimateMonthlyIncomeTax(taxablePay, dependents, isSmeReductionActive(criteria, ym));
+    if(isSmeReductionActive(criteria, ym)) incomeTax = Math.floor((incomeTax * 0.3)/10)*10;
+    if($('deductItem_incomeTax')) $('deductItem_incomeTax').value = incomeTax.toLocaleString();
+    if($('deductItem_localTax')) $('deductItem_localTax').value = (Math.floor((incomeTax*0.1)/10)*10).toLocaleString();
     const deduct = deductItemFields.reduce((sum,[key])=>sum+parseNum($v('deductItem_'+key)),0);
     if($('paySumGross')) $('paySumGross').innerText = gross.toLocaleString()+'원';
     if($('paySumDeduct')) $('paySumDeduct').innerText = deduct.toLocaleString()+'원';
@@ -1804,8 +2670,10 @@ window.saveCurrentPayroll = async () => {
     payItemFields.forEach(([key])=>payments[key]=parseNum($v('payItem_'+key)));
     deductItemFields.forEach(([key])=>deductions[key]=parseNum($v('deductItem_'+key)));
     const gross = Object.values(payments).reduce((a,b)=>a+b,0), deduct = Object.values(deductions).reduce((a,b)=>a+b,0);
+    const oldCriteria = getEmpTaxCriteria(selectedPayCurrentEmp, getPayrollRecord(ym, selectedPayCurrentEmp.empID));
+    const taxCriteria = {...oldCriteria, dependents: parseNum($v('payTaxDependents')) || 1};
     const payload = {
-        id:getPayrollDocId(ym, selectedPayCurrentEmp.empID), payYm:ym, payDate:getPayDateForYm(ym), empID:selectedPayCurrentEmp.empID, name:selectedPayCurrentEmp.name||'', dept:selectedPayCurrentEmp.dept||'', rank:selectedPayCurrentEmp.rank||'', duty:selectedPayCurrentEmp.duty||'', contractType:selectedPayCurrentEmp.contractType||'', joinDate:selectedPayCurrentEmp.joinDate||'', quitDate:selectedPayCurrentEmp.quitDate||'', payments, deductions, grossPay:gross, deductionTotal:deduct, netPay:gross-deduct, savedAt:new Date().toISOString(), savedBy:currentLoggedInUserName
+        id:getPayrollDocId(ym, selectedPayCurrentEmp.empID), payYm:ym, payDate:getPayDateForYm(ym), empID:selectedPayCurrentEmp.empID, name:selectedPayCurrentEmp.name||'', dept:selectedPayCurrentEmp.dept||'', rank:selectedPayCurrentEmp.rank||'', duty:selectedPayCurrentEmp.duty||'', contractType:selectedPayCurrentEmp.contractType||'', joinDate:selectedPayCurrentEmp.joinDate||'', quitDate:selectedPayCurrentEmp.quitDate||'', payments, deductions, taxCriteria, taxablePay: Math.max(0, gross - (payments.meal||0) - (payments.drive||0)), grossPay:gross, deductionTotal:deduct, netPay:gross-deduct, savedAt:new Date().toISOString(), savedBy:currentLoggedInUserName
     };
     await setDoc(doc(salaryPaymentRef, payload.id), payload);
     await window.logSystemAction('저장', '당월 급여지급', `${ym} / ${payload.empID} ${payload.name} / 실지급 ${payload.netPay.toLocaleString()}원`);
@@ -1823,7 +2691,8 @@ const buildPayrollExportRow = (record, seq=1) => {
 };
 window.downloadCurrentPayrollExcel = () => {
     const ym = $v('payCurrentYm') || getDefaultPayYm();
-    const records = salaryPayments.filter(p=>p.payYm===ym).sort((a,b)=>(a.empID||'').localeCompare(b.empID||''));
+    const order = new Map(getPayTargets(ym).map((e,i)=>[e.empID,i]));
+    const records = salaryPayments.filter(p=>p.payYm===ym).sort((a,b)=>(order.get(a.empID)??9999)-(order.get(b.empID)??9999) || (a.empID||'').localeCompare(b.empID||''));
     if(!records.length) return window.showMessageBox('해당 귀속년월에 저장된 급여자료가 없습니다.');
     const aoa = [
         Array(payrollHeaders.length+1).fill(''),
@@ -1837,6 +2706,233 @@ window.downloadCurrentPayrollExcel = () => {
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, '급여대장');
     XLSX.writeFile(wb, `급여대장_${ym.replace('-','')}.xlsx`);
 };
+
+const findPayrollUploadEmp = (row={}) => {
+    const vals = Object.entries(row).reduce((acc,[k,v])=>{ acc[String(k).replace(/\s/g,'')] = String(v||'').trim(); return acc; },{});
+    const empId = vals['사번'] || vals['사원번호'] || vals['직원번호'] || vals['근로자번호'];
+    if(empId){ const found = emps.find(e=>String(e.empID||'').trim()===empId); if(found) return found; }
+    const name = vals['성명'] || vals['이름'] || vals['근로자명'] || vals['직원명'];
+    if(name){ const candidates = emps.filter(e=>String(e.name||'').trim()===name); if(candidates.length===1) return candidates[0]; }
+    return null;
+};
+const rowValueByHeaderIncludes = (row, patterns=[], excludes=[]) => {
+    let total = 0;
+    Object.entries(row).forEach(([k,v])=>{
+        const key = String(k||'').replace(/\s/g,'');
+        const ok = patterns.some(p=>key.includes(p));
+        const no = excludes.some(p=>key.includes(p));
+        if(ok && !no) total += parseNum(v);
+    });
+    return total;
+};
+const buildPayrollPayloadForUpload = (emp, ym, patchDeductions={}) => {
+    const saved = getPayrollRecord(ym, emp.empID);
+    const payments = saved?.payments || getPayrollDefaults(emp);
+    const deductions = {...(saved?.deductions || {}), ...patchDeductions};
+    const gross = Object.values(payments).reduce((a,b)=>a+parseNum(b),0);
+    if(deductions.incomeTax == null) deductions.incomeTax = estimateMonthlyIncomeTax(gross, getEmpTaxCriteria(emp, saved).dependents, isSmeReductionActive(getEmpTaxCriteria(emp, saved), ym));
+    if(deductions.localTax == null) deductions.localTax = Math.floor((deductions.incomeTax*0.1)/10)*10;
+    const deduct = Object.values(deductions).reduce((a,b)=>a+parseNum(b),0);
+    return { id:getPayrollDocId(ym, emp.empID), payYm:ym, payDate:getPayDateForYm(ym), empID:emp.empID, name:emp.name||'', dept:emp.dept||'', rank:emp.rank||'', duty:emp.duty||'', contractType:emp.contractType||'', joinDate:emp.joinDate||'', quitDate:emp.quitDate||'', payments, deductions, taxCriteria:getEmpTaxCriteria(emp, saved), grossPay:gross, deductionTotal:deduct, netPay:gross-deduct, savedAt:new Date().toISOString(), savedBy:currentLoggedInUserName };
+};
+window.handlePayrollInsuranceUpload = async (event, type) => {
+    const file = event.target?.files?.[0];
+    if(event.target) event.target.value='';
+    if(!file) return;
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+    const targets = new Set(getPayTargets(ym).map(e=>e.empID));
+    const items = [];
+    const misses = [];
+    rows.forEach((row, idx)=>{
+        const emp = findPayrollUploadEmp(row);
+        if(!emp || !targets.has(emp.empID)){ if(idx < 10) misses.push(idx+2); return; }
+        let patch = {};
+        if(type === 'pension'){
+            let premium = rowValueByHeaderIncludes(row, ['산출보험료'], []);
+            if(!premium) premium = rowValueByHeaderIncludes(row, ['연금보험료','국민연금'], ['사업장','사용자','회사']);
+            patch.pension = Math.floor(parseNum(premium)/2);
+        } else {
+            const baseHealth = rowValueByHeaderIncludes(row, ['건강보험료','건강보험'], ['정산','연말','장기','요양']) + rowValueByHeaderIncludes(row, ['장기요양보험료','장기요양'], ['정산','연말']);
+            const settleHealth = rowValueByHeaderIncludes(row, ['정산'], []) && (rowValueByHeaderIncludes(row, ['건강정산'], []) || rowValueByHeaderIncludes(row, ['정산보험료','정산건강','정산장기'], []));
+            const yearEndHealth = rowValueByHeaderIncludes(row, ['연말'], []) && (rowValueByHeaderIncludes(row, ['연말정산','연말건강','연말장기'], []));
+            patch.health = baseHealth;
+            patch.settleHealth = parseNum(settleHealth);
+            patch.yearEndHealth = parseNum(yearEndHealth);
+        }
+        items.push(buildPayrollPayloadForUpload(emp, ym, patch));
+    });
+    if(!items.length) return window.showMessageBox('업로드 가능한 급여 대상자를 찾지 못했습니다. 사번 또는 성명 항목을 확인해주세요.');
+    window.showConfirmBox(`${ym} 귀속 급여자료에 ${type==='pension'?'국민연금':'건강보험'} 자료 ${items.length}건을 반영하시겠습니까?`, async()=>{
+        try{
+            await runBatched(items,(batch,item)=>batch.set(doc(salaryPaymentRef,item.id),item,{merge:true}),400,`${type==='pension'?'국민연금':'건강보험'} 업로드 중...`);
+            await window.logSystemAction('업로드', '당월 급여지급', `${ym} / ${type==='pension'?'국민연금':'건강보험'} ${items.length}건`);
+            window.showMessageBox('업로드 완료');
+            window.renderPayCurrentPage();
+            if(selectedPayCurrentEmp) window.loadPayCurrentEmployee(selectedPayCurrentEmp.empID);
+        } finally { setTimeout(()=>window.hideLoading(),250); }
+    }, null);
+};
+window.handleTaxTableUpload = async (event) => {
+    const file = event.target?.files?.[0]; event.target.value='';
+    if(!file) return;
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rowsRaw = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+    const rows = [];
+    rowsRaw.forEach(arr => {
+        const nums = arr.map(v=>parseNum(v)).filter(v=>v>0);
+        if(nums.length >= 3){
+            const from = nums[0], to = nums[1];
+            const row = {from, to};
+            nums.slice(2, 13).forEach((v,i)=>row['fam'+(i+1)] = v);
+            rows.push(row);
+        }
+    });
+    if(!rows.length) return window.showMessageBox('간이세액표 데이터를 읽지 못했습니다. 월급여 구간과 가족수별 세액이 포함된 엑셀인지 확인해주세요.');
+    const id = 'tax_table_' + ym.replace('-','');
+    await setDoc(doc(settingsRef, id), {type:'TAX_TABLE', effectiveYm:ym, fileName:file.name, uploadedAt:new Date().toISOString(), uploadedBy:currentLoggedInUserName, rows});
+    await window.logSystemAction('업로드','근로소득 간이세액표',`${ym} 적용 / ${rows.length}행`);
+    window.showMessageBox(`근로소득 간이세액표 업로드 완료\n적용 시작 귀속월 : ${ym}\n읽은 구간 수 : ${rows.length}건`);
+    if(selectedPayCurrentEmp) window.loadPayCurrentEmployee(selectedPayCurrentEmp.empID);
+};
+
+
+
+const getAnnualLeaveTargets = (ym='') => getPayTargets(ym).filter(e => (e.quitDate||'').startsWith(ym));
+window.renderAnnualLeavePayPage = () => {
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    if($('annualPayYm')) $('annualPayYm').value = ym;
+    const body = $('annualLeavePayBody'); if(!body) return;
+    const rows = getAnnualLeaveTargets(ym);
+    body.innerHTML = rows.length ? rows.map(emp => {
+        const rec = getPayrollRecord(ym, emp.empID);
+        const hourly = calcSalarySummary(emp).ordinaryHourly || 0;
+        const savedDays = rec?.annualLeaveDays ?? '';
+        const savedPay = rec?.payments?.annualLeave || 0;
+        return `<tr data-emp-id="${emp.empID}"><td style="font-weight:bold">${emp.name||''}</td><td>${emp.joinDate||''}</td><td>${emp.quitDate||''}</td><td class="annual-hourly">${hourly.toLocaleString()}원</td><td><input class="annual-days" inputmode="decimal" value="${savedDays}" oninput="window.handleAnnualDaysInput(this)"></td><td class="annual-pay" data-value="${savedPay}">${parseNum(savedPay).toLocaleString()}원</td></tr>`;
+    }).join('') : '<tr><td colspan="6" style="padding:20px;color:#999">해당 귀속월 퇴사자가 없습니다.</td></tr>';
+};
+window.handleAnnualDaysInput = (input) => {
+    if(!input) return;
+    let raw = String(input.value||'').replace(/[^0-9.]/g,'');
+    const parts = raw.split('.');
+    if(parts.length > 2) raw = parts[0] + '.' + parts.slice(1).join('');
+    if(raw.includes('.')) raw = raw.split('.')[0] + '.' + raw.split('.')[1].slice(0,1);
+    input.value = raw;
+    const tr = input.closest('tr'); if(!tr) return;
+    const emp = emps.find(e => e.empID === tr.dataset.empId);
+    const hourly = emp ? (calcSalarySummary(emp).ordinaryHourly || 0) : 0;
+    const days = parseFloat(raw || '0') || 0;
+    const pay = Math.round(hourly * 8 * days);
+    const payCell = tr.querySelector('.annual-pay');
+    if(payCell){ payCell.dataset.value = String(pay); payCell.innerText = pay.toLocaleString() + '원'; }
+};
+window.saveAnnualLeavePayAll = async () => {
+    const ym = $v('payCurrentYm') || getDefaultPayYm();
+    const rows = Array.from(document.querySelectorAll('#annualLeavePayBody tr[data-emp-id]'));
+    if(!rows.length) return window.showMessageBox('저장할 연차수당 대상자가 없습니다.');
+    const items = [];
+    rows.forEach(tr => {
+        const emp = emps.find(e => e.empID === tr.dataset.empId);
+        if(!emp) return;
+        const saved = getPayrollRecord(ym, emp.empID);
+        const payments = {...(saved?.payments || getPayrollDefaults(emp, ym))};
+        payments.annualLeave = parseNum(tr.querySelector('.annual-pay')?.dataset.value || 0);
+        const deductions = {...(saved?.deductions || {})};
+        const gross = Object.values(payments).reduce((a,b)=>a+parseNum(b),0);
+        const deduct = Object.values(deductions).reduce((a,b)=>a+parseNum(b),0);
+        items.push({
+            id:getPayrollDocId(ym, emp.empID), payYm:ym, payDate:getPayDateForYm(ym), empID:emp.empID, name:emp.name||'', dept:emp.dept||'', rank:emp.rank||'', duty:emp.duty||'', contractType:emp.contractType||'', joinDate:emp.joinDate||'', quitDate:emp.quitDate||'',
+            payments, deductions, annualLeaveDays: tr.querySelector('.annual-days')?.value || '', taxCriteria:getEmpTaxCriteria(emp, saved), taxablePay: Math.max(0, gross - (payments.meal||0) - (payments.drive||0)), grossPay:gross, deductionTotal:deduct, netPay:gross-deduct, savedAt:new Date().toISOString(), savedBy:currentLoggedInUserName
+        });
+    });
+    try{
+        await runBatched(items,(batch,item)=>batch.set(doc(salaryPaymentRef,item.id),item,{merge:true}),400,'연차수당 저장 중...');
+        await window.logSystemAction('저장', '연차수당', `${ym} / ${items.length}건`);
+        window.showMessageBox('연차수당 저장 완료');
+        window.renderAnnualLeavePayPage();
+        if($('page-pay-current')?.classList.contains('active')) window.renderPayCurrentPage();
+    } finally { setTimeout(()=>window.hideLoading(),250); }
+};
+
+const getSalaryInfoMonthlyTotal = (emp={}) => ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].reduce((sum,k)=>sum+parseNum(emp[k]||0),0);
+const getPayReportMonths = (baseYm='') => {
+    const [y,m] = String(baseYm||getDefaultPayYm()).split('-').map(Number);
+    const arr = [];
+    if(!y || !m) return arr;
+    for(let i=11;i>=0;i--){
+        const d = new Date(y, m-1-i, 1);
+        arr.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    return arr;
+};
+const getSalaryBand = (amount=0) => {
+    const n = parseNum(amount);
+    const unit = 1000000;
+    if(n <= 0) return '0원';
+    const from = Math.floor(n/unit)*unit;
+    const to = from + unit;
+    return `${Math.floor(from/10000).toLocaleString()}~${Math.floor(to/10000).toLocaleString()}만원`;
+};
+const renderSimpleRows = (bodyId, rows, emptyColspan=3) => {
+    const body = $(bodyId); if(!body) return;
+    body.innerHTML = rows.length ? rows.join('') : `<tr><td colspan="${emptyColspan}" style="padding:20px;color:#999">조회된 데이터가 없습니다.</td></tr>`;
+};
+window.renderReportPayPage = () => {
+    const ymEl = $('reportPayYm');
+    if(ymEl && !ymEl.value) ymEl.value = getDefaultPayYm();
+    const ym = $v('reportPayYm') || getDefaultPayYm();
+    const months = getPayReportMonths(ym);
+    const monthRecords = months.map(m => salaryPayments.filter(p => p.payYm === m));
+    const headcounts = monthRecords.map(rows => rows.length);
+    const grossTotals = monthRecords.map(rows => rows.reduce((sum,p)=>sum+parseNum(p.grossPay||0),0));
+    const activeForYm = getPayTargets(ym);
+    const activeIdsForYm = new Set(activeForYm.map(e=>e.empID));
+    const selectedRecords = salaryPayments.filter(p => p.payYm === ym && activeIdsForYm.has(p.empID));
+    const totalGross = selectedRecords.reduce((sum,p)=>sum+parseNum(p.grossPay||0),0);
+    const avgGross = selectedRecords.length ? Math.round(totalGross/selectedRecords.length) : 0;
+    if($('reportPaySummaryBox')) $('reportPaySummaryBox').innerHTML = `
+      <div class="stats-rate-box"><div class="label">지급인원수</div><div style="font-size:18px;font-weight:bold;color:var(--icube-blue)">${selectedRecords.length.toLocaleString()}명</div></div>
+      <div class="stats-rate-box"><div class="label">총 지급액</div><div style="font-size:18px;font-weight:bold;color:var(--icube-blue)">${totalGross.toLocaleString()}원</div></div>
+      <div class="stats-rate-box"><div class="label">평균 지급액</div><div style="font-size:18px;font-weight:bold;color:var(--icube-blue)">${avgGross.toLocaleString()}원</div></div>`;
+    const rankMap = new Map();
+    activeForYm.forEach(emp => {
+        const rank = getDisplayRole(emp) || '미지정';
+        if(!rankMap.has(rank)) rankMap.set(rank, {infoTotal:0, infoCnt:0, payTotal:0, payCnt:0});
+        const row = rankMap.get(rank);
+        row.infoTotal += getSalaryInfoMonthlyTotal(emp);
+        row.infoCnt += 1;
+        const rec = getPayrollRecord(ym, emp.empID);
+        if(rec){ row.payTotal += parseNum(rec.grossPay||0); row.payCnt += 1; }
+    });
+    const rankRows = Array.from(rankMap.entries()).map(([rank,v]) => `<tr><td>${rank}</td><td>${v.infoCnt?Math.round(v.infoTotal/v.infoCnt).toLocaleString():0}원</td><td>${v.payCnt?Math.round(v.payTotal/v.payCnt).toLocaleString():0}원</td></tr>`);
+    renderSimpleRows('reportPayRankAvgBody', rankRows, 3);
+    const infoBands = new Map(), payBands = new Map();
+    activeForYm.forEach(emp => { const b = getSalaryBand(getSalaryInfoMonthlyTotal(emp)); infoBands.set(b, (infoBands.get(b)||0)+1); });
+    selectedRecords.forEach(p => { const b = getSalaryBand(p.grossPay||0); payBands.set(b, (payBands.get(b)||0)+1); });
+    const bandKeys = Array.from(new Set([...infoBands.keys(), ...payBands.keys()])).sort((a,b)=>parseNum(a)-parseNum(b));
+    const bandRows = bandKeys.map(k => `<tr><td>${k}</td><td>${(infoBands.get(k)||0).toLocaleString()}명</td><td>${(payBands.get(k)||0).toLocaleString()}명</td></tr>`);
+    renderSimpleRows('reportPayBandBody', bandRows, 3);
+    const canvas = $('reportPayTrendChart');
+    if(canvas && typeof Chart !== 'undefined'){
+        if(window.reportPayTrendChart && typeof window.reportPayTrendChart.destroy === 'function') window.reportPayTrendChart.destroy();
+        window.reportPayTrendChart = new Chart(canvas, {
+            type:'bar',
+            data:{ labels: months.map(m=>`${parseInt(m.slice(5,7),10)}월`), datasets:[
+                {type:'line', label:'지급인원수', data:headcounts, yAxisID:'yCount', tension:.35, pointRadius:4, borderWidth:3},
+                {type:'bar', label:'총 지급액', data:grossTotals, yAxisID:'yAmount', borderRadius:10, barPercentage:.55, categoryPercentage:.7}
+            ]},
+            options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}, tooltip:{callbacks:{label:(ctx)=> ctx.dataset.yAxisID === 'yCount' ? `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}명` : `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()}원`}} }, scales:{ yCount:{type:'linear', position:'left', beginAtZero:true, ticks:{callback:v=>`${v}명`}, grid:{drawOnChartArea:false}}, yAmount:{type:'linear', position:'right', beginAtZero:true, ticks:{callback:v=>`${Math.round(v/10000).toLocaleString()}만원`}}, x:{grid:{display:false}} } }
+        });
+    }
+};
+
 window.renderPayHistoryPage = () => {
     const ymEl = $('payHistoryYm'); if(ymEl && !ymEl.value) ymEl.value = getDefaultPayYm();
     const ym = $v('payHistoryYm') || getDefaultPayYm();
@@ -1846,6 +2942,246 @@ window.renderPayHistoryPage = () => {
     body.innerHTML = rows.length ? rows.map(p=>`<tr><td>${p.payYm||''}</td><td>${p.empID||''}</td><td style="font-weight:bold">${p.name||''}</td><td>${p.dept||''}</td><td>${p.contractType||''}</td><td>${(p.grossPay||0).toLocaleString()}원</td><td>${(p.deductionTotal||0).toLocaleString()}원</td><td style="font-weight:bold;color:var(--icube-blue)">${(p.netPay||0).toLocaleString()}원</td><td>${(p.savedAt||'').replace('T',' ').slice(0,16)}</td><td>${p.savedBy||''}</td></tr>`).join('') : '<tr><td colspan="10" style="padding:20px;color:#999">조회된 급여지급내역이 없습니다.</td></tr>';
 };
 
+
+
+
+window.openPayrollPaymentBulkModal = () => {
+    if($('payrollPaymentBulkRows')) $('payrollPaymentBulkRows').innerHTML = '';
+    window.addPayrollPaymentBulkRow($v('payCurrentYm') || getDefaultPayYm());
+    if($('payrollPaymentBulkModal')) $('payrollPaymentBulkModal').style.display = 'flex';
+};
+window.closePayrollPaymentBulkModal = () => { if($('payrollPaymentBulkModal')) $('payrollPaymentBulkModal').style.display='none'; };
+window.addPayrollPaymentBulkRow = (ym='') => {
+    const box = $('payrollPaymentBulkRows'); if(!box) return;
+    const row = document.createElement('div');
+    row.className = 'payroll-payment-bulk-row';
+    row.style.cssText = 'display:grid;grid-template-columns:120px 1fr 60px;gap:8px;align-items:center;border:1px solid var(--icube-border);padding:10px;border-radius:6px;background:#fbfbfb;';
+    row.innerHTML = `<input type="month" class="payroll-bulk-ym" value="${ym||getDefaultPayYm()}" style="height:30px;border:1px solid var(--icube-border);padding:0 8px"><input type="file" class="payroll-bulk-file" accept=".xlsx,.xls" multiple style="height:30px"><button class="tool-btn danger" onclick="this.closest('.payroll-payment-bulk-row').remove()">삭제</button>`;
+    box.appendChild(row);
+};
+const normalizePayrollUploadRow = (row={}) => Object.entries(row).reduce((acc,[k,v]) => { acc[String(k||'').replace(/\s/g,'')] = v; return acc; }, {});
+const getPayrollUploadCell = (row={}, header='') => {
+    const normalized = normalizePayrollUploadRow(row);
+    return normalized[String(header||'').replace(/\s/g,'')] ?? '';
+};
+const parsePayrollWorkbookRows = (wb) => {
+    const result = [];
+    wb.SheetNames.forEach(sheetName => {
+        const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header:1, defval:''});
+        const headerIdx = aoa.findIndex(r => r.some(c => String(c).replace(/\s/g,'') === '사번') && r.some(c => String(c).replace(/\s/g,'') === '이름'));
+        if(headerIdx < 0) return;
+        const headers = aoa[headerIdx].map(h => String(h||'').trim());
+        aoa.slice(headerIdx+1).forEach(arr => {
+            const row = {};
+            headers.forEach((h,i) => { if(h) row[h] = arr[i]; });
+            if(Object.values(row).some(v => String(v||'').trim() !== '')) result.push(row);
+        });
+    });
+    return result;
+};
+const payrollHeaderToPaymentKey = {'기본급':'base','식대':'meal','기본상여':'basicBonus','성과상여':'performanceBonus','장기성과':'longTermBonus','차량유지':'car','자가운전':'drive','근속수당':'service','직책수당':'dutyAllowance','연차수당':'annualLeave','기타수당':'etcPay','고정연장':'fixedOver','초과근로':'overtime','소급급여':'retroPay','인센티브':'incentive','상여':'bonus','교통비':'transport'};
+const payrollHeaderToDeductKey = {'소득세':'incomeTax','지방소득세':'localTax','국민연금':'pension','건강보험':'health','고용보험':'employmentIns','정산소득세':'settleIncomeTax','정산지소세':'settleLocalTax','건강정산':'settleHealth','고용정산':'settleEmployment','연말소득세':'yearEndIncomeTax','연말지소세':'yearEndLocalTax','건강연말':'yearEndHealth','건강이자':'healthInterest','고용연말':'yearEndEmployment','기타공제':'etcDeduct'};
+const buildPayrollPaymentPayloadFromUploadRow = (row={}, ym='') => {
+    const emp = findPayrollUploadEmp(row);
+    if(!emp) return null;
+    const payments = {};
+    Object.entries(payrollHeaderToPaymentKey).forEach(([header,key]) => payments[key] = parseNum(getPayrollUploadCell(row, header)));
+    const deductions = {};
+    Object.entries(payrollHeaderToDeductKey).forEach(([header,key]) => deductions[key] = parseNum(getPayrollUploadCell(row, header)));
+    const grossFromFile = parseNum(getPayrollUploadCell(row, '지급액 계'));
+    const deductionFromFile = parseNum(getPayrollUploadCell(row, '공제액 계'));
+    const netFromFile = parseNum(getPayrollUploadCell(row, '실지급액 계'));
+    const gross = grossFromFile || Object.values(payments).reduce((a,b)=>a+parseNum(b),0);
+    const deductionTotal = deductionFromFile || Object.values(deductions).reduce((a,b)=>a+parseNum(b),0);
+    const netPay = netFromFile || (gross - deductionTotal);
+    return { id:getPayrollDocId(ym, emp.empID), payYm:ym, payDate:getPayDateForYm(ym), empID:emp.empID, name:emp.name||String(getPayrollUploadCell(row,'이름')||''), dept:emp.dept||String(getPayrollUploadCell(row,'부서명')||''), rank:emp.rank||String(getPayrollUploadCell(row,'직위')||''), duty:emp.duty||String(getPayrollUploadCell(row,'직책')||''), contractType:emp.contractType||String(getPayrollUploadCell(row,'계약구분')||''), joinDate:emp.joinDate||String(getPayrollUploadCell(row,'입사일')||''), quitDate:emp.quitDate||String(getPayrollUploadCell(row,'퇴사일')||''), payments, deductions, taxCriteria:getEmpTaxCriteria(emp, getPayrollRecord(ym, emp.empID)), taxablePay: Math.max(0, gross - (payments.meal||0) - (payments.drive||0)), grossPay:gross, deductionTotal, netPay, source:'bulk_upload', savedAt:new Date().toISOString(), savedBy:currentLoggedInUserName };
+};
+window.handlePayrollPaymentBulkUpload = async () => {
+    const rows = Array.from(document.querySelectorAll('#payrollPaymentBulkRows .payroll-payment-bulk-row'));
+    if(!rows.length) return window.showMessageBox('업로드할 귀속연월을 추가해주세요.');
+    const items = [];
+    for(const rowEl of rows){
+        const ym = rowEl.querySelector('.payroll-bulk-ym')?.value || '';
+        const files = Array.from(rowEl.querySelector('.payroll-bulk-file')?.files || []);
+        if(!ym || !files.length) continue;
+        for(const file of files){
+            const buf = await file.arrayBuffer();
+            const wb = XLSX.read(buf, {type:'array'});
+            parsePayrollWorkbookRows(wb).forEach(row => {
+                const item = buildPayrollPaymentPayloadFromUploadRow(row, ym);
+                if(item) items.push(item);
+            });
+        }
+    }
+    if(!items.length) return window.showMessageBox('업로드 가능한 급여지급내역을 찾지 못했습니다. 사번/이름 및 양식 구조를 확인해주세요.');
+    window.showConfirmBox(`급여지급내역 ${items.length}건을 일괄 업로드하시겠습니까?`, async()=>{
+        try{
+            await runBatched(items,(batch,item)=>batch.set(doc(salaryPaymentRef,item.id),item,{merge:true}),400,'급여지급내역 업로드 중...');
+            await window.logSystemAction('업로드', '급여지급내역 일괄업로드', `${items.length}건`);
+            window.closePayrollPaymentBulkModal();
+            window.showMessageBox('급여지급내역 일괄 업로드 완료');
+            if($('page-pay-history')?.classList.contains('active')) window.renderPayHistoryPage();
+            if($('page-report-pay')?.classList.contains('active')) window.renderReportPayPage();
+        } finally { setTimeout(()=>window.hideLoading(),250); }
+    }, null);
+};
+
+
+const parseDateSafe = (s='') => { const d=new Date(s); return isNaN(d) ? null : d; };
+const calcFullYears = (birthDate='', refDate='') => {
+    const b=parseDateSafe(birthDate), r=parseDateSafe(refDate);
+    if(!b || !r) return null;
+    let age = r.getFullYear() - b.getFullYear();
+    const m = r.getMonth() - b.getMonth();
+    if(m < 0 || (m === 0 && r.getDate() < b.getDate())) age--;
+    return age;
+};
+const calcMilitaryMonths = (emp={}) => {
+    if(!emp.milS || !emp.milE) return 0;
+    const s=parseDateSafe(emp.milS), e=parseDateSafe(emp.milE);
+    if(!s || !e || e < s) return 0;
+    const months = (e.getFullYear()-s.getFullYear())*12 + (e.getMonth()-s.getMonth()) + 1;
+    return Math.min(Math.max(months,0),72);
+};
+const getAdjustedYouthAge = (emp={}) => {
+    const birth = getBirthFromSsn(emp.ssn||'');
+    const age = calcFullYears(birth, emp.joinDate||getTodayStr());
+    if(age == null) return null;
+    return Math.max(0, age - Math.floor(calcMilitaryMonths(emp)/12));
+};
+const getSmeTaxAutoCheck = (emp={}) => {
+    const join = emp.joinDate || getTodayStr();
+    const birth = getBirthFromSsn(emp.ssn||'');
+    const age = calcFullYears(birth, join);
+    const adjustedAge = getAdjustedYouthAge(emp);
+    const disabled = String($v('smeTaxDisabled') || emp.smeTaxDisabled || 'false') === 'true';
+    const careerBreak = String($v('smeTaxCareerBreak') || emp.smeTaxCareerBreak || 'false') === 'true';
+    const isYouth = adjustedAge != null && adjustedAge >= 15 && adjustedAge <= 34;
+    const isSenior = age != null && age >= 60;
+    let type = '', rate = 0, years = 0;
+    if(isYouth){ type='청년'; rate=90; years=5; }
+    else if(isSenior){ type='고령자'; rate=70; years=3; }
+    else if(disabled){ type='장애인'; rate=70; years=3; }
+    else if(careerBreak){ type='경력단절근로자'; rate=70; years=3; }
+    const eligible = !!type;
+    return {eligible, type:type||'기타', rate, years, age, adjustedAge, militaryMonths:calcMilitaryMonths(emp), disabled, careerBreak, join};
+};
+const getSmeTaxEndDate = (start='', years=3) => {
+    const s=parseDateSafe(start); if(!s || !years) return '';
+    const y = s.getFullYear() + years;
+    const m = s.getMonth();
+    return new Date(y, m+1, 0).toISOString().slice(0,10);
+};
+window.applySmeTaxTypeRules = () => {
+    const type = $v('smeTaxType');
+    const rate = type === '청년' ? 90 : (type === '기타' ? 0 : 70);
+    $sv('smeTaxRate', rate ? String(rate) : '');
+    window.applySmeTaxPeriodByStart();
+};
+window.applySmeTaxPeriodByStart = () => {
+    const type = $v('smeTaxType');
+    const years = type === '청년' ? 5 : (['고령자','장애인','경력단절근로자'].includes(type) ? 3 : 0);
+    const start = $v('smeTaxStart');
+    if(start && years) $sv('smeTaxEnd', getSmeTaxEndDate(start, years));
+};
+window.setSmeTaxYnDisplay = (yn) => {
+    $sv('smeTaxYn', yn ? 'true' : 'false');
+    $sv('smeTaxYnText', yn ? '대상' : '미대상');
+};
+window.refreshSmeTaxAutoDisplay = () => {
+    const emp = window.selectedSmeTaxEmp;
+    if(!emp) return;
+    const auto = getSmeTaxAutoCheck(emp);
+    const savedYn = !!emp.smeTaxReductionYn;
+    const yn = savedYn || auto.eligible;
+    window.setSmeTaxYnDisplay(yn);
+    if(auto.eligible && !savedYn){
+        $sv('smeTaxType', auto.type);
+        $sv('smeTaxRate', String(auto.rate || ''));
+    }
+};
+window.handleSmeTaxPreviouslyAppliedChange = () => {
+    const checked = !!$('smeTaxPreviouslyApplied')?.checked;
+    if(checked){
+        window.showMessageBox('기신청자는 기존 신청내역 기준으로 감면 시작일과 종료일을 직접 입력해주세요. 신청일 입력 시 자동 계산하지 않습니다.');
+    } else {
+        window.updateSmeTaxStartByApplyDate();
+    }
+};
+window.updateSmeTaxStartByApplyDate = () => {
+    if($('smeTaxPreviouslyApplied')?.checked) return;
+    const emp = window.selectedSmeTaxEmp || {};
+    const applyDate = $v('smeTaxApplyDate');
+    if(!applyDate || applyDate.length < 7) return;
+    const applyYm = applyDate.slice(0,7);
+    const joinDate = emp.joinDate || '';
+    const start = (joinDate && joinDate.slice(0,7) === applyYm) ? joinDate : `${applyYm}-01`;
+    $sv('smeTaxStart', start);
+    window.applySmeTaxPeriodByStart();
+};
+window.openSmeTaxCheckModal = () => {
+    const emp = window.selectedSmeTaxEmp;
+    if(!emp) return window.showMessageBox('좌측에서 사원을 선택해주세요.');
+    const auto = getSmeTaxAutoCheck(emp);
+    const rows = [
+        ['청년', '근로계약 체결일 현재 15~34세 이하(군복무기간 최대 6년 차감)', `입사일 ${emp.joinDate||'-'} / 실제 나이 ${auto.age ?? '-'}세 / 군복무 차감 후 ${auto.adjustedAge ?? '-'}세`, auto.adjustedAge != null && auto.adjustedAge >= 15 && auto.adjustedAge <= 34],
+        ['고령자', '근로계약 체결일 현재 60세 이상', `입사일 ${emp.joinDate||'-'} / 나이 ${auto.age ?? '-'}세`, auto.age != null && auto.age >= 60],
+        ['장애인', '장애인복지법상 장애인, 국가유공자법상 상이자 등 증빙 확인', $('smeTaxDisabled')?.value==='true' ? '장애인 해당으로 선택됨' : '사원정보 자동판단 불가 / 증빙 확인 필요', $('smeTaxDisabled')?.value==='true'],
+        ['경력단절근로자', '같은 기업 1년 이상 근무 후 결혼·임신·출산·육아·자녀교육·가족돌봄 사유 퇴직, 2~15년 미만 내 재취업', $('smeTaxCareerBreak')?.value==='true' ? '경력단절근로자 해당으로 선택됨' : '사원정보 자동판단 불가 / 증빙 확인 필요', $('smeTaxCareerBreak')?.value==='true']
+    ];
+    if($('smeTaxCheckSummary')) $('smeTaxCheckSummary').innerHTML = `자동 점검 결과: ${auto.eligible ? `<span class="sme-badge ok">대상 가능</span> ${auto.type} / 감면율 ${auto.rate}% / 감면기간 ${auto.years}년` : '<span class="sme-badge no">미대상</span> 자동 충족 요건 없음'}`;
+    if($('smeTaxCheckBody')) $('smeTaxCheckBody').innerHTML = rows.map((r,idx)=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><input type="checkbox" class="sme-check-item" data-type="${r[0]}" ${r[3]?'checked':''}></td></tr>`).join('');
+    if($('smeTaxCheckModal')) $('smeTaxCheckModal').style.display='flex';
+};
+window.closeSmeTaxCheckModal = () => { if($('smeTaxCheckModal')) $('smeTaxCheckModal').style.display='none'; };
+window.applySmeTaxCheckResult = () => {
+    const checked = Array.from(document.querySelectorAll('.sme-check-item')).filter(x=>x.checked).map(x=>x.dataset.type);
+    const priority = ['청년','고령자','장애인','경력단절근로자'];
+    const type = priority.find(t=>checked.includes(t)) || '';
+    window.setSmeTaxYnDisplay(!!type);
+    if(type){
+        $sv('smeTaxType', type);
+        window.applySmeTaxTypeRules();
+        window.updateSmeTaxStartByApplyDate();
+    }
+    window.closeSmeTaxCheckModal();
+};
+
+window.renderSmeTaxPage = () => { window.renderSmeTaxList(); };
+window.renderSmeTaxList = () => {
+    const q = ($v('smeTaxSearch')||'').trim();
+    const list = sortEmployeesLikeHome(emps.filter(e=>['임원','정규직','계약직'].includes(e.contractType||'') && (!q || [e.empID,e.name,e.dept].some(v=>String(v||'').includes(q)))));
+    const body = $('smeTaxEmpList'); if(!body) return;
+    body.innerHTML = list.length ? list.map(e=>`<tr onclick="window.selectSmeTaxEmp('${e.empID}', this)"><td>${e.empID||''}</td><td style="font-weight:bold">${e.name||''}</td><td>${e.dept||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">대상 사원이 없습니다.</td></tr>';
+};
+window.selectSmeTaxEmp = (empId, tr) => {
+    document.querySelectorAll('#smeTaxEmpList tr').forEach(r=>r.classList.remove('selected'));
+    if(tr) tr.classList.add('selected');
+    const emp = emps.find(e=>e.empID===empId); if(!emp) return;
+    window.selectedSmeTaxEmp = emp;
+    if($('smeTaxEmptyArea')) $('smeTaxEmptyArea').style.display='none';
+    if($('smeTaxFormArea')) $('smeTaxFormArea').style.display='block';
+    if($('smeTaxEmpTitle')) $('smeTaxEmpTitle').innerText = `${emp.empID||''} / ${emp.name||''} / ${emp.dept||''}`;
+    $sv('smeTaxApplyDate', emp.smeTaxApplyDate||'');
+    if($('smeTaxPreviouslyApplied')) $('smeTaxPreviouslyApplied').checked = !!emp.smeTaxPreviouslyApplied;
+    $sv('smeTaxStart', emp.smeTaxReductionStart||'');
+    $sv('smeTaxEnd', emp.smeTaxReductionEnd||'');
+    $sv('smeTaxType', emp.smeTaxType||'청년');
+    $sv('smeTaxRate', String(emp.smeTaxRate||70));
+    $sv('smeTaxDisabled', emp.smeTaxDisabled ? 'true' : 'false');
+    $sv('smeTaxCareerBreak', emp.smeTaxCareerBreak ? 'true' : 'false');
+    $sv('smeTaxDoc', emp.smeTaxDoc||'미수령');
+    $sv('smeTaxMemo', emp.smeTaxMemo||'');
+    window.refreshSmeTaxAutoDisplay();
+};
+window.saveSmeTaxInfo = async () => {
+    const emp = window.selectedSmeTaxEmp;
+    if(!emp) return window.showMessageBox('좌측에서 사원을 선택해주세요.');
+    const patch = {smeTaxReductionYn:$v('smeTaxYn')==='true', smeTaxPreviouslyApplied:!!$('smeTaxPreviouslyApplied')?.checked, smeTaxApplyDate:$v('smeTaxApplyDate'), smeTaxReductionStart:$v('smeTaxStart'), smeTaxReductionEnd:$v('smeTaxEnd'), smeTaxType:$v('smeTaxType'), smeTaxRate:parseNum($v('smeTaxRate'))||70, smeTaxDisabled:$v('smeTaxDisabled')==='true', smeTaxCareerBreak:$v('smeTaxCareerBreak')==='true', smeTaxDoc:$v('smeTaxDoc'), smeTaxMemo:$v('smeTaxMemo')};
+    await updateDoc(doc(empRef, emp.empID), patch);
+    await window.logSystemAction('저장','중소기업소득세감면 대상',`${emp.empID} ${emp.name}`);
+    window.showMessageBox('저장 완료');
+};
 
 // 2. NAV & SYNC
 window.safeRun = (fn, label='') => {
@@ -1905,12 +3241,14 @@ window.switchMenu = (id, el) => {
         'mgmt-appoint': ()=>window.renderAppointList(),
         'pay-status': ()=>window.renderSalaryStatusList(),
         'pay-current': ()=>window.renderPayCurrentPage(),
+        'pay-sme-tax': ()=>window.renderSmeTaxPage(),
         'pay-history': ()=>window.renderPayHistoryPage(),
         'mgmt-download': ()=>window.renderEmployeeDownloadPage(),
         'report-today': ()=>window.renderTodayReport(),
         'report-today-write': ()=>window.renderReportWritePage(),
         'report-headcount-month': ()=>window.renderHeadcountMonthReport(),
         'report-headcount-year': ()=>window.renderHeadcountYearReport(),
+        'report-pay': ()=>window.renderReportPayPage(),
         account: ()=>window.renderAccountGrid(),
         'backup-data': ()=>window.renderBackupPages(),
                 'sys-log': ()=>window.renderLogs(),
@@ -2145,7 +3483,7 @@ window.openModal = (edit=false) => {
     isEditMode=edit; isSalaryLocked=edit; $('empModal').style.display='flex'; $('modalTitle').innerText=edit?"사원 정보 수정":"사원 신규 등록";
     ['formName','formSSN','formContractType','formEmpID','formJoinDate'].forEach(id=>{const el=$(id); if(el){el.classList.toggle('disabled-field',edit); if(el.tagName==='INPUT')el.readOnly=edit;} });
     $('salaryInputMask').style.display=edit?'flex':'none'; $('salaryCalcMask').style.display=edit?'flex':'none'; if($('empDeleteBtn')) { $('empDeleteBtn').style.display=edit?'inline-flex':'none'; $('empDeleteBtn').disabled=!edit; }
-    if(!edit) { document.querySelectorAll('.modal-body input').forEach(i=>i.value=''); ['eduBody','careerBody','langBody','licenseBody','familyBody'].forEach(id=>{$(''+id).innerHTML='';}); window.addRow('familyBody'); currentEditPhotoData=''; window.renderProfilePhotoPreview(''); window.handleContractTypeChange(); window.updateSalaryCalc(); $sv('formMilType','해당없음'); window.toggleMil(); }
+    if(!edit) { document.querySelectorAll('.modal-body input').forEach(i=>i.value=''); ['eduBody','careerBody','langBody','licenseBody','familyBody'].forEach(id=>{$(''+id).innerHTML='';}); window.addRow('familyBody'); currentEditPhotoData=''; window.renderProfilePhotoPreview(''); $sv('formDisabledYn','N'); $sv('formVeteranYn','N'); window.toggleDisabilityDetail(); window.handleContractTypeChange(); window.updateSalaryCalc(); $sv('formMilType','해당없음'); window.toggleMil(); }
     window.switchTab('basic');
 };
 window.closeModal = () => $('empModal').style.display='none';
@@ -2155,7 +3493,7 @@ window.doSave = async () => {
     const id=$v('formEmpID'), nm=$v('formName'), jd=$v('formJoinDate'); if(!id||!nm||!jd) return window.showMessageBox("사번/성명/입사일 누락");
     const selectedContractType = $v('formContractType')||"정규직";
     const employmentDateValue = $v('formProbationEnd');
-    let d = { empID:id, name:nm, joinDate:jd, ssn:$v('formSSN'), photoData:currentEditPhotoData, workplace:$v('formWorkplace'), dept:$v('formDept'), rank:$v('formRank')||"사원", duty:$v('formDuty')||"직책없음", contractType:selectedContractType, phone:$v('formPhone'), email:$v('formEmail'), zip:'', addr:$v('formAddr'), addrDetail:$v('formAddrDetail'), bank:$v('formBank'), account:$v('formAccount'), quitDate:$v('formQuitDate'), probationEndDate:selectedContractType==='정규직'?employmentDateValue:'', contractEndDate:selectedContractType==='계약직'?employmentDateValue:'', milType:$v('formMilType')||"해당없음", milGroup:$v('formMilGroup'), milExit:$v('formMilExit'), milRank:$v('formMilRank'), milS:$v('formMilS'), milE:$v('formMilE'), milReason:$v('formMilReason'), educations:window.getTableData('eduBody'), careers:window.getTableData('careerBody'), languages:window.getTableData('langBody'), licenses:window.getTableData('licenseBody'), families:window.getTableData('familyBody') };
+    let d = { empID:id, name:nm, joinDate:jd, ssn:$v('formSSN'), photoData:currentEditPhotoData, workplace:$v('formWorkplace'), dept:$v('formDept'), rank:$v('formRank')||"사원", duty:$v('formDuty')||"직책없음", contractType:selectedContractType, phone:$v('formPhone'), email:$v('formEmail'), zip:'', addr:$v('formAddr'), addrDetail:$v('formAddrDetail'), bank:$v('formBank'), account:$v('formAccount'), disabledYn:$v('formDisabledYn')||'N', disabilityType:$v('formDisabilityType'), disabilityGrade:$v('formDisabilityGrade'), veteranYn:$v('formVeteranYn')||'N', quitDate:$v('formQuitDate'), probationEndDate:selectedContractType==='정규직'?employmentDateValue:'', contractEndDate:selectedContractType==='계약직'?employmentDateValue:'', milType:$v('formMilType')||"해당없음", milGroup:$v('formMilGroup'), milExit:$v('formMilExit'), milRank:$v('formMilRank'), milS:$v('formMilS'), milE:$v('formMilE'), milReason:$v('formMilReason'), educations:window.getTableData('eduBody'), careers:window.getTableData('careerBody'), languages:window.getTableData('langBody'), licenses:window.getTableData('licenseBody'), families:window.getTableData('familyBody') };
     ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>{ const el=$(k); if(el) d[k]=el.value.replace(/,/g,''); });
     ['salWorkDay','salProbationRate'].forEach(k=>{ const el=$(k); if(el) d[k]=el.value; });
     const ex=isEditMode?emps.find(e=>e.empID===id)||{}:{}; let h=ex.salaryHistory||[], t=0; ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>t+=parseInt(d[k])||0);
@@ -2171,13 +3509,20 @@ window.doSave = async () => {
 window.viewDetail = (id) => {
     const e = emps.find(x=>x.empID===id); if(!e) return; window.openModal(true);
     const sV = (k,v)=>{const el=$(k); if(el)el.value=v||'';};
-    sV('formName',e.name); sV('formSSN',e.ssn); currentEditPhotoData=e.photoData||''; window.renderProfilePhotoPreview(currentEditPhotoData); sV('formEmpID',e.empID); sV('formWorkplace',e.workplace||''); sV('formDept',e.dept); sV('formJoinDate',e.joinDate); sV('formRank',e.rank||'사원'); sV('formDuty',e.duty||'직책없음'); sV('formContractType',e.contractType||'정규직'); sV('formPhone',e.phone); sV('formEmail',e.email); sV('formAddr',e.addr); sV('formAddrDetail',e.addrDetail); sV('formBank',e.bank); sV('formAccount',e.account); sV('formQuitDate',e.quitDate); sV('formProbationEnd',(e.contractType==='계약직'?(e.contractEndDate||''):(e.probationEndDate||'')));
+    sV('formName',e.name); sV('formSSN',e.ssn); currentEditPhotoData=e.photoData||''; window.renderProfilePhotoPreview(currentEditPhotoData); sV('formEmpID',e.empID); sV('formWorkplace',e.workplace||''); sV('formDept',e.dept); sV('formJoinDate',e.joinDate); sV('formRank',e.rank||'사원'); sV('formDuty',e.duty||'직책없음'); sV('formContractType',e.contractType||'정규직'); sV('formPhone',e.phone); sV('formEmail',e.email); sV('formAddr',e.addr); sV('formAddrDetail',e.addrDetail); sV('formBank',e.bank); sV('formAccount',e.account); sV('formDisabledYn',e.disabledYn||'N'); sV('formDisabilityType',e.disabilityType||''); sV('formDisabilityGrade',e.disabilityGrade||''); sV('formVeteranYn',e.veteranYn||'N'); window.toggleDisabilityDetail(); sV('formQuitDate',e.quitDate); sV('formProbationEnd',(e.contractType==='계약직'?(e.contractEndDate||''):(e.probationEndDate||'')));
     ['salBase','salMeal','salDrive','salCar','salService','salRank','salFixedOver'].forEach(k=>{ const el=$(k); if(el) el.value=parseInt(e[k]||0).toLocaleString(); });
     sV('salWorkDay', e.salWorkDay||'8'); sV('salProbationRate', e.salProbationRate||'100'); window.updateSalaryCalc(); window.handleContractTypeChange();
     sV('formMilType',e.milType||'해당없음'); sV('formMilGroup',e.milGroup||''); window.toggleMil(); sV('formMilExit',e.milExit||''); sV('formMilRank',e.milRank||''); sV('formMilS',e.milS||''); sV('formMilE',e.milE||''); sV('formMilReason',e.milReason||'');
     const rT = (tid, list, keepEmptyRow=false) => { const b=$(tid); b.innerHTML=''; (list||[]).forEach(i=>window.addRow(tid,i)); if(keepEmptyRow && (!list||!list.length)) window.addRow(tid); };
     rT('eduBody',e.educations); rT('careerBody',e.careers); rT('familyBody',e.families,true); rT('langBody',e.languages); rT('licenseBody',e.licenses);
     let tm=0; document.querySelectorAll('.month-calc-output').forEach(el=>tm+=parseInt(el.value)||0); $('totalCareerMonths').innerText=tm+'개월';
+};
+
+window.toggleDisabilityDetail = () => {
+    const show = $v('formDisabledYn') === 'Y';
+    const row = $('disabilityDetailRow');
+    if(row) row.classList.toggle('show', show);
+    if(!show){ $sv('formDisabilityType',''); $sv('formDisabilityGrade',''); }
 };
 
 // 7. RECORD CARD (SEARCH)
@@ -2259,7 +3604,7 @@ window.selectForSearch = (id, tr) => {
         } else {
             mergedRows.push({
                 d: sal.date,
-                r: sal.reason || '연봉갱신',
+                r: sal.reason || '임금인상',
                 b: '-',
                 a: '-',
                 bs: currentSal,
@@ -2274,8 +3619,8 @@ window.selectForSearch = (id, tr) => {
             r: app.type || '-',
             b: getAppDisplay(app, 'before'),
             a: getAppDisplay(app, 'after'),
-            bs: currentSal,
-            as: currentSal
+            bs: app.beforeWage || currentSal,
+            as: app.afterWage || currentSal
         });
     });
     mergedRows.sort((a,b) => {
@@ -2601,6 +3946,125 @@ window.handleEmpBulkUpload = (e) => {
     }; r.readAsArrayBuffer(f);
 };
 
+
+// V.3.7.7 인사발령·연봉갱신 통합 업로드
+window.downloadAppointSalaryLinkedTemplate = () => {
+    const wb = XLSX.utils.book_new();
+    const appHeaders = ['사번(필수)','발령일','대상자','입사(위촉)일','발령내용','발령 전','열1','발령 후','열2','발령 전 임금','발령 후 임금'];
+    const salHeaders1 = ['', '', '', '', '', '', '수습기간', '', '', '', '연봉계약', '연봉계약', '', '', '', '통상임금', '통상임금', '기타수당', '통상임금', '통상임금', '통상임금', '통상임금', '통상임금', '', '', '월급여합계', '', '연봉', '', '', '', '', '', '', '', '', ''];
+    const salHeaders2 = ['NO.','구분','사번(필수)','부서','이름','입사일','적용개월','수습종료일','적용요율','퇴사일','시작일','종료일','직위/직책','비고','수습급여','기본급','식대','고정연장수당','자가운전보조금','직책수당','근속수당','교통비','차량유지비','기타수당1','기타수당2','월급여','공제전월급여','연봉','공제전연봉','통상시급','월소정근로시간','일근로시간','수습적용률(%)','연동키','업로드검증','검토메모','비고2'];
+    const appWs = XLSX.utils.aoa_to_sheet([appHeaders]);
+    const salWs = XLSX.utils.aoa_to_sheet([salHeaders1, salHeaders2]);
+    const guide = [
+        ['구분','내용'],
+        ['필수 시트','인사발령내역, 연봉갱신현황'],
+        ['사번 검증','업로드 시 ERP의 이름+입사일 기준 사원과 파일의 사번이 일치해야 업로드 가능'],
+        ['사번 불일치','이름+입사일로 찾은 ERP 사원의 사번과 파일 사번이 다르면 검증 오류 처리'],
+        ['공란 처리','필수값 누락 또는 ERP 사원 매칭 불가 시 업로드 중단'],
+        ['임금 기준','발령 전/후 임금은 연봉 기준 금액 입력']
+    ];
+    const guideWs = XLSX.utils.aoa_to_sheet(guide);
+    appWs['!cols'] = appHeaders.map(h=>({wch:Math.max(12,String(h).length+4)}));
+    salWs['!cols'] = salHeaders2.map(h=>({wch:Math.max(12,String(h).length+4)}));
+    guideWs['!cols'] = [{wch:18},{wch:70}];
+    XLSX.utils.book_append_sheet(wb, appWs, '인사발령내역');
+    XLSX.utils.book_append_sheet(wb, salWs, '연봉갱신현황');
+    XLSX.utils.book_append_sheet(wb, guideWs, '업로드안내');
+    XLSX.writeFile(wb, '인사발령_연봉갱신_통합업로드_양식.xlsx');
+};
+
+window.handleAppointSalaryLinkedUpload = (e) => {
+    const f=e.target.files[0]; if(!f) return; const reader=new FileReader();
+    const clean=v=>String(v??'').trim();
+    const cleanKey=v=>clean(v).replace(/\s+/g,'');
+    const toNum=v=>{ if(v===null||v===undefined||v==='') return 0; const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
+    const won=n=>toNum(n)?toNum(n).toLocaleString()+'원':'';
+    const excelDate=n=>{ const d=XLSX.SSF.parse_date_code(n); if(!d) return ''; return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`; };
+    const dateStr=v=>{ if(!v) return ''; if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10); if(typeof v==='number') return excelDate(v); let s=clean(v).replace(/\./g,'-').replace(/\//g,'-'); if(/^\d{8}$/.test(s)) s=`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`; const m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); return m?`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`:s; };
+    const makeMap=hdr=>{ const m={}; hdr.forEach((h,i)=>{ if(h!==undefined && h!==null && String(h).trim()!=='') m[String(h).trim()]=i; }); return m; };
+    const cell=(row,map,names)=>{ for(const n of names){ if(map[n]!=null) return row[map[n]]; } return ''; };
+    const empByNameJoinAndId=(name, join, empId, label, rowNo, errs)=>{
+        const n=cleanKey(name), jd=dateStr(join), id=clean(empId);
+        if(!id){ errs.push(`[${label} ${rowNo}행] 사번 누락`); return null; }
+        if(!n || !jd){ errs.push(`[${label} ${rowNo}행] 이름 또는 입사일 누락으로 사번 검증 불가`); return null; }
+        const candidates=emps.filter(x=>cleanKey(x.name)===n && dateStr(x.joinDate)===jd);
+        if(candidates.length===0){ errs.push(`[${label} ${rowNo}행] ERP 사원 매칭 불가: 이름 ${clean(name)} / 입사일 ${jd} / 입력 사번 ${id}`); return null; }
+        if(candidates.length>1){ errs.push(`[${label} ${rowNo}행] 이름+입사일 기준 동명이인 중복으로 자동 검증 불가: ${clean(name)} / ${jd}`); return null; }
+        const emp=candidates[0];
+        if(clean(emp.empID)!==id){ errs.push(`[${label} ${rowNo}행] 사번 불일치: 입력 사번 ${id} / ERP 사번 ${emp.empID||'-'} / 이름 ${clean(name)} / 입사일 ${jd}`); return null; }
+        return emp;
+    };
+    const applyAppField=(payload, app)=>{ if(!app) return; if(app.type==='정규직전환' || app.type==='정규직 전환') payload.contractType='정규직'; else if(app.type==='직책부여' || app.type==='직책발령') payload.duty=String(app.after||'').split(' ').pop()||app.after; else if(app.type==='직책해제') payload.duty='직책없음'; else if(app.type==='직위승진') payload.rank=String(app.after||'').split(' ').pop()||app.after; else if(String(app.type||'').includes('부서')) payload.dept=String(app.after||'').split(' ')[0]||app.after; };
+    const monthlyFromAnnual=n=> Math.round(toNum(n)/12);
+    const dedup=(arr,keyfn)=>{ const m={}; (arr||[]).forEach(x=>{ m[keyfn(x)]=x; }); return Object.values(m); };
+    reader.onload=async(ev)=>{
+        const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
+        const appWs=wb.Sheets['인사발령내역'], salWs=wb.Sheets['연봉갱신현황'];
+        if(!appWs || !salWs){ window.showMessageBox('업로드 실패: 인사발령내역, 연봉갱신현황 시트가 모두 필요합니다.'); e.target.value=''; return; }
+        const appAoa=XLSX.utils.sheet_to_json(appWs,{header:1,defval:'',raw:false});
+        const salAoa=XLSX.utils.sheet_to_json(salWs,{header:1,defval:'',raw:false});
+        const appHdr=appAoa[0]||[], appMap=makeMap(appHdr);
+        const salHdr=salAoa[1]||salAoa[0]||[], salMap=makeMap(salHdr);
+        let errs=[], groups={};
+        const groupOf=emp=> groups[emp.empID] ||= {emp, apps:[], sals:[], latest:null};
+        for(let i=1;i<appAoa.length;i++){
+            const r=appAoa[i]; if(!r || r.every(x=>clean(x)==='')) continue;
+            const empId=cell(r,appMap,['사번(필수)','사원번호(사번)','사원번호','사번','empID','EMPID']);
+            const date=dateStr(cell(r,appMap,['발령일','발령일자']));
+            const name=cell(r,appMap,['대상자','성명','이름']);
+            const join=cell(r,appMap,['입사(위촉)일','입사일','위촉일']);
+            const type=clean(cell(r,appMap,['발령내용','발령구분']));
+            const before=[cell(r,appMap,['발령 전','변경 전']), cell(r,appMap,['열1'])].map(clean).filter(Boolean).join(' ');
+            const after=[cell(r,appMap,['발령 후','발령 후(필수)','변경 후']), cell(r,appMap,['열2'])].map(clean).filter(Boolean).join(' ');
+            const beforeW=toNum(cell(r,appMap,['발령 전 임금','발령 전 임금(연봉)']));
+            const afterW=toNum(cell(r,appMap,['발령 후 임금','발령 후 임금(연봉)']));
+            if(!date || !name || !type){ errs.push(`[인사발령내역 ${i+1}행] 발령일/대상자/발령내용 누락`); continue; }
+            const emp=empByNameJoinAndId(name,join,empId,'인사발령내역',i+1,errs); if(!emp) continue;
+            const changed=beforeW && afterW && beforeW!==afterW; const linkId=changed?`LNK_${emp.empID}_${date.replace(/[^0-9]/g,'')}_${type}`:'';
+            const app={date,type,before,after,wage:changed?'변동':'유지',beforeWage:won(beforeW),afterWage:won(afterW),linkId,source:'통합업로드'};
+            groupOf(emp).apps.push(app);
+            if(changed){ groupOf(emp).sals.push({date,reason:'인사발령',monthly:won(monthlyFromAnnual(afterW)),annual:won(afterW),period:date,linkId,source:'통합업로드'}); }
+        }
+        for(let i=2;i<salAoa.length;i++){
+            const r=salAoa[i]; if(!r || r.every(x=>clean(x)==='')) continue;
+            const empId=cell(r,salMap,['사번(필수)','사원번호(사번)','사원번호','사번','empID','EMPID']) || r[2];
+            const name=cell(r,salMap,['성명','이름']) || r[4];
+            const join=cell(r,salMap,['입사일','입사(위촉)일']) || r[5];
+            const start=dateStr(cell(r,salMap,['시작일','연봉시작일','적용일']) || r[10]);
+            const end=dateStr(cell(r,salMap,['종료일','연봉종료일']) || r[11]);
+            const annual=toNum(cell(r,salMap,['연봉','연봉합계']) || r[27]);
+            if(!name && !start && !annual && !empId) continue;
+            if(!name || !start || !annual){ errs.push(`[연봉갱신현황 ${i+1}행] 이름/시작일/연봉 누락`); continue; }
+            const emp=empByNameJoinAndId(name,join,empId,'연봉갱신현황',i+1,errs); if(!emp) continue;
+            const monthly=toNum(cell(r,salMap,['월급여','월 급여합계','월급여합계']) || r[25]) || monthlyFromAnnual(annual);
+            const base=toNum(cell(r,salMap,['기본급']) || r[15]);
+            const meal=toNum(cell(r,salMap,['식대']) || r[16]);
+            const fixed=toNum(cell(r,salMap,['고정연장수당','고정OT']) || r[17]);
+            const drive=toNum(cell(r,salMap,['자가운전보조','자가운전보조금','교통비']) || r[18] || r[21]);
+            const rankPay=toNum(cell(r,salMap,['직책수당']) || r[19]);
+            const service=toNum(cell(r,salMap,['근속수당']) || r[20]);
+            const car=toNum(cell(r,salMap,['차량유지비']) || r[22]);
+            const linkId=`SAL_${emp.empID}_${start.replace(/[^0-9]/g,'')}_${annual}`;
+            groupOf(emp).sals.push({date:start,reason:'임금인상',monthly:won(monthly),annual:won(annual),period:end?`${start} ~ ${end}`:start,linkId,source:'통합업로드',snapshot:{salBase:String(base),salMeal:String(meal),salFixedOver:String(fixed),salDrive:String(drive),salRank:String(rankPay),salService:String(service),salCar:String(car),salWorkDay:String(emp.salWorkDay||'8'),salProbationRate:String(emp.salProbationRate||'100')}});
+            if(!groupOf(emp).latest || start>groupOf(emp).latest.start) groupOf(emp).latest={start,salBase:String(base),salMeal:String(meal),salFixedOver:String(fixed),salDrive:String(drive),salRank:String(rankPay),salService:String(service),salCar:String(car)};
+        }
+        if(errs.length){ $('bulkValidationErrors').innerHTML=errs.slice(0,80).join('<br>')+(errs.length>80?`<br>외 ${errs.length-80}건`:'' ); $('bulkValidationErrors').style.display='block'; $('bulkValidationSuccess').style.display='none'; $('bulkConfirmBtn').style.display='none'; $('bulkValidationModal').style.display='flex'; e.target.value=''; return; }
+        const ids=Object.keys(groups); $('bulkValidationErrors').style.display='none'; $('bulkValidationSuccess').style.display='block'; $('bulkValidationSuccess').innerText=`${ids.length}명 / 인사발령 ${ids.reduce((s,id)=>s+groups[id].apps.length,0)}건 / 연봉갱신 ${ids.reduce((s,id)=>s+groups[id].sals.length,0)}건을 통합 업로드할 수 있습니다. 진행하시겠습니까?`; $('bulkConfirmBtn').style.display='block';
+        $('bulkConfirmBtn').onclick=async()=>{ try{ window.showLoading('통합 업로드 준비 중...',5,'인사발령·연봉갱신 데이터를 준비하고 있습니다.'); await window.createBackup('AUTO','인사발령·연봉갱신 통합 업로드 전 자동 백업'); const items=ids.map(id=>{ const g=groups[id], emp=g.emp;
+                const appMap={};
+                (emp.appointments||[]).forEach(x=>{ const key=x.linkId||`APP_${id}_${x.date||''}_${x.type||''}`; appMap[key]=x; });
+                g.apps.forEach(x=>{ const key=x.linkId||`APP_${id}_${x.date||''}_${x.type||''}`; delete appMap[key]; appMap[key]={...x,linkId:key,updatedByUpload:true,updatedAt:new Date().toISOString()}; });
+                const salMap={};
+                (emp.salaryHistory||[]).forEach(x=>{ const key=x.linkId||`SAL_${id}_${x.date||''}`; salMap[key]=x; });
+                g.sals.forEach(x=>{ const key=x.linkId||`SAL_${id}_${x.date||''}`; delete salMap[key]; salMap[key]={...x,linkId:key,updatedByUpload:true,updatedAt:new Date().toISOString()}; });
+                const apps=Object.values(appMap).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+                const sals=Object.values(salMap).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+                const payload={appointments:apps,salaryHistory:sals}; const latestApp=[...apps].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))[0]; applyAppField(payload, latestApp); if(g.latest) Object.assign(payload,g.latest); return {id,payload}; }); await runBatched(items,(batch,item)=>batch.set(doc(empRef,item.id),item.payload,{merge:true}),400,'통합 업로드 중...'); await window.createBackup('AUTO','인사발령·연봉갱신 통합 업로드 후 자동 백업'); window.setLoadingProgress(100,'통합 업로드가 완료되었습니다.'); window.showMessageBox('통합 업로드 완료'); $('bulkValidationModal').style.display='none'; window.renderAppointList?.(); window.renderSalaryStatusList?.(); window.renderGrid?.(); } finally { setTimeout(()=>window.hideLoading(),250); e.target.value=''; } };
+        $('bulkValidationModal').style.display='flex';
+    };
+    reader.readAsArrayBuffer(f);
+};
+
 window.handleSalaryBulkUpload = (e) => {
     const f=e.target.files[0]; if(!f) return; const r=new FileReader();
     r.onload=async(ev)=>{
@@ -2731,6 +4195,12 @@ const MENU_PERMISSION_DEFS = [
   {id:'mgmt-bulk', label:'일괄업로드'},
   {id:'mgmt-download', label:'사원정보 다운로드'},
   {id:'pay-status', label:'연봉 산정/갱신 현황'},
+  {id:'pay-current', label:'당월 급여지급'},
+  {id:'pay-current-overtime', label:'초과근로'},
+  {id:'pay-current-incentive', label:'인센티브'},
+  {id:'pay-current-etc', label:'기타수당'},
+  {id:'pay-current-annual', label:'연차수당'},
+  {id:'pay-sme-tax', label:'중소기업소득세감면 대상'},
   {id:'pay-history', label:'급여지급내역'},
   {id:'eval-probation', label:'수습평가'},
   {id:'eval-kpi', label:'KPI평가'},
@@ -2803,6 +4273,7 @@ window.applyMenuVisibility = () => {
     const hasVisible = Array.from(group.querySelectorAll('.menu-item')).some(li => li.style.display !== 'none');
     group.style.display = hasVisible ? 'block' : 'none';
   });
+  document.body.setAttribute('data-menu-ready','true');
 };
 window.hasMenuWritePermission = (menuId) => {
   if(!currentLoginAcc) return true;
@@ -2837,7 +4308,7 @@ async function start() {
             }
 
             onSnapshot(empRef, s=>{ emps=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-mgmt-reg').classList.contains('active')) window.renderGrid(); if($('page-home').classList.contains('active')) window.renderHomeData(); });
-            onSnapshot(settingsRef, async s=>{ const d=s.docs.map(x=>({...x.data(), id:x.id})); siteLinks=d.filter(x=>x.type==='SITE'); sysDepts=d.filter(x=>x.type==='DEPT'); sysRanks=d.filter(x=>x.type==='RANK'); sysDuties=d.filter(x=>x.type==='DUTY'); sysWorkplaces=d.filter(x=>x.type==='WORKPLACE'); headquartersSetting=d.find(x=>x.type==='HQ')||null; allowedIps=d.filter(x=>x.type==='IP'); 
+            onSnapshot(settingsRef, async s=>{ const d=s.docs.map(x=>({...x.data(), id:x.id})); siteLinks=d.filter(x=>x.type==='SITE'); sysDepts=d.filter(x=>x.type==='DEPT'); sysRanks=d.filter(x=>x.type==='RANK'); sysDuties=d.filter(x=>x.type==='DUTY'); sysWorkplaces=d.filter(x=>x.type==='WORKPLACE'); headquartersSetting=d.find(x=>x.type==='HQ')||null; allowedIps=d.filter(x=>x.type==='IP'); salaryTaxTables=d.filter(x=>x.type==='TAX_TABLE'); 
                 const wantedRankNames = ['대표이사','이사','수석부장','부장','책임','전임','선임','주임','사원','팀원','애널리스트','웰시연구원','훈련생','프리랜서','PM','아르바이트'];
                 if(wantedRankNames.some(n => !sysRanks.some(r => r.name===n))) { try { await window.ensureDefaultRanks(); } catch(e){ console.warn('ensureDefaultRanks failed', e); } }
                 window.syncOrgSettings(); if($('page-sys-ip').classList.contains('active')) window.renderIpSettings(); if(allowedIps.length>0 && !allowedIps.some(i=>i.ip===currentIp)) { $('displayBlockedIp').innerText=currentIp; $('ipBlockOverlay').style.display='flex'; } else $('ipBlockOverlay').style.display='none'; });
@@ -2846,7 +4317,7 @@ async function start() {
             onSnapshot(backupRef, s=>{ backups=s.docs.map(d=>({...d.data(), id:d.id})); if(($('page-backup-data') && $('page-backup-data').classList.contains('active')) || ($('page-restore-data') && $('page-restore-data').classList.contains('active'))) window.renderBackupPages(); });
             onSnapshot(reportRef, s=>{ dailyReports=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-report-today')?.classList.contains('active')) window.renderTodayReport(); if($('page-report-today-write')?.classList.contains('active')) window.renderReportWritePage(); });
             onSnapshot(downloadApprovalRef, s=>{ downloadRequests=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-mgmt-download')?.classList.contains('active')) window.renderEmployeeDownloadHistory(); if($('notificationCenterModal')?.style.display==='flex') window.renderNotificationCenter(); window.processEmployeeDownloadApprovalNotifications(); window.updateNotificationBell(); });
-            onSnapshot(salaryPaymentRef, s=>{ salaryPayments=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-pay-current')?.classList.contains('active')) window.renderPayCurrentPage(); if($('page-pay-history')?.classList.contains('active')) window.renderPayHistoryPage(); });
+            onSnapshot(salaryPaymentRef, s=>{ salaryPayments=s.docs.map(d=>({...d.data(), id:d.id})); if($('page-pay-current')?.classList.contains('active')) window.renderPayCurrentPage(); if($('page-pay-history')?.classList.contains('active')) window.renderPayHistoryPage(); if($('page-pay-current-annual')?.classList.contains('active')) window.renderAnnualLeavePayPage(); if($('page-report-pay')?.classList.contains('active')) window.renderReportPayPage(); });
 
             // Bypass Login
             document.body.setAttribute('data-role', '관리자'); currentLoginAcc = { accountId:'hypo-hr', name:'최고관리자', permissions:null }; $('displayLoggedInUser').innerText = "최고관리자"; $('app-container').style.display='flex'; window.ensureStatusInputs(); window.applyMenuVisibility(); window.switchMenu('home');
@@ -2855,6 +4326,189 @@ async function start() {
     fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>{ currentIp=d.ip; if($('currentIpDisplay')) $('currentIpDisplay').innerText=currentIp; }).catch(e=>{});
 }
 start();
+
+/* ===== V.3.7.7 요청사항 반영: 상태필터/권한트리/추가기능 ===== */
+window.isActiveEmpByFilter = (emp, filterValue) => {
+    const f = filterValue || '재직';
+    const isRetired = !!String(emp?.quitDate || '').trim();
+    if(f === '전체') return true;
+    if(f === '퇴직') return isRetired;
+    return !isRetired;
+};
+
+(function(){
+    const oldRenderSearchList = window.renderSearchList;
+    window.renderSearchList = function(){
+        if(typeof oldRenderSearchList !== 'function') return;
+        oldRenderSearchList();
+        const filter = document.getElementById('recordStatusFilter')?.value || '재직';
+        const search = (document.getElementById('recordSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('recordEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => ['정규직','계약직','임원','단시간근로','일용직'].includes(e.contractType || ''))
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectRecordEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.dept||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderAppointList = window.renderAppointList;
+    window.renderAppointList = function(){
+        if(typeof oldRenderAppointList !== 'function') return;
+        oldRenderAppointList();
+        const filter = document.getElementById('appointStatusFilter')?.value || '재직';
+        const search = (document.getElementById('appointSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('appointEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectAppointEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+
+    const oldRenderSalaryStatusList = window.renderSalaryStatusList;
+    window.renderSalaryStatusList = function(){
+        if(typeof oldRenderSalaryStatusList !== 'function') return;
+        oldRenderSalaryStatusList();
+        const filter = document.getElementById('salStatusFilter')?.value || '재직';
+        const search = (document.getElementById('salStatusSearch')?.value || '').trim().toLowerCase();
+        const body = document.getElementById('salStatusEmpList');
+        if(!body) return;
+        const rows = (emps || [])
+            .filter(e => window.isActiveEmpByFilter(e, filter))
+            .filter(e => !search || String(e.empID||'').toLowerCase().includes(search) || String(e.name||'').toLowerCase().includes(search))
+            .sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+        body.innerHTML = rows.length ? rows.map(e=>`<tr onclick="window.selectSalaryEmp('${e.empID}')"><td>${e.empID||''}</td><td>${e.name||''}</td><td>${e.joinDate||''}</td></tr>`).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+    };
+})();
+
+window.permissionMenuTree = [
+    {id:'report', name:'보고 및 통계', children:[
+        {id:'report-today', name:'인원현황보고'},
+        {id:'report-today-write', name:'인원현황보고 작성'},
+        {id:'report-headcount', name:'인원현황', children:[
+            {id:'report-headcount-month', name:'당월 인원 변동'},
+            {id:'report-headcount-year', name:'당해년도 인원 통계'}
+        ]},
+        {id:'report-pay', name:'임금지급현황'}
+    ]},
+    {id:'mgmt', name:'사원관리', children:[
+        {id:'mgmt-reg', name:'사원 등록/수정'},
+        {id:'mgmt-search', name:'사원 조회'},
+        {id:'org-chart', name:'조직도'},
+        {id:'mgmt-appoint', name:'인사 발령 등록'},
+        {id:'mgmt-bulk', name:'일괄업로드'},
+        {id:'mgmt-download', name:'사원정보 다운로드'}
+    ]},
+    {id:'pay', name:'임금', children:[
+        {id:'pay-status', name:'연봉 산정/갱신 현황'},
+        {id:'pay-sme-tax', name:'중소기업소득세감면 대상'},
+        {id:'pay-current', name:'당월 급여지급', children:[
+            {id:'pay-current-overtime', name:'초과근로'},
+            {id:'pay-current-incentive', name:'인센티브'},
+            {id:'pay-current-etc', name:'기타수당'},
+            {id:'pay-current-annual', name:'연차수당'}
+        ]},
+        {id:'pay-history', name:'급여지급내역'}
+    ]},
+    {id:'subsidy', name:'지원금', children:[
+        {id:'subsidy-youth-job', name:'청년일자리도약장려금'},
+        {id:'subsidy-parental-leave', name:'육아휴직 지원금'},
+        {id:'subsidy-short-time', name:'육아기/임신기 단축근로 지원금'},
+        {id:'subsidy-spouse-birth', name:'배우자출산휴가 지원금'}
+    ]},
+    {id:'eval', name:'평가', children:[
+        {id:'eval-probation', name:'수습평가'},
+        {id:'eval-kpi', name:'KPI평가'}
+    ]},
+    {id:'system', name:'시스템 설정', children:[
+        {id:'sys-site', name:'사이트 관리'},
+        {id:'org-dept', name:'부서명 관리'},
+        {id:'org-rank', name:'직위/직책 관리'},
+        {id:'sys-workplace', name:'근무지 관리'},
+        {id:'sys-ip', name:'접속 IP 설정'},
+        {id:'sys-log', name:'Log 기록'},
+        {id:'account', name:'계정 관리'},
+        {id:'backup-data', name:'데이터 백업/복원'}
+    ]}
+];
+
+window.flattenPermissionTree = (nodes=window.permissionMenuTree, depth=0, parentId='') => {
+    let rows = [];
+    nodes.forEach(n => {
+        rows.push({...n, depth, parentId});
+        if(n.children) rows = rows.concat(window.flattenPermissionTree(n.children, depth+1, n.id));
+    });
+    return rows;
+};
+
+window.getChildPermissionIds = (id, nodes=window.permissionMenuTree) => {
+    let found = null;
+    const walk = (list) => {
+        for(const n of list){
+            if(n.id === id){ found = n; return; }
+            if(n.children) walk(n.children);
+            if(found) return;
+        }
+    };
+    walk(nodes);
+    const ids = [];
+    const collect = (n) => { (n.children||[]).forEach(c => { ids.push(c.id); collect(c); }); };
+    if(found) collect(found);
+    return ids;
+};
+
+window.toggleChildPermissions = (id, checked) => {
+    window.getChildPermissionIds(id).forEach(cid => {
+        const cb = document.querySelector(`#permissionGrid input[data-menu-id="${cid}"]`);
+        if(cb) cb.checked = checked;
+    });
+    window.refreshPermSelectAllState();
+};
+
+window.toggleAllPermissions = (checked) => {
+    document.querySelectorAll('#permissionGrid input[type="checkbox"]').forEach(cb => cb.checked = checked);
+};
+
+window.refreshPermSelectAllState = () => {
+    const all = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]'));
+    const master = document.getElementById('permSelectAll');
+    if(master) master.checked = all.length > 0 && all.every(cb => cb.checked);
+};
+
+(function(){
+    const oldOpenPermissionModal = window.openPermissionModal;
+    window.openPermissionModal = function(accountId){
+        if(typeof oldOpenPermissionModal === 'function') oldOpenPermissionModal(accountId);
+        setTimeout(() => {
+            const acc = (accounts || []).find(a => a.id === accountId || a.accountId === accountId) || currentPermAccount || {};
+            const current = acc.permissions || acc.menuPermissions || acc.allowedMenus || [];
+            const currentSet = new Set(Array.isArray(current) ? current : Object.keys(current || {}).filter(k => current[k]));
+            const grid = document.getElementById('permissionGrid');
+            if(!grid) return;
+            const rows = window.flattenPermissionTree();
+            grid.innerHTML = '<div class="head">메뉴명</div><div class="head">접속 권한</div>' + rows.map((m, idx) => {
+                const cls = m.depth === 0 ? 'permission-menu-parent' : (m.depth === 1 ? 'permission-menu-child' : 'permission-menu-grandchild');
+                const prefix = m.depth === 0 ? '' : (m.depth === 1 ? 'ㄴ ' : 'ㄴ ㄴ ');
+                const checked = currentSet.has(m.id) ? 'checked' : '';
+                return `<div class="cell label ${cls}">${prefix}${m.name}</div><div class="cell"><input type="checkbox" data-menu-id="${m.id}" ${checked} onchange="window.toggleChildPermissions('${m.id}', this.checked)"></div>`;
+            }).join('');
+            window.refreshPermSelectAllState();
+        }, 50);
+    };
+
+    const oldSavePermissionSettings = window.savePermissionSettings;
+    window.savePermissionSettings = function(){
+        const checkedMenus = Array.from(document.querySelectorAll('#permissionGrid input[type="checkbox"]:checked')).map(cb => cb.dataset.menuId);
+        const hidden = document.getElementById('permSelectedMenus');
+        if(hidden) hidden.value = JSON.stringify(checkedMenus);
+        window.__latestPermissionMenus = checkedMenus;
+        if(typeof oldSavePermissionSettings === 'function') return oldSavePermissionSettings();
+    };
+})();
+
 </script>
 </body>
 </html>
