@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>히포케이메논 ERP V.4.0.7 - 통합 관리</title>
+<title>히포케이메논 ERP V.4.1.6 - 통합 관리</title>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js">
 /* ===== V.3.9.3 요청사항 반영: 상태필터/권한트리/추가기능 ===== */
 window.isActiveEmpByFilter = (emp, filterValue) => {
@@ -897,9 +897,26 @@ body:not([data-menu-ready="true"]) .sidebar .menu-item[onclick*="switchMenu"]{vi
 .permission-menu-grandchild{padding-left:46px !important;color:#555}
 .permission-select-all{display:flex;align-items:center;justify-content:space-between;background:#fff8e1;border:1px solid #f0d98c;padding:8px 10px;margin-bottom:10px;border-radius:4px}
 
+
+
+/* ===== V.4.1.6 테스트: 좌측 메뉴바 접기/펼치기 ===== */
+.sidebar-toggle-btn{width:28px;height:28px;margin-right:10px;border:1px solid var(--icube-border);background:white;color:var(--sidebar-dark);border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-toggle-btn:hover{background:#f4f6f8;color:var(--icube-blue)}
+body.sidebar-collapsed{--sidebar-width:64px}
+body.sidebar-collapsed .sidebar{width:var(--sidebar-width)}
+body.sidebar-collapsed .menu-category{display:none}
+body.sidebar-collapsed .menu-group{margin-top:6px}
+body.sidebar-collapsed .menu-item{font-size:0;padding:12px 0;justify-content:center;gap:0;min-height:42px}
+body.sidebar-collapsed .menu-item i{font-size:15px;width:auto;flex:0 0 auto}
+body.sidebar-collapsed .menu-item.submenu-child{padding-left:0}
+body.sidebar-collapsed .menu-item.submenu-parent{cursor:default}
+body.sidebar-collapsed .content-area{width:calc(100% - var(--sidebar-width))}
+body.sidebar-collapsed .sidebar .menu-list{margin:0}
+
 </style>
 </head>
 <body data-role="">
+<!-- V.4.1.6: 좌측 메뉴바 접기/펼치기 테스트 기능 반영 -->
 <!-- V.3.9.3: 통합업로드 비연동 연봉이력 사유 기본값 임금인상, 연봉 산정/갱신 현황 사유 '계약연장/연봉조정/임신기·육아기 단축근로' 반영 -->
 
 <!-- V.3.9.3 인사발령·연봉갱신 통합 업로드 사번 검증 보정 / V.3.1.5 전반 점검 보정: 메뉴 진입/렌더 null-safe 보강, 버튼 줄바꿈 방지, 기본 날짜 자동세팅, 목록 비어있을 때 기본 문구 정리 -->
@@ -930,7 +947,8 @@ body:not([data-menu-ready="true"]) .sidebar .menu-item[onclick*="switchMenu"]{vi
     </div>
 
     <div class="header">
-        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.4.0.7</span></div>
+        <button id="sidebarToggleBtn" class="sidebar-toggle-btn" type="button" title="메뉴 접기/펼치기" onclick="window.toggleSidebarCollapsed()"><i class="fa-solid fa-bars"></i></button>
+        <div class="header-title" onclick="window.switchMenu('home',null)"><i class="fa-solid fa-id-card-clip"></i> 히포케이메논 ERP <span class="version-tag">V.4.1.6</span></div>
         <div style="margin-left:auto;font-size:12px;color:#555;display:flex;align-items:center;gap:15px">
             <span><span id="displayLoggedInUser" style="font-weight:bold;color:var(--icube-blue)"></span> 님 로그인 중</span>
             <button id="notifyBellBtn" class="tool-btn" onclick="window.openNotificationCenter()" style="position:relative;width:34px;height:28px;padding:0;min-width:34px"><i class="fa-regular fa-bell"></i><span id="notifyUnreadDot" style="display:none;position:absolute;top:4px;right:6px;width:8px;height:8px;border-radius:50%;background:#2f80ff"></span></button>
@@ -1981,7 +1999,10 @@ window.__completeLogin = (acc) => {
     window.currentLoginAcc = acc;
     currentLoggedInUserName = acc.name || acc.accountId || '사용자';
     const isAdmin = typeof window.isAdminAccount === 'function' && window.isAdminAccount(acc);
-    document.body.setAttribute('data-role', isAdmin ? '관리자' : (acc.role || '관리자'));
+    /* V.4.1.0 권한 표시 보정:
+       기존 role 기반 CSS(auth-basic-up/auth-payroll-up)가 메뉴 권한보다 먼저 메뉴를 숨기는 문제가 있어,
+       로그인 후 메뉴 노출은 applyMenuVisibility의 계정별 permissions 기준으로만 제어한다. */
+    document.body.setAttribute('data-role', '관리자');
     if($('displayLoggedInUser')) $('displayLoggedInUser').innerText = currentLoggedInUserName;
     if($('login-screen')) $('login-screen').style.display = 'none';
     if($('app-container')) $('app-container').style.display = 'flex';
@@ -4699,6 +4720,7 @@ const MENU_PERMISSION_DEFS = [
   {id:'account', label:'계정 관리'},
   {id:'backup-data', label:'데이터 백업/복원'}
 ];
+window.MENU_PERMISSION_DEFS = MENU_PERMISSION_DEFS;
 window.getDefaultMenuPermissions = () => Object.fromEntries(MENU_PERMISSION_DEFS.map(m => [m.id, {access:false, write:false}]));
 window.getAdminMenuPermissions = () => Object.fromEntries(MENU_PERMISSION_DEFS.map(m => [m.id, {access:true, write:true}]));
 window.isAdminAccount = (accOrId) => {
@@ -8681,7 +8703,7 @@ window.__erpModuleApi = {
 
 </script>
 
-<!-- V.4.0.9 employee bulk upload save patch -->
+<!-- V.4.1.0 employee bulk upload save patch -->
 <script>
 /* ===== V.4.0.7 사원 일괄 업로드 양식 근무지 열 실행 보정 ===== */
 (function(){
@@ -8881,7 +8903,7 @@ window.__erpModuleApi = {
 </script>
 
 
-<!-- V.4.0.9 사원 일괄 업로드 저장 오류 보정 -->
+<!-- V.4.1.0 사원 일괄 업로드 저장 오류 보정 -->
 <script>
 (function(){
   const $ = id => document.getElementById(id);
@@ -8965,7 +8987,7 @@ window.__erpModuleApi = {
               if(window.renderGrid) window.renderGrid();
               if(window.renderHomeData) window.renderHomeData();
             } catch(err){
-              console.error('[V.4.0.9 사원 일괄 업로드 오류]', err);
+              console.error('[V.4.1.0 사원 일괄 업로드 오류]', err);
               const msg = err && err.message ? err.message : '업로드 중 오류가 발생했습니다.';
               if(window.showMessageBox) window.showMessageBox(`업로드 중 오류가 발생했습니다.\n${msg}`);
               else alert(`업로드 중 오류가 발생했습니다.\n${msg}`);
@@ -8976,7 +8998,7 @@ window.__erpModuleApi = {
           };
         }
       } catch(err){
-        console.error('[V.4.0.9 사원 일괄 업로드 파일 읽기 오류]', err);
+        console.error('[V.4.1.0 사원 일괄 업로드 파일 읽기 오류]', err);
         const msg = err && err.message ? err.message : '업로드 파일을 읽는 중 오류가 발생했습니다.';
         if(window.showMessageBox) window.showMessageBox(msg);
         else alert(msg);
@@ -8991,6 +9013,666 @@ window.__erpModuleApi = {
     const input = document.getElementById('empBulkInput');
     if(input) input.setAttribute('onchange','window.handleEmpBulkUploadWorkplaceV406(event)');
   });
+})();
+</script>
+
+
+<script>
+/* ===== V.4.1.1 권한 메뉴 표시 최종 보정 =====
+   - 로그인 시 permissions / menuPermissions / allowedMenus 등 기존 저장 형식 모두 인식
+   - 배열, boolean 객체, {access:true} 객체 모두 인식
+   - 상위 메뉴 권한 부여 시 하위 메뉴도 표시
+   - role 기반 CSS 충돌 방지를 위해 로그인 완료 후 관리자 role로 고정하고 메뉴는 계정별 권한값으로만 표시
+*/
+(function(){
+    const ADMIN_IDS = new Set(['hypo-hr','admin','Admin']);
+    const byId = id => document.getElementById(id);
+    const getAccountId = acc => String(typeof acc === 'string' ? acc : (acc?.accountId || acc?.id || '')).trim();
+    const getMenuIdFromItem = li => {
+        const oc = li?.getAttribute?.('onclick') || '';
+        const m = oc.match(/switchMenu\('([^']+)'/);
+        return m ? m[1] : '';
+    };
+    const walkTree = (nodes, parentId='', rows=[]) => {
+        (nodes || []).forEach(n => {
+            if(!n || !n.id) return;
+            rows.push({id:n.id, name:n.name || n.label || n.id, parentId});
+            if(n.children) walkTree(n.children, n.id, rows);
+        });
+        return rows;
+    };
+    const getPermissionRowsV411 = () => {
+        const rows = [];
+        const seen = new Set();
+        const add = (id, name, parentId='') => {
+            if(!id || seen.has(id)) return;
+            seen.add(id);
+            rows.push({id, name:name || id, parentId});
+        };
+        walkTree(window.permissionMenuTree || []).forEach(r => add(r.id, r.name, r.parentId));
+        (window.MENU_PERMISSION_DEFS || []).forEach(r => add(r.id, r.name || r.label, r.parentId || ''));
+        document.querySelectorAll('.sidebar .menu-item').forEach(li => {
+            const id = getMenuIdFromItem(li);
+            if(id) add(id, (li.textContent || '').trim(), '');
+        });
+        add('home', 'HOME', '');
+        return rows;
+    };
+    const getChildIdsV411 = (parentId) => {
+        const rows = getPermissionRowsV411();
+        const children = new Map();
+        rows.forEach(r => {
+            if(!r.parentId) return;
+            if(!children.has(r.parentId)) children.set(r.parentId, []);
+            children.get(r.parentId).push(r.id);
+        });
+        const out = [];
+        const walk = id => (children.get(id) || []).forEach(cid => { out.push(cid); walk(cid); });
+        walk(parentId);
+        return out;
+    };
+    window.isAdminAccount = (accOrId) => ADMIN_IDS.has(getAccountId(accOrId));
+    window.getDefaultMenuPermissions = () => Object.fromEntries(getPermissionRowsV411().map(r => [r.id, {access:false, write:false}]));
+    window.getAdminMenuPermissions = () => Object.fromEntries(getPermissionRowsV411().map(r => [r.id, {access:true, write:true}]));
+    window.normalizePermissions = (acc) => {
+        if(window.isAdminAccount(acc)) return window.getAdminMenuPermissions();
+        const perms = window.getDefaultMenuPermissions();
+        const grant = (id, write=true) => {
+            if(!id) return;
+            if(!perms[id]) perms[id] = {access:false, write:false};
+            perms[id].access = true;
+            perms[id].write = !!write;
+            getChildIdsV411(id).forEach(cid => {
+                if(!perms[cid]) perms[cid] = {access:false, write:false};
+                perms[cid].access = true;
+                perms[cid].write = !!write;
+            });
+        };
+        const ingest = src => {
+            if(!src) return;
+            if(Array.isArray(src)) { src.forEach(id => grant(String(id), true)); return; }
+            if(typeof src === 'string') { grant(src, true); return; }
+            if(typeof src === 'object') {
+                Object.entries(src).forEach(([id, value]) => {
+                    if(value === true) return grant(id, true);
+                    if(value && typeof value === 'object') {
+                        const access = value.access === true || value.write === true || value.read === true || value.allowed === true;
+                        if(access) grant(id, value.write !== false);
+                    }
+                });
+            }
+        };
+        ingest(acc?.permissions);
+        ingest(acc?.menuPermissions);
+        ingest(acc?.allowedMenus);
+        ingest(acc?.permissionMenus);
+        ingest(acc?.menus);
+        perms.home = {access:true, write:true};
+        return perms;
+    };
+    window.getGrantedMenuCount = (acc) => Object.values(window.normalizePermissions(acc)).filter(v => v && v.access).length;
+    window.applyMenuVisibility = () => {
+        const acc = window.currentLoginAcc || (typeof currentLoginAcc !== 'undefined' ? currentLoginAcc : null);
+        document.body.setAttribute('data-role', '관리자');
+        const allMenuItems = Array.from(document.querySelectorAll('.sidebar .menu-item'));
+        allMenuItems.forEach(li => li.style.display = 'flex');
+        if(!acc){ document.body.setAttribute('data-menu-ready','true'); return; }
+        if(!window.isAdminAccount(acc)){
+            const perms = window.normalizePermissions(acc);
+            allMenuItems.forEach(li => {
+                const menuId = getMenuIdFromItem(li);
+                if(!menuId) return;
+                if(menuId === 'home') { li.style.display = 'flex'; return; }
+                li.style.display = perms[menuId]?.access ? 'flex' : 'none';
+            });
+        }
+        document.querySelectorAll('.sidebar .menu-group').forEach(group => {
+            const hasVisible = Array.from(group.querySelectorAll('.menu-item')).some(li => li.style.display !== 'none');
+            group.style.display = hasVisible ? 'block' : 'none';
+        });
+        document.body.setAttribute('data-menu-ready','true');
+    };
+    window.openPermissionModal = (accountId) => {
+        const acc = (window.accounts || (typeof accounts !== 'undefined' ? accounts : []) || []).find(a => getAccountId(a) === String(accountId));
+        if(!acc) return;
+        if(window.isAdminAccount(acc)) return window.showMessageBox('관리자(Admin) 계정은 모든 권한이 고정되어 있으며 수정할 수 없습니다.');
+        const nameEl = byId('permAccountName');
+        const idEl = byId('permAccountId');
+        if(nameEl) nameEl.value = acc.name || '';
+        if(idEl) idEl.value = getAccountId(acc);
+        const perms = window.normalizePermissions(acc);
+        const rows = getPermissionRowsV411().filter(r => r.id !== 'home');
+        const grid = byId('permissionGrid');
+        if(!grid) return;
+        grid.innerHTML = '<div class="head">메뉴명</div><div class="head">접속 권한</div>' + rows.map((m, idx) => {
+            const depth = (function calcDepth(id){ const row=rows.find(r=>r.id===id); return row?.parentId ? 1 + calcDepth(row.parentId) : 0; })(m.id);
+            const cls = depth === 0 ? 'permission-menu-parent' : (depth === 1 ? 'permission-menu-child' : 'permission-menu-grandchild');
+            const prefix = depth === 0 ? '' : (depth === 1 ? 'ㄴ ' : 'ㄴ ㄴ ');
+            const checked = perms[m.id]?.access ? 'checked' : '';
+            const rowEnd = idx === rows.length - 1 ? ' row-end' : '';
+            return `<div class="cell label ${cls}${rowEnd}">${prefix}${m.name || m.label || m.id}</div><div class="cell${rowEnd}"><input type="checkbox" class="perm-access" data-menu-id="${m.id}" ${checked} onchange="window.toggleChildPermissions('${m.id}', this.checked)"></div>`;
+        }).join('');
+        if(typeof window.refreshPermSelectAllState === 'function') window.refreshPermSelectAllState();
+        const modal = byId('permissionModal');
+        if(modal) modal.style.display = 'flex';
+    };
+    window.savePermissionSettings = async () => {
+        const accountId = (byId('permAccountId')?.value || '').trim();
+        if(!accountId) return;
+        if(window.isAdminAccount(accountId)) return window.showMessageBox('관리자(Admin) 계정은 권한을 수정할 수 없습니다.');
+        const permissions = window.getDefaultMenuPermissions();
+        document.querySelectorAll('.perm-access[data-menu-id]').forEach(cb => {
+            const id = cb.dataset.menuId;
+            const access = !!cb.checked;
+            permissions[id] = {access, write: access};
+        });
+        await updateDoc(doc(accountRef, accountId), {permissions, menuPermissions:permissions, allowedMenus:Object.keys(permissions).filter(id => permissions[id]?.access)});
+        const acc = (window.accounts || (typeof accounts !== 'undefined' ? accounts : []) || []).find(a => getAccountId(a) === accountId);
+        if(acc){ acc.permissions = permissions; acc.menuPermissions = permissions; acc.allowedMenus = Object.keys(permissions).filter(id => permissions[id]?.access); }
+        if(window.currentLoginAcc && getAccountId(window.currentLoginAcc) === accountId){ window.currentLoginAcc.permissions = permissions; window.currentLoginAcc.menuPermissions = permissions; window.currentLoginAcc.allowedMenus = Object.keys(permissions).filter(id => permissions[id]?.access); }
+        if(typeof window.closePermissionModal === 'function') window.closePermissionModal();
+        if(typeof window.applyMenuVisibility === 'function') window.applyMenuVisibility();
+        if(typeof window.renderAccountGrid === 'function') window.renderAccountGrid();
+        window.showMessageBox('권한 저장 완료');
+        if(typeof window.logSystemAction === 'function') window.logSystemAction('수정', '계정 권한', `${accountId} 메뉴 권한 저장`);
+    };
+    const oldCompleteLoginV411 = window.__completeLogin;
+    window.__completeLogin = (acc) => {
+        if(typeof oldCompleteLoginV411 === 'function') oldCompleteLoginV411(acc);
+        window.currentLoginAcc = acc;
+        try { currentLoginAcc = acc; } catch(e) {}
+        document.body.setAttribute('data-role', '관리자');
+        window.applyMenuVisibility();
+    };
+    document.addEventListener('DOMContentLoaded', () => setTimeout(() => { if(window.currentLoginAcc) window.applyMenuVisibility(); }, 0));
+})();
+</script>
+
+<!-- ===== V.4.1.2 TEST PATCH: 로그인 화면 숨김 및 Admin 자동 로그인 ===== -->
+<style id="testAutoAdminLoginStyle">
+    #login-screen{display:none !important;}
+    #app-container{display:flex !important;}
+</style>
+<script>
+(function(){
+    window.__TEST_AUTO_ADMIN_LOGIN__ = true;
+    const makeAdminAcc = () => {
+        const adminPerms = (typeof window.getAdminMenuPermissions === 'function') ? window.getAdminMenuPermissions() : {};
+        return { accountId:'Admin', id:'Admin', name:'Admin', role:'관리자', empID:'Admin', dept:'관리자', rankDuty:'관리자', permissions:adminPerms, menuPermissions:adminPerms, allowedMenus:Object.keys(adminPerms) };
+    };
+    const findAdminAccount = () => {
+        const list = window.accounts || (typeof accounts !== 'undefined' ? accounts : []) || [];
+        const isAdmin = (acc) => {
+            if(typeof window.isAdminAccount === 'function') return window.isAdminAccount(acc);
+            const id = String(acc?.accountId || acc?.id || '').trim();
+            return ['Admin','admin','hypo-hr'].includes(id);
+        };
+        return list.find(isAdmin) || makeAdminAcc();
+    };
+    window.__autoLoginAsAdminForTest = function(){
+        const acc = findAdminAccount();
+        const adminPerms = (typeof window.getAdminMenuPermissions === 'function') ? window.getAdminMenuPermissions() : (acc.permissions || {});
+        acc.permissions = adminPerms;
+        acc.menuPermissions = adminPerms;
+        acc.allowedMenus = Object.keys(adminPerms);
+        try { currentLoginAcc = acc; } catch(e) {}
+        try { currentLoggedInUserName = acc.name || acc.accountId || 'Admin'; } catch(e) {}
+        window.currentLoginAcc = acc;
+        document.body.setAttribute('data-role', '관리자');
+        const login = document.getElementById('login-screen');
+        const app = document.getElementById('app-container');
+        const forcePw = document.getElementById('forcePwModal');
+        const displayUser = document.getElementById('displayLoggedInUser');
+        if(login) login.style.setProperty('display', 'none', 'important');
+        if(app) app.style.setProperty('display', 'flex', 'important');
+        if(forcePw) forcePw.style.display = 'none';
+        if(displayUser) displayUser.innerText = acc.name || acc.accountId || 'Admin';
+        if(typeof window.applyMenuVisibility === 'function') window.applyMenuVisibility();
+        document.body.setAttribute('data-menu-ready', 'true');
+        if(typeof window.switchMenu === 'function') { try { window.switchMenu('home', null); } catch(e) {} }
+    };
+    window.handleLogout = function(){
+        window.__autoLoginAsAdminForTest();
+        if(typeof window.showMessageBox === 'function') window.showMessageBox('테스트 모드입니다. Admin 계정으로 자동 로그인 상태를 유지합니다.');
+    };
+    const scheduleAutoLogin = () => {
+        window.__autoLoginAsAdminForTest();
+        setTimeout(window.__autoLoginAsAdminForTest, 300);
+        setTimeout(window.__autoLoginAsAdminForTest, 1000);
+        setTimeout(window.__autoLoginAsAdminForTest, 2000);
+    };
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scheduleAutoLogin);
+    else scheduleAutoLogin();
+})();
+</script>
+
+<script>
+/* ===== V.4.1.6 테스트: 좌측 메뉴바 접기/펼치기 ===== */
+(function(){
+    function prepareSidebarTitles(){
+        document.querySelectorAll('.sidebar .menu-item').forEach(function(item){
+            if(!item.getAttribute('title')){
+                var label = (item.textContent || '').replace(/\s+/g, ' ').trim();
+                if(label) item.setAttribute('title', label);
+            }
+        });
+    }
+    window.toggleSidebarCollapsed = function(force){
+        var body = document.body;
+        var collapsed = (typeof force === 'boolean') ? force : !body.classList.contains('sidebar-collapsed');
+        body.classList.toggle('sidebar-collapsed', collapsed);
+        try{ localStorage.setItem('hypoSidebarCollapsed', collapsed ? 'Y' : 'N'); }catch(e){}
+        var btn = document.getElementById('sidebarToggleBtn');
+        if(btn){
+            btn.setAttribute('title', collapsed ? '메뉴 펼치기' : '메뉴 접기');
+            var icon = btn.querySelector('i');
+            if(icon){ icon.className = collapsed ? 'fa-solid fa-angles-right' : 'fa-solid fa-bars'; }
+        }
+    };
+    document.addEventListener('DOMContentLoaded', function(){
+        prepareSidebarTitles();
+        var saved = 'N';
+        try{ saved = localStorage.getItem('hypoSidebarCollapsed') || 'N'; }catch(e){}
+        window.toggleSidebarCollapsed(saved === 'Y');
+    });
+})();
+</script>
+
+
+<script>
+/* ===== V.4.1.6 수정: 사원목록 초기조회 / 인사기록카드 빈값 표기 / 입퇴사 급여 일할계산 ===== */
+(function(){
+    const $ = (id)=>document.getElementById(id);
+    const val = (id)=>($(id)?.value || '').trim();
+    const setVal = (id,v)=>{ const el=$(id); if(el) el.value = v ?? ''; };
+    const esc = (s)=>String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const num = (v)=>{ const n=parseInt(String(v ?? '').replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
+    const money = (v)=> num(v) ? num(v).toLocaleString()+'원' : '';
+    const ymFirst = (ym)=>`${ym}-01`;
+    const ymLast = (ym)=>{ const [y,m]=String(ym||'').split('-').map(Number); if(!y||!m) return ''; return `${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`; };
+    const defaultYm = ()=>{ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
+    const parseDate = (s)=>{ const d=new Date(s); return isNaN(d.getTime()) ? null : d; };
+    const daysInclusive = (a,b)=>{ if(!a||!b) return 0; return Math.max(0, Math.floor((b-a)/(1000*60*60*24))+1); };
+    const isRetired = (e)=>!!String(e?.quitDate||'').trim();
+    const payDocId = (ym, empId)=>`${String(ym||'').replace('-','')}_${empId}`;
+    const getPayrollRecordSafe = (ym, empId)=> (window.salaryPayments||[]).find(p => p.id===payDocId(ym, empId) || (p.payYm===ym && String(p.empID)===String(empId)));
+    const isPayTarget = (emp, ym)=>{
+        if(!['임원','정규직','계약직','일용직'].includes(emp?.contractType||'')) return false;
+        const first=ymFirst(ym), last=ymLast(ym);
+        if(!emp.joinDate || emp.joinDate > last) return false;
+        if(emp.quitDate && String(emp.quitDate).trim() && emp.quitDate < first) return false;
+        return true;
+    };
+    const sortEmp = (list=[])=>[...list].sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+    const payWorkInfo = (emp, ym)=>{
+        const firstStr=ymFirst(ym), lastStr=ymLast(ym);
+        const first=parseDate(firstStr), last=parseDate(lastStr);
+        if(!first||!last) return {monthDays:0,workDays:0,ratio:1,isProrated:false};
+        let start=first, end=last;
+        if(emp.joinDate && emp.joinDate > firstStr) start=parseDate(emp.joinDate) || first;
+        if(emp.quitDate && String(emp.quitDate).trim() && emp.quitDate < lastStr) end=parseDate(emp.quitDate) || last;
+        const monthDays=new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
+        const workDays=Math.min(monthDays, Math.max(0, daysInclusive(start,end)));
+        return {monthDays, workDays, ratio: monthDays ? workDays/monthDays : 1, isProrated: workDays>0 && workDays<monthDays, period:`${start.toISOString().slice(0,10)} ~ ${end.toISOString().slice(0,10)}`};
+    };
+    const latestSalarySnapshot = (emp, ym)=>{
+        const last=ymLast(ym||defaultYm());
+        const hist = Array.isArray(emp?.salaryHistory) ? [...emp.salaryHistory]
+            .filter(h => String(h.date||h.period||'') <= last)
+            .sort((a,b)=>String(b.date||b.period||'').localeCompare(String(a.date||a.period||''))) : [];
+        const snap = hist.find(h=>h.snapshot)?.snapshot || hist[0]?.snapshot || {};
+        return {...emp, ...snap};
+    };
+    const prorate = (amount, wi)=> wi.isProrated ? Math.round(num(amount) * wi.ratio) : num(amount);
+    const probationAdjust = (amount, emp, ym, wi)=>{
+        if(emp.contractType !== '정규직') return prorate(amount, wi);
+        const endStr = emp.probationEndDate || '';
+        if(!endStr || endStr < ymFirst(ym)) return prorate(amount, wi);
+        const [startStr, workEndStr] = String(wi.period||'').split(' ~ ');
+        const start=parseDate(startStr), workEnd=parseDate(workEndStr), probEnd=parseDate(endStr);
+        if(!start||!workEnd||!probEnd) return prorate(amount, wi);
+        const actualProbEnd = probEnd < workEnd ? probEnd : workEnd;
+        let probDays = Math.min(wi.workDays, Math.max(0, daysInclusive(start, actualProbEnd)));
+        const normalDays = Math.max(0, wi.workDays - probDays);
+        const rate = (parseFloat(emp.salProbationRate)||100)/100;
+        return Math.round((num(amount)/Math.max(1,wi.monthDays))*((probDays*rate)+normalDays));
+    };
+    const payrollDefaultsFromSavedSalary = (emp, ym)=>{
+        const s=latestSalarySnapshot(emp, ym);
+        const wi=payWorkInfo(emp, ym);
+        return {
+            base: probationAdjust(s.salBase, s, ym, wi),
+            meal: prorate(s.salMeal, wi),
+            basicBonus: 0,
+            performanceBonus: 0,
+            longTermBonus: 0,
+            car: probationAdjust(s.salCar, s, ym, wi),
+            drive: probationAdjust(s.salDrive, s, ym, wi),
+            service: probationAdjust(s.salService, s, ym, wi),
+            dutyAllowance: probationAdjust(s.salRank, s, ym, wi),
+            annualLeave: 0,
+            etcPay: 0,
+            fixedOver: probationAdjust(s.salFixedOver, s, ym, wi),
+            overtime: 0,
+            retroPay: 0,
+            incentive: 0,
+            bonus: 0,
+            transport: 0
+        };
+    };
+    const payKeys=['base','meal','basicBonus','performanceBonus','longTermBonus','car','drive','service','dutyAllowance','annualLeave','etcPay','fixedOver','overtime','retroPay','incentive','bonus','transport'];
+    const payLabels={base:'기본급',meal:'식대',basicBonus:'기본상여',performanceBonus:'성과상여',longTermBonus:'장기성과',car:'차량유지',drive:'자가운전',service:'근속수당',dutyAllowance:'직책수당',annualLeave:'연차수당',etcPay:'기타수당',fixedOver:'고정연장',overtime:'초과근로',retroPay:'소급급여',incentive:'인센티브',bonus:'상여',transport:'교통비'};
+    const deductKeys=['incomeTax','localTax','pension','health','employmentIns','settleIncomeTax','settleLocalTax','settleHealth','settleEmployment','yearEndIncomeTax','yearEndLocalTax','yearEndHealth','healthInterest','yearEndEmployment','etcDeduct'];
+    const deductLabels={incomeTax:'소득세',localTax:'지방소득세',pension:'국민연금',health:'건강보험',employmentIns:'고용보험',settleIncomeTax:'정산소득세',settleLocalTax:'정산지소세',settleHealth:'건강정산',settleEmployment:'고용정산',yearEndIncomeTax:'연말소득세',yearEndLocalTax:'연말지소세',yearEndHealth:'건강연말',healthInterest:'건강이자',yearEndEmployment:'고용연말',etcDeduct:'기타공제'};
+    const numInput = (id)=>`<input id="${id}" class="pay-num" inputmode="numeric" oninput="window.handlePayNumInput&&window.handlePayNumInput(this);window.updateCurrentPayrollCalc&&window.updateCurrentPayrollCalc()" onkeydown="window.handlePayInputKeydown&&window.handlePayInputKeydown(event)" value="0">`;
+    const textInput = (id,v)=>`<input id="${id}" class="pay-text read-only" readonly value="${esc(v)}">`;
+    const field = (id,label,html)=>`<div class="pay-field"><label>${label}</label>${html}</div>`;
+
+    const rowHasValue = (obj, keys)=> keys.some(k=>String(obj?.[k] ?? '').trim());
+    const putTable = (id, rows, cols, emptyCols)=>{
+        const body=document.querySelector(`#${id} tbody`); if(!body) return;
+        const clean=(rows||[]).filter(r=>rowHasValue(r, Object.keys(r||{})));
+        body.innerHTML = clean.length ? clean.map(r=>`<tr>${cols(r).join('')}</tr>`).join('') : `<tr><td colspan="${emptyCols}" style="color:#999;padding:10px;">입력사항 없음</td></tr>`;
+    };
+
+    const oldSelectRecordEmp = window.selectRecordEmp;
+    window.selectRecordEmp = function(empID, tr){
+        const ret = oldSelectRecordEmp ? oldSelectRecordEmp(empID, tr) : undefined;
+        const emp=(window.emps||[]).find(e=>String(e.empID)===String(empID));
+        if(!emp) return ret;
+        putTable('rc_familyTable', emp.families||[], r=>[`<td>${esc(r.relation||'')}</td>`,`<td>${esc(r.name||'')}</td>`,`<td>${esc(r.birth||'')}</td>`,`<td>${esc(r.living||'')}</td>`],4);
+        putTable('rc_eduTable', emp.educations||[], r=>[`<td>${esc(r.school||'')}</td>`,`<td>${esc(r.major||'')}</td>`,`<td>${esc(r.period||'')}</td>`,`<td>${esc(r.status||r.type||'')}</td>`],4);
+        const licenses=[...(emp.licenses||[]).map(x=>({...x,kind:'자격'})), ...(emp.languages||[]).map(x=>({name:x.name,issuer:x.score||x.issuer,date:x.date,kind:'어학'}))];
+        putTable('rc_licenseTable', licenses, r=>[`<td>${esc(r.kind||'')}</td>`,`<td>${esc(r.name||'')}</td>`,`<td>${esc(r.score||r.issuer||'')}</td>`,`<td>${esc(r.date||'')}</td>`],4);
+        putTable('rc_careerTable', emp.careers||[], r=>[`<td>${esc(r.company||'')}</td>`,`<td>${esc([r.dept,r.rank].filter(Boolean).join('/'))}</td>`,`<td>${esc(r.duty||'')}</td>`,`<td>${esc(r.period||'')}</td>`],4);
+        return ret;
+    };
+    window.selectForSearch = function(empID, tr){ return window.selectRecordEmp(empID, tr); };
+
+    window.renderPayCurrentList = function(){
+        const ym=val('payCurrentYm') || defaultYm();
+        const q=val('payCurrentSearch');
+        const targets=sortEmp((window.emps||[]).filter(e=>isPayTarget(e,ym)));
+        const list=targets.filter(e=>!q || [e.empID,e.name,e.dept].some(x=>String(x||'').includes(q)));
+        if($('payCurrentTargetCount')) $('payCurrentTargetCount').innerText=`${targets.length}명`;
+        const body=$('payCurrentEmpList'); if(!body) return;
+        body.innerHTML = list.length ? list.map(e=>{
+            const joined=(e.joinDate||'').startsWith(ym), quit=(e.quitDate||'').startsWith(ym);
+            let tags='';
+            if(joined && quit) tags += '<span class="pay-name-quit">(입/퇴사자)</span>';
+            else { if(joined) tags += '<span class="pay-name-join">(입사자)</span>'; if(quit) tags += '<span class="pay-name-quit">(퇴사자)</span>'; }
+            if(e.contractType==='정규직' && e.probationEndDate && e.probationEndDate>=ymFirst(ym) && e.probationEndDate<=ymLast(ym)) tags += '<span class="pay-name-probation">(수습)</span>';
+            const saved=getPayrollRecordSafe(ym,e.empID);
+            return `<tr onclick="window.selectPayCurrentEmp('${esc(e.empID)}', this)"><td>${esc(e.empID||'')}</td><td style="font-weight:bold">${esc(e.name||'')}${tags}${saved?'<span class="pay-name-saved">저장</span>':''}</td><td>${esc(e.dept||'')}</td></tr>`;
+        }).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">대상자가 없습니다.</td></tr>';
+    };
+
+    window.loadPayCurrentEmployee = function(empId){
+        const ym=val('payCurrentYm') || defaultYm();
+        const emp=(window.emps||[]).find(e=>String(e.empID)===String(empId)); if(!emp) return;
+        window.selectedPayCurrentEmp=emp;
+        const saved=getPayrollRecordSafe(ym, empId);
+        if($('payCurrentEmptyArea')) $('payCurrentEmptyArea').style.display='none';
+        if($('payCurrentFormArea')) $('payCurrentFormArea').style.display='block';
+        if($('payCurrentEmpTitle')) $('payCurrentEmpTitle').innerText=`${emp.empID||''} / ${emp.name||''} / ${emp.dept||''}`;
+        const wi=payWorkInfo(emp, ym);
+        const info=[['payInfoGroup','그룹',emp.contractType==='임원'?'임원':'직원'],['payInfoYm','지급년월',ym],['payInfoEmpID','사번',emp.empID||''],['payInfoName','이름',emp.name||''],['payInfoDept','부서명',emp.dept||''],['payInfoRank','직위',emp.rank||''],['payInfoDuty','직책',emp.duty||''],['payInfoJoin','입사일',emp.joinDate||''],['payInfoQuit','퇴사일',emp.quitDate||''],['payInfoContract','계약구분',emp.contractType||''],['payInfoHours','소정시간',emp.salWorkDay?`${emp.salWorkDay}시간/일`:'' ],['payInfoWorkDays','근무일수',`${wi.workDays}/${wi.monthDays}일${wi.isProrated?' (일할계산)':''}`]];
+        if($('payCurrentInfoGrid')) $('payCurrentInfoGrid').innerHTML=info.map(([id,label,v])=>field(id,label,textInput(id,v))).join('');
+        if($('payCurrentPayGrid')) $('payCurrentPayGrid').innerHTML=payKeys.map(k=>field('payItem_'+k,payLabels[k],numInput('payItem_'+k))).join('');
+        if($('payCurrentDeductGrid')) $('payCurrentDeductGrid').innerHTML=deductKeys.map(k=>field('deductItem_'+k,deductLabels[k],numInput('deductItem_'+k))).join('');
+        const payVals=saved?.payments || payrollDefaultsFromSavedSalary(emp, ym);
+        const dedVals=saved?.deductions || {};
+        payKeys.forEach(k=>setVal('payItem_'+k, num(payVals[k]).toLocaleString()));
+        deductKeys.forEach(k=>setVal('deductItem_'+k, num(dedVals[k]).toLocaleString()));
+        if($('payTaxDependents')) $('payTaxDependents').value=(saved?.taxCriteria?.dependents || emp.taxDependents || 1).toLocaleString();
+        if($('payTaxSmeStatus')) $('payTaxSmeStatus').value = emp.smeTaxReductionYn ? '감면대상' : '미대상';
+        if($('payTaxSmePeriod')) $('payTaxSmePeriod').value = emp.smeTaxReductionYn ? `${emp.smeTaxReductionStart||'-'} ~ ${emp.smeTaxReductionEnd||'-'}` : '-';
+        if(typeof window.updateCurrentPayrollCalc==='function') window.updateCurrentPayrollCalc();
+    };
+
+    const oldSwitch = window.switchMenu;
+    window.switchMenu = function(id, el){
+        if(id==='mgmt-reg') setVal('topSearch','');
+        const ret = oldSwitch ? oldSwitch(id, el) : undefined;
+        setTimeout(()=>{
+            if(id==='mgmt-reg'){ setVal('topSearch',''); window.renderGrid&&window.renderGrid(); }
+            if(id==='pay-current'){ window.renderPayCurrentList&&window.renderPayCurrentList(); }
+        }, 0);
+        return ret;
+    };
+})();
+</script>
+
+
+<script>
+/* ===== V.4.1.6 재보정: 메뉴 진입 전체조회 / 인사기록카드 빈 경력 표기 / 입퇴사자 저장임금 일할계산 ===== */
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const v = (id)=>($(id)?.value || '').trim();
+  const sv = (id,val)=>{ const el=$(id); if(el) el.value = val ?? ''; };
+  const esc = (s)=>String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const parseNum = (x)=>{ const n=parseInt(String(x ?? '').replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
+  const fmtNum = (x)=>parseNum(x).toLocaleString();
+  const toYmd = (d)=> d ? d.toISOString().slice(0,10) : '';
+  const ymFirst = (ym)=>`${ym}-01`;
+  const ymLast = (ym)=>{ const [y,m]=String(ym||'').split('-').map(Number); if(!y||!m) return ''; return `${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`; };
+  const defYm = ()=>{ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
+  const d = (s)=>{ const x=new Date(s); return isNaN(x.getTime())?null:x; };
+  const days = (a,b)=> (!a||!b) ? 0 : Math.max(0, Math.floor((b-a)/(1000*60*60*24))+1);
+  const role = (e)=> (e?.duty && e.duty !== '직책없음') ? `${e.rank||''}/${e.duty||''}`.replace(/^\//,'') : (e?.rank||'');
+  const isQuit = (e)=>!!String(e?.quitDate||'').trim();
+  const meaningful = (obj, keys)=> keys.some(k=>String(obj?.[k] ?? '').trim());
+  const setEmptyRow = (tableId, colspan)=>{ const body=document.querySelector(`#${tableId} tbody`); if(body) body.innerHTML=`<tr><td colspan="${colspan}" style="color:#999;padding:10px;text-align:center;">입력사항 없음</td></tr>`; };
+  const putRows = (tableId, rows, keys, render, colspan)=>{
+    const body=document.querySelector(`#${tableId} tbody`); if(!body) return;
+    const clean=(rows||[]).filter(r=>meaningful(r, keys));
+    body.innerHTML = clean.length ? clean.map(r=>`<tr>${render(r)}</tr>`).join('') : `<tr><td colspan="${colspan}" style="color:#999;padding:10px;text-align:center;">입력사항 없음</td></tr>`;
+  };
+  const latestSalary = (emp, ym)=>{
+    const last=ymLast(ym||defYm());
+    const hist=Array.isArray(emp?.salaryHistory) ? [...emp.salaryHistory]
+      .filter(h=>String(h.date||h.startDate||h.period||'') <= last)
+      .sort((a,b)=>String(b.date||b.startDate||b.period||'').localeCompare(String(a.date||a.startDate||a.period||''))) : [];
+    const h=hist[0] || {};
+    return Object.assign({}, emp||{}, h.snapshot||{}, h);
+  };
+  const workInfo = (emp, ym)=>{
+    const firstS=ymFirst(ym), lastS=ymLast(ym);
+    const first=d(firstS), last=d(lastS);
+    if(!first||!last) return {monthDays:0,workDays:0,ratio:1,isProrated:false,period:''};
+    let start=first, end=last;
+    if(emp.joinDate && emp.joinDate > firstS) start=d(emp.joinDate)||first;
+    if(emp.quitDate && String(emp.quitDate).trim() && emp.quitDate < lastS) end=d(emp.quitDate)||last;
+    const monthDays=new Date(first.getFullYear(), first.getMonth()+1,0).getDate();
+    const workDays=Math.min(monthDays, Math.max(0, days(start,end)));
+    return {monthDays, workDays, ratio:monthDays?workDays/monthDays:1, isProrated:workDays>0 && workDays<monthDays, period:`${toYmd(start)} ~ ${toYmd(end)}`};
+  };
+  const prorate = (amount, wi)=> wi.isProrated ? Math.round(parseNum(amount)*wi.ratio) : parseNum(amount);
+  const payAmount = (amount, emp, ym, wi)=>{
+    // 계약직은 수습 계산 제외. 정규직만 수습 급여 적용 가능.
+    if(emp.contractType !== '정규직') return prorate(amount, wi);
+    const pEnd=emp.probationEndDate || '';
+    if(!pEnd || pEnd < ymFirst(ym)) return prorate(amount, wi);
+    const parts=String(wi.period||'').split(' ~ ');
+    const start=d(parts[0]), end=d(parts[1]), pe=d(pEnd);
+    if(!start||!end||!pe) return prorate(amount, wi);
+    const probEnd=pe < end ? pe : end;
+    const probDays=Math.min(wi.workDays, Math.max(0, days(start, probEnd)));
+    const normalDays=Math.max(0, wi.workDays-probDays);
+    const rate=(parseFloat(emp.salProbationRate)||100)/100;
+    return Math.round((parseNum(amount)/Math.max(1,wi.monthDays))*((probDays*rate)+normalDays));
+  };
+  const savedPayroll = (ym, empId)=> (window.salaryPayments||[]).find(p=> p.id===`${String(ym||'').replace('-','')}_${empId}` || (p.payYm===ym && String(p.empID)===String(empId)));
+  const isTarget = (e, ym)=> ['임원','정규직','계약직','일용직'].includes(e?.contractType||'') && e.joinDate && e.joinDate <= ymLast(ym) && !(e.quitDate && e.quitDate < ymFirst(ym));
+
+  // 1. 사원 등록/수정 메뉴는 진입 시 검색어를 비우고 전체 사원을 표시
+  window.renderGrid = function(){
+    const b=$('empGridBody'); if(!b) return;
+    const q=(v('topSearch')||'').toLowerCase();
+    const rows=(window.emps||[]).filter(e=>!q || [e.empID,e.name,e.dept].some(x=>String(x||'').toLowerCase().includes(q)));
+    b.innerHTML = rows.length ? rows.sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||''))).map(e=>{
+      const stat=['위탁직','프리랜서'].includes(e.contractType)?(isQuit(e)?'해촉':'위촉'):(isQuit(e)?'퇴직':'재직');
+      const cls=['재직','위촉'].includes(stat)?'status-active':'status-retired';
+      const gen=String(e.ssn||'').split('-')[1]?.charAt(0)||'';
+      const gender=['1','3','9'].includes(gen)?'남':(['2','4','0'].includes(gen)?'여':'-');
+      return `<tr onclick="window.viewDetail('${esc(e.empID)}')"><td><span class="status-badge ${cls}">${stat}</span></td><td>${esc(e.contractType||'-')}</td><td>${esc(e.empID||'')}</td><td>${esc(e.dept||'-')}</td><td style="font-weight:bold;color:var(--icube-blue)">${esc(e.name||'')}</td><td>${esc(role(e)||'-')}</td><td>${esc(e.ssn||'-')}</td><td>${gender}</td><td>${esc(e.joinDate||'-')}</td><td>${esc(e.quitDate||'-')}</td></tr>`;
+    }).join('') : '<tr><td colspan="10" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+  };
+
+  // 2. 인사기록카드 목록성 항목은 실제 입력값이 없으면 입력사항 없음으로 표기
+  window.__fixRecordEmptyTables = function(emp){
+    if(!emp) return;
+    putRows('rc_familyTable', emp.families||[], ['relation','name','birth','living'], r=>`<td>${esc(r.relation||'')}</td><td>${esc(r.name||'')}</td><td>${esc(r.birth||'')}</td><td>${esc(r.living||'')}</td>`,4);
+    putRows('rc_eduTable', emp.educations||[], ['school','major','period','status','type'], r=>`<td>${esc(r.school||'')}</td><td>${esc(r.major||'')}</td><td>${esc(r.period||'')}</td><td>${esc(r.status||r.type||'')}</td>`,4);
+    const lic=[...(emp.licenses||[]).map(x=>Object.assign({kind:'자격'},x)), ...(emp.languages||[]).map(x=>({kind:'어학',name:x.name,score:x.score,issuer:x.issuer,date:x.date}))];
+    putRows('rc_licenseTable', lic, ['kind','name','score','issuer','date'], r=>`<td>${esc(r.kind||'')}</td><td>${esc(r.name||'')}</td><td>${esc(r.score||r.issuer||'')}</td><td>${esc(r.date||'')}</td>`,4);
+    putRows('rc_careerTable', emp.careers||[], ['company','dept','rank','duty','period'], r=>`<td>${esc(r.company||'')}</td><td>${esc([r.dept,r.rank].filter(Boolean).join(' / '))}</td><td>${esc(r.duty||'')}</td><td>${esc(r.period||'')}</td>`,4);
+  };
+  const prevSelectRecord = window.selectRecordEmp;
+  window.selectRecordEmp = function(empID, tr){
+    const ret = prevSelectRecord ? prevSelectRecord(empID, tr) : undefined;
+    const emp=(window.emps||[]).find(e=>String(e.empID)===String(empID));
+    window.__fixRecordEmptyTables(emp);
+    setTimeout(()=>window.__fixRecordEmptyTables(emp),0);
+    setTimeout(()=>window.__fixRecordEmptyTables(emp),80);
+    return ret;
+  };
+  window.selectForSearch = function(empID,tr){ return window.selectRecordEmp(empID,tr); };
+
+  // 3. 당월 급여지급: 저장 임금 기준 자동 로딩 + 입퇴사자 일할계산 + 계약직 수습표시 제외
+  const payKeys=['base','meal','basicBonus','performanceBonus','longTermBonus','car','drive','service','dutyAllowance','annualLeave','etcPay','fixedOver','overtime','retroPay','incentive','bonus','transport'];
+  const payLabels={base:'기본급',meal:'식대',basicBonus:'기본상여',performanceBonus:'성과상여',longTermBonus:'장기성과',car:'차량유지',drive:'자가운전',service:'근속수당',dutyAllowance:'직책수당',annualLeave:'연차수당',etcPay:'기타수당',fixedOver:'고정연장',overtime:'초과근로',retroPay:'소급급여',incentive:'인센티브',bonus:'상여',transport:'교통비'};
+  const deductKeys=['incomeTax','localTax','pension','health','employmentIns','settleIncomeTax','settleLocalTax','settleHealth','settleEmployment','yearEndIncomeTax','yearEndLocalTax','yearEndHealth','healthInterest','yearEndEmployment','etcDeduct'];
+  const deductLabels={incomeTax:'소득세',localTax:'지방소득세',pension:'국민연금',health:'건강보험',employmentIns:'고용보험',settleIncomeTax:'정산소득세',settleLocalTax:'정산지소세',settleHealth:'건강정산',settleEmployment:'고용정산',yearEndIncomeTax:'연말소득세',yearEndLocalTax:'연말지소세',yearEndHealth:'건강연말',healthInterest:'건강이자',yearEndEmployment:'고용연말',etcDeduct:'기타공제'};
+  const field=(id,label,html)=>`<div class="pay-field"><label>${label}</label>${html}</div>`;
+  const numField=(id)=>`<input id="${id}" class="pay-num" inputmode="numeric" oninput="window.handlePayNumInput&&window.handlePayNumInput(this);window.updateCurrentPayrollCalc&&window.updateCurrentPayrollCalc()" onkeydown="window.handlePayInputKeydown&&window.handlePayInputKeydown(event)" value="0">`;
+  const textField=(id,value)=>`<input id="${id}" class="pay-text read-only" readonly value="${esc(value)}">`;
+  const defaults = (emp, ym)=>{
+    const s=latestSalary(emp, ym), wi=workInfo(emp, ym);
+    return {
+      base:payAmount(s.salBase, s, ym, wi), meal:prorate(s.salMeal, wi), basicBonus:0, performanceBonus:0, longTermBonus:0,
+      car:payAmount(s.salCar, s, ym, wi), drive:payAmount(s.salDrive, s, ym, wi), service:payAmount(s.salService, s, ym, wi), dutyAllowance:payAmount(s.salRank, s, ym, wi),
+      annualLeave:0, etcPay:0, fixedOver:payAmount(s.salFixedOver, s, ym, wi), overtime:0, retroPay:0, incentive:0, bonus:0, transport:0
+    };
+  };
+  window.renderPayCurrentList = function(){
+    const ym=v('payCurrentYm')||defYm();
+    const q=v('payCurrentSearch').toLowerCase();
+    const targets=(window.emps||[]).filter(e=>isTarget(e,ym)).sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+    const list=targets.filter(e=>!q || [e.empID,e.name,e.dept].some(x=>String(x||'').toLowerCase().includes(q)));
+    if($('payCurrentTargetCount')) $('payCurrentTargetCount').innerText=`${targets.length}명`;
+    const body=$('payCurrentEmpList'); if(!body) return;
+    body.innerHTML = list.length ? list.map(e=>{
+      const joined=(e.joinDate||'').startsWith(ym), quit=(e.quitDate||'').startsWith(ym);
+      let tags='';
+      if(joined && quit) tags='<span class="pay-name-quit">(입/퇴사자)</span>';
+      else { if(joined) tags+='<span class="pay-name-join">(입사자)</span>'; if(quit) tags+='<span class="pay-name-quit">(퇴사자)</span>'; }
+      if(e.contractType==='정규직' && e.probationEndDate && e.probationEndDate>=ymFirst(ym) && e.probationEndDate<=ymLast(ym)) tags+='<span class="pay-name-probation">(수습)</span>';
+      const saved=savedPayroll(ym,e.empID);
+      return `<tr onclick="window.selectPayCurrentEmp('${esc(e.empID)}', this)"><td>${esc(e.empID||'')}</td><td style="font-weight:bold">${esc(e.name||'')}${tags}${saved?'<span class="pay-name-saved">저장</span>':''}</td><td>${esc(e.dept||'')}</td></tr>`;
+    }).join('') : '<tr><td colspan="3" style="padding:20px;color:#999">대상자가 없습니다.</td></tr>';
+  };
+  window.selectPayCurrentEmp = function(empId, tr){
+    document.querySelectorAll('#payCurrentEmpList tr').forEach(r=>r.classList.remove('selected'));
+    if(tr) tr.classList.add('selected');
+    window.loadPayCurrentEmployee(empId);
+  };
+  window.loadPayCurrentEmployee = function(empId){
+    const ym=v('payCurrentYm')||defYm();
+    const emp=(window.emps||[]).find(e=>String(e.empID)===String(empId)); if(!emp) return;
+    try{ selectedPayCurrentEmp=emp; }catch(e){}
+    window.selectedPayCurrentEmp=emp;
+    const wi=workInfo(emp,ym), saved=savedPayroll(ym,empId);
+    if($('payCurrentEmptyArea')) $('payCurrentEmptyArea').style.display='none';
+    if($('payCurrentFormArea')) $('payCurrentFormArea').style.display='block';
+    if($('payCurrentEmpTitle')) $('payCurrentEmpTitle').innerText=`${emp.empID||''} / ${emp.name||''} / ${emp.dept||''}`;
+    const info=[['payInfoGroup','그룹', emp.contractType==='임원'?'임원':'직원'],['payInfoYm','지급년월',ym],['payInfoEmpID','사번',emp.empID||''],['payInfoName','이름',emp.name||''],['payInfoDept','부서명',emp.dept||''],['payInfoRank','직위',emp.rank||''],['payInfoDuty','직책',emp.duty||''],['payInfoJoin','입사일',emp.joinDate||''],['payInfoQuit','퇴사일',emp.quitDate||''],['payInfoContract','계약구분',emp.contractType||''],['payInfoHours','소정시간',emp.salWorkDay?`${emp.salWorkDay}시간/일`:'' ],['payInfoWorkDays','근무일수',`${wi.workDays}/${wi.monthDays}일${wi.isProrated?' (일할계산)':''}`]];
+    if($('payCurrentInfoGrid')) $('payCurrentInfoGrid').innerHTML=info.map(([id,label,value])=>field(id,label,textField(id,value))).join('');
+    if($('payCurrentPayGrid')) $('payCurrentPayGrid').innerHTML=payKeys.map(k=>field('payItem_'+k,payLabels[k],numField('payItem_'+k))).join('');
+    if($('payCurrentDeductGrid')) $('payCurrentDeductGrid').innerHTML=deductKeys.map(k=>field('deductItem_'+k,deductLabels[k],numField('deductItem_'+k))).join('');
+    const pv=saved?.payments || defaults(emp,ym), dv=saved?.deductions || {};
+    payKeys.forEach(k=>sv('payItem_'+k,fmtNum(pv[k])));
+    deductKeys.forEach(k=>sv('deductItem_'+k,fmtNum(dv[k])));
+    if($('payTaxDependents')) $('payTaxDependents').value=fmtNum(saved?.taxCriteria?.dependents || emp.taxDependents || 1);
+    if($('payTaxSmeStatus')) $('payTaxSmeStatus').value=emp.smeTaxReductionYn?'감면대상':'미대상';
+    if($('payTaxSmePeriod')) $('payTaxSmePeriod').value=emp.smeTaxReductionYn?`${emp.smeTaxReductionStart||'-'} ~ ${emp.smeTaxReductionEnd||'-'}`:'-';
+    if(typeof window.updateCurrentPayrollCalc==='function') window.updateCurrentPayrollCalc();
+  };
+
+  const oldSwitchV415=window.switchMenu;
+  window.switchMenu=function(id, el){
+    if(id==='mgmt-reg') sv('topSearch','');
+    const ret=oldSwitchV415 ? oldSwitchV415(id,el) : undefined;
+    setTimeout(()=>{
+      if(id==='mgmt-reg'){ sv('topSearch',''); window.renderGrid&&window.renderGrid(); }
+      if(id==='pay-current'){ window.renderPayCurrentList&&window.renderPayCurrentList(); }
+    },0);
+    return ret;
+  };
+})();
+</script>
+
+
+
+<script>
+/* ===== V.4.1.6 재수정: 사원 등록/수정 메뉴 진입 시 검색조건 완전 초기화 및 전체조회 강제 ===== */
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const esc = (s)=>String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const roleText = (e)=> (e?.duty && e.duty !== '직책없음') ? `${e.rank||''}/${e.duty||''}`.replace(/^\//,'') : (e?.rank||'');
+  const isRetired = (e)=>!!String(e?.quitDate||'').trim();
+  const genderFromSsn = (ssn)=>{ const g=String(ssn||'').split('-')[1]?.charAt(0)||''; return ['1','3','5','7','9'].includes(g)?'남':(['2','4','6','8','0'].includes(g)?'여':'-'); };
+
+  window.__renderEmployeeGridAll = function(){
+    const body = $('empGridBody');
+    if(!body) return;
+    const rows = (window.emps || []).slice().sort((a,b)=>String(a.empID||'').localeCompare(String(b.empID||'')));
+    body.innerHTML = rows.length ? rows.map(e=>{
+      const stat = ['위탁직','프리랜서'].includes(e.contractType) ? (isRetired(e)?'해촉':'위촉') : (isRetired(e)?'퇴직':'재직');
+      const cls = ['재직','위촉'].includes(stat) ? 'status-active' : 'status-retired';
+      return `<tr onclick="window.viewDetail('${esc(e.empID)}')"><td><span class="status-badge ${cls}">${stat}</span></td><td>${esc(e.contractType||'-')}</td><td>${esc(e.empID||'')}</td><td>${esc(e.dept||'-')}</td><td style="font-weight:bold;color:var(--icube-blue)">${esc(e.name||'')}</td><td>${esc(roleText(e)||'-')}</td><td>${esc(e.ssn||'-')}</td><td>${genderFromSsn(e.ssn)}</td><td>${esc(e.joinDate||'-')}</td><td>${esc(e.quitDate||'-')}</td></tr>`;
+    }).join('') : '<tr><td colspan="10" style="padding:20px;color:#999">조회되는 사원이 없습니다.</td></tr>';
+  };
+
+  window.__resetMgmtRegAndRenderAll = function(){
+    const input = $('topSearch');
+    if(input){
+      input.value = '';
+      input.defaultValue = '';
+      input.removeAttribute('value');
+      input.blur();
+    }
+    window.__renderEmployeeGridAll();
+  };
+
+  const prevRenderGrid = window.renderGrid;
+  window.renderGrid = function(options){
+    if(options && options.forceAll === true){
+      return window.__resetMgmtRegAndRenderAll();
+    }
+    return prevRenderGrid ? prevRenderGrid() : window.__renderEmployeeGridAll();
+  };
+
+  const prevSwitchMenu = window.switchMenu;
+  window.switchMenu = function(id, el){
+    const ret = prevSwitchMenu ? prevSwitchMenu(id, el) : undefined;
+    if(id === 'mgmt-reg'){
+      // 기존 래핑 함수들이 뒤늦게 renderGrid/topSearch 값을 다시 건드리는 경우까지 차단하기 위해 여러 타이밍에 강제 초기화
+      [0, 30, 120, 300].forEach(ms=>setTimeout(()=>window.__resetMgmtRegAndRenderAll(), ms));
+    }
+    return ret;
+  };
+
+  // 브라우저 자동완성/이전 입력값 복원 방지
+  setTimeout(()=>{
+    const input = $('topSearch');
+    if(input){
+      input.setAttribute('autocomplete','off');
+      input.setAttribute('autocorrect','off');
+      input.setAttribute('autocapitalize','off');
+      input.setAttribute('spellcheck','false');
+    }
+  },0);
 })();
 </script>
 
